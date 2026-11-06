@@ -8,7 +8,7 @@ import { resolveLiveDb } from './test_db_paths.mjs';
 
 function resolveDevDb() {
   const dir = '.wrangler/state/v3/d1/miniflare-D1DatabaseObject';
-  execFileSync('npx', ['wrangler', 'd1', 'execute', 'bliss-legacy-staging-db', '--local',
+  execFileSync('npx', ['wrangler', 'd1', 'execute', 'elpis-property-staging-db', '--local',
     '--command', 'CREATE TABLE IF NOT EXISTS _browser_probe (id INTEGER)'], { stdio: 'ignore' });
   for (const name of readdirSync(dir).filter(n => n.endsWith('.sqlite'))) {
     try {
@@ -85,7 +85,7 @@ if (!existsSync(CHROME)) {
 }
 
 console.log('\n========================================================');
-console.log('   BLISS LEGACY — BROWSER DRILL-DOWN / COLOUR / CHAT');
+console.log('   elpis LEGACY — BROWSER DRILL-DOWN / COLOUR / CHAT');
 console.log('========================================================\n');
 
 const db = new DatabaseSync(LIVE_DB);
@@ -105,12 +105,12 @@ function upsert(email, name, role, branch) {
     .run(email, hashPw(PASSWORD), name, role, branch);
   return db.prepare('SELECT id FROM users WHERE email=?').get(email).id;
 }
-const mdId = upsert('browser.md@bliss.test', 'Browser MD', mdRole, ikeja);
-const marketerId = upsert('browser.marketer@bliss.test', 'Browser Marketer', marketerRole, ikeja);
+const mdId = upsert('browser.md@elpisproperty.test', 'Browser MD', mdRole, ikeja);
+const marketerId = upsert('browser.marketer@elpisproperty.test', 'Browser Marketer', marketerRole, ikeja);
 const teamLeadRole = roleId('Team Lead');
-const teamLead = db.prepare("SELECT id FROM users WHERE email='tl.ikeja@bliss.com'").get()
-  || { id: upsert('tl.ikeja@bliss.com', 'Ikeja Team Lead', teamLeadRole, ikeja) };
-const existingMarketer = db.prepare("SELECT id FROM users WHERE email='mkt.ikeja@bliss.com'").get();
+const teamLead = db.prepare("SELECT id FROM users WHERE email='tl.ikeja@elpisproperty.test'").get()
+  || { id: upsert('tl.ikeja@elpisproperty.test', 'Ikeja Team Lead', teamLeadRole, ikeja) };
+const existingMarketer = db.prepare("SELECT id FROM users WHERE email='mkt.ikeja@elpisproperty.test'").get();
 const property = db.prepare('SELECT id FROM properties ORDER BY id LIMIT 1').get();
 
 for (const [ref, temp] of [['TEST-BROWSER-HOT', 'Hot'], ['TEST-BROWSER-WARM', 'Warm'], ['TEST-BROWSER-COLD', 'Cold']]) {
@@ -142,7 +142,7 @@ try {
   const pageB = await contextB.newPage();
 
   await test('drill-down breadcrumbs show National > Branch > Team Lead and can drill back up', async () => {
-    await login(pageA, 'browser.md@bliss.test');
+    await login(pageA, 'browser.md@elpisproperty.test');
     await goto(pageA, `${BASE}/revenue.html?branch_id=${ikeja}&team_lead_id=${teamLead.id}`);
     await pageA.waitForFunction(() => {
       const node = document.getElementById('revBreadcrumbs');
@@ -192,7 +192,7 @@ try {
       return { status: res.status, id: data.room_id || data.id || (data.room && data.room.id), error: data.error };
     }, { targetId: marketerId });
     assert(room.status === 200 && room.id, `chat room create failed: ${JSON.stringify(room)}`);
-    await login(pageB, 'browser.marketer@bliss.test');
+    await login(pageB, 'browser.marketer@elpisproperty.test');
     await goto(pageA, BASE + '/staff-chat.html');
     await goto(pageB, BASE + '/staff-chat.html');
     for (const page of [pageA, pageB]) {
@@ -220,7 +220,7 @@ try {
   try {
     const cleanup = new DatabaseSync(LIVE_DB);
     cleanup.exec('PRAGMA foreign_keys = ON;');
-    const ids = cleanup.prepare("SELECT id FROM users WHERE email LIKE 'browser.%@bliss.test'").all().map(row => row.id);
+    const ids = cleanup.prepare("SELECT id FROM users WHERE email LIKE 'browser.%@elpisproperty.test'").all().map(row => row.id);
     if (ids.length) {
       const marks = ids.map(() => '?').join(',');
       cleanup.prepare(`DELETE FROM chat_messages WHERE sender_id IN (${marks})`).run(...ids);
