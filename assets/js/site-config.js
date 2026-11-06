@@ -1,7 +1,7 @@
 // Single public-site configuration. Values may be overridden by the
 // Super Admin settings API at runtime; these are safe fallbacks.
-window.BLIS_CONFIG = {
-  companyName: "Bliss Legacy Limited",
+window.ELPIS_CONFIG = {
+  companyName: "Elpis Property Limited",
   tagline: "Your Future Begins With the Right Property.",
   whatsappNumber: "",
   phone: "",
@@ -15,20 +15,20 @@ window.BLIS_CONFIG = {
   }
 };
 
-window.BLISS_CONFIG_READY = fetch("/api/site-config", { credentials: "same-origin" })
+window.ELPIS_CONFIG_READY = fetch("/api/site-config", { credentials: "same-origin" })
   .then(function (res) { return res.ok ? res.json() : null; })
   .then(function (payload) {
     if (payload && payload.config) {
       var c = payload.config;
-      window.BLIS_CONFIG.companyName = c.companyName || window.BLIS_CONFIG.companyName;
-      window.BLIS_CONFIG.tagline = c.tagline || window.BLIS_CONFIG.tagline;
-      window.BLIS_CONFIG.whatsappNumber = c.whatsappNumber || "";
-      window.BLIS_CONFIG.phone = c.phone || "";
-      window.BLIS_CONFIG.email = c.email || "";
-      window.BLIS_CONFIG.address = c.address || "";
-      window.BLIS_CONFIG.social = c.social || window.BLIS_CONFIG.social;
-      window.BLIS_CONFIG.branches = c.branches || [];
+      window.ELPIS_CONFIG.companyName = c.companyName || window.ELPIS_CONFIG.companyName;
+      window.ELPIS_CONFIG.tagline = c.tagline || window.ELPIS_CONFIG.tagline;
+      window.ELPIS_CONFIG.whatsappNumber = c.whatsappNumber || "";
+      window.ELPIS_CONFIG.phone = c.phone || "";
+      window.ELPIS_CONFIG.email = c.email || "";
+      window.ELPIS_CONFIG.address = c.address || "";
+      window.ELPIS_CONFIG.social = c.social || window.ELPIS_CONFIG.social;
+      window.ELPIS_CONFIG.branches = c.branches || [];
     }
-    return window.BLIS_CONFIG;
+    return window.ELPIS_CONFIG;
   })
-  .catch(function () { return window.BLIS_CONFIG; });
+  .catch(function () { return window.ELPIS_CONFIG; });
