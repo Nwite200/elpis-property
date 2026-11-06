@@ -1,4 +1,4 @@
-// Bliss Legacy Limited — Reusable Frontend Components & Utilities
+// Elpis Property Limited — Reusable Frontend Components & Utilities
 window.Bliss = window.Bliss || {};
 
 Bliss.money = function(n) {
@@ -28,7 +28,7 @@ Bliss.whatsappLink = function(msg) {
   const c = Bliss.config();
   const num = String(c.whatsappNumber || "").replace(/\D/g, "");
   if (!num) return null;
-  const text = msg || "Hello Bliss Legacy Limited, I would like to make an enquiry regarding your properties.";
+  const text = msg || "Hello Elpis Property Limited, I would like to make an enquiry regarding your properties.";
   return `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
 };
 
@@ -63,7 +63,7 @@ Bliss.renderHeader = function(activePage) {
   <header class="site-header" id="siteHeader">
     <div class="container nav-wrapper">
       <a class="brand" href="${homePrefix}#home" aria-label="${c.companyName} Home">
-        <img src="assets/images/bliss-legacy-logo.png" alt="${c.companyName} Official Logo" class="brand-img" onerror="this.src='bliss-legacy-logo.png'">
+        <img src="assets/images/elpis-property-logo.svg" alt="${c.companyName} Official Logo" class="brand-img" onerror="this.src='assets/images/elpis-property-logo.svg'">
       </a>
 
       <nav class="nav-links" id="navLinks">
@@ -98,10 +98,10 @@ Bliss.renderFooter = function() {
       <div class="footer-grid">
         <div class="footer-col footer-col-brand">
           <a href="index.html#home" class="footer-brand-link">
-            <img class="footer-logo" src="assets/images/bliss-legacy-logo.png" alt="${c.companyName}" onerror="this.src='bliss-legacy-logo.png'">
+            <img class="footer-logo" src="assets/images/elpis-property-logo.svg" alt="${c.companyName}" onerror="this.src='assets/images/elpis-property-logo.svg'">
           </a>
           <p class="footer-bio">
-            Discover exceptional property opportunities with Bliss Legacy Limited. We make property ownership and investment straightforward, transparent and rewarding across Nigeria.
+            Discover exceptional property opportunities with Elpis Property Limited. We make property ownership and investment straightforward, transparent and rewarding across Nigeria.
           </p>
           <div class="footer-trust-badge">
             <span class="badge-dot"></span> Registered & Verified Properties
@@ -113,7 +113,7 @@ Bliss.renderFooter = function() {
           <ul class="footer-links-list">
             <li><a href="index.html#home">Home</a></li>
             <li><a href="index.html#properties">Explore Properties</a></li>
-            <li><a href="index.html#about">About Bliss Legacy</a></li>
+            <li><a href="index.html#about">About Elpis Property</a></li>
             <li><a href="index.html#branches">Our Branches</a></li>
             <li><a href="index.html#why">Why Choose Us</a></li>
             <li><a href="index.html#contact">Contact & Enquiries</a></li>
@@ -206,7 +206,7 @@ Bliss.initNav = function() {
   if (footerWa) {
     footerWa.addEventListener("click", (e) => {
       e.preventDefault();
-      Bliss.enquireWhatsApp("Hello Bliss Legacy Limited, I would like to make an enquiry about your properties.");
+      Bliss.enquireWhatsApp("Hello Elpis Property Limited, I would like to make an enquiry about your properties.");
     });
   }
 
@@ -214,7 +214,7 @@ Bliss.initNav = function() {
   document.querySelectorAll(".wa-link").forEach(a => {
     a.addEventListener("click", (e) => {
       e.preventDefault();
-      const msg = a.getAttribute("data-message") || "Hello Bliss Legacy Limited, I would like to make a property enquiry.";
+      const msg = a.getAttribute("data-message") || "Hello Elpis Property Limited, I would like to make a property enquiry.";
       Bliss.enquireWhatsApp(msg);
     });
   });
