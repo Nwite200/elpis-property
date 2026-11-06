@@ -1,37 +1,37 @@
 /* ==========================================================================
-   BLISS LEGACY LIMITED — OFFICIAL DESIGN SYSTEM & STYLESHEET
+   ELPIS PROPERTY LIMITED — OFFICIAL DESIGN SYSTEM & STYLESHEET
    Brand Palette:
-   - Primary Green: #00B522
-   - Primary Dark Green: #008F1B
+   - Primary Green: #C69A20
+   - Primary Dark Green: #A77B0A
    - Charcoal / Ink: #414141
    - Dark Charcoal: #2A2A2A
    - Clean White: #FFFFFF
-   - Light Grey / Soft: #F5F7F5
-   - Line Border: #E2E8E2
+   - Light Grey / Soft: #F8F7F2
+   - Line Border: #E8E2D2
    ========================================================================== */
 
 :root {
-  --green: #00B522;
-  --green-dark: #008F1B;
-  --green-light: #E8F9EB;
-  --green-glow: rgba(0, 181, 34, 0.16);
+  --green: #C69A20;
+  --green-dark: #A77B0A;
+  --green-light: #F8F0D8;
+  --green-glow: rgba(201, 154, 22, 0.16);
   --charcoal: #414141;
-  --charcoal-dark: #222B24;
-  --ink: #303A32;
+  --charcoal-dark: #05063F;
+  --ink: #11133F;
   --muted: #6B7280;
   --muted-light: #9CA3AF;
   --paper: #FFFFFF;
-  --soft: #F5F7F5;
-  --sidebar: #17231A;
-  --soft-alt: #EDF3EE;
-  --line: #E2E8E2;
-  --line-dark: #37473B;
+  --soft: #F8F7F2;
+  --sidebar: #05063F;
+  --soft-alt: #F4F1E7;
+  --line: #E8E2D2;
+  --line-dark: #34345A;
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
   --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 8px 24px rgba(25, 55, 32, 0.08);
-  --shadow-lg: 0 18px 45px rgba(25, 55, 32, 0.12);
+  --shadow-md: 0 8px 24px rgba(5, 6, 63, 0.08);
+  --shadow-lg: 0 18px 45px rgba(5, 6, 63, 0.12);
   --transition: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   --font-body: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-display: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -721,7 +721,7 @@ button, input, select, textarea {
 }
 
 .btn-reset-filters:hover {
-  background-color: #E2E8E2;
+  background-color: #E8E2D2;
   color: var(--ink);
 }
 
@@ -1057,7 +1057,7 @@ button, input, select, textarea {
   overflow: hidden;
   box-shadow: var(--shadow-md);
   height: 520px;
-  background-color: #E2E8E2;
+  background-color: #E8E2D2;
 }
 
 .about-main-img {
@@ -1586,7 +1586,7 @@ button, input, select, textarea {
    FOOTER SECTION
    ========================================================================== */
 .site-footer {
-  background-color: #17231A;
+  background-color: #05063F;
   color: #D3DED5;
   padding: 65px 0 24px;
 }
@@ -1891,7 +1891,7 @@ button, input, select, textarea {
   height: 480px;
   border-radius: var(--radius-md);
   overflow: hidden;
-  background-color: #E2E8E2;
+  background-color: #E8E2D2;
   box-shadow: var(--shadow-sm);
 }
 
@@ -1930,7 +1930,7 @@ button, input, select, textarea {
   overflow: hidden;
   border: 2px solid transparent;
   cursor: pointer;
-  background-color: #E2E8E2;
+  background-color: #E8E2D2;
   padding: 0;
   flex-shrink: 0;
   transition: var(--transition);
@@ -2590,7 +2590,7 @@ button, input, select, textarea {
 .role-hero {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(120deg, #17231A 0%, #1E3A27 62%, #0E5C22 100%);
+  background: linear-gradient(120deg, #05063F 0%, #1E3A27 62%, #0E5C22 100%);
   color: #FFFFFF;
   border-radius: var(--radius-md);
   padding: 26px 28px;
@@ -2617,7 +2617,7 @@ button, input, select, textarea {
   border-radius: 100px;
   background: rgba(255,255,255,.1);
   border: 1px solid rgba(255,255,255,.16);
-  color: #E8F9EB;
+  color: #F8F0D8;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: .5px;
@@ -2665,7 +2665,7 @@ button, input, select, textarea {
   font-size: 14px;
   flex-shrink: 0;
 }
-.progress-track { height: 8px; border-radius: 100px; background: #EDF3EE; overflow: hidden; }
+.progress-track { height: 8px; border-radius: 100px; background: #F4F1E7; overflow: hidden; }
 .progress-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg, var(--green), #39D353); }
 .chart-card { min-height: 300px; }
 .bar-chart {
