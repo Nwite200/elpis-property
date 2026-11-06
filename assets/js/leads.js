@@ -1,5 +1,5 @@
 (function () {
-  const S = window.BlissStaff;
+  const S = window.ElpisStaff;
   let me = null;
   let branches = [];
   let assignees = [];
