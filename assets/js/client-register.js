@@ -16,7 +16,7 @@ async function load() {
   const me = await fetchJson("/me");
   if (!me.ok) { window.location.href = "/login.html"; return; }
   const canSetPrice = ["Managing Director", "Branch Manager"].includes(me.data.role);
-  window.__blissCanSetClientPrice = canSetPrice;
+  window.__ElpisCanSetClientPrice = canSetPrice;
   if (!canSetPrice) {
     const price = document.getElementById("agreed_purchase_price");
     if (price) {
@@ -107,7 +107,7 @@ async function onSubmit(e) {
     property_plan_id: document.getElementById("property_plan_id").value
       ? Number(document.getElementById("property_plan_id").value) : null,
     plan_start_date: new Date().toISOString().slice(0, 10),
-    agreed_purchase_price: window.__blissCanSetClientPrice && !document.getElementById("agreed_purchase_price").readOnly && document.getElementById("agreed_purchase_price").value
+    agreed_purchase_price: window.__ElpisCanSetClientPrice && !document.getElementById("agreed_purchase_price").readOnly && document.getElementById("agreed_purchase_price").value
       ? Number(document.getElementById("agreed_purchase_price").value) : null,
     assigned_branch_id: document.getElementById("assigned_branch_id").value,
     static_wallet_bvn: document.getElementById("static_wallet_bvn").value.trim() || null,
