@@ -309,7 +309,7 @@ function assert(condition, message) {
 function moneyKobo(value) { return Math.round(Number(value || 0) * 100); }
 
 console.log('\n========================================================');
-console.log('   elpis LEGACY — PHASE 6 VERIFICATION SUITE');
+console.log('   Elpis Property — PHASE 6 VERIFICATION SUITE');
 console.log('========================================================\n');
 
 const mdCookie = await login('md@elpisproperty.test');

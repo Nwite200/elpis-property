@@ -246,7 +246,7 @@ function assert(condition, message) { if (!condition) throw new Error(message); 
 function pdfText(bytes) { return Buffer.from(bytes).toString('latin1'); }
 
 console.log('\n========================================================');
-console.log('   elpis LEGACY — PHASE 7 COMMISSION & REPORT SUITE');
+console.log('   Elpis Property — PHASE 7 COMMISSION & REPORT SUITE');
 console.log('========================================================\n');
 
 const mdCookie = await login('md@elpisproperty.test');
