@@ -1,5 +1,5 @@
 (function () {
-  const S = window.BlissStaff;
+  const S = window.elpisStaff;
   let me = null;
   const reportLabels = {
     sales: 'Sales report',
