@@ -1,5 +1,5 @@
 (function () {
-  const S = window.BlissStaff;
+  const S = window.elpisStaff;
   let me = null;
   let analytics = null;
 
@@ -241,7 +241,7 @@
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `bliss-performance-${analytics.range.from}-to-${analytics.range.to}.csv`;
+    link.download = `elpis-performance-${analytics.range.from}-to-${analytics.range.to}.csv`;
     link.click();
     URL.revokeObjectURL(link.href);
   }
