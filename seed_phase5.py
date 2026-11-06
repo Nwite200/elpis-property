@@ -1,4 +1,4 @@
-"""Deterministic local demo seed for the elpis Legacy Phase 5 portal.
+"""Deterministic local demo seed for the Elpis Property Phase 5 portal.
 
 Run after applying local D1 migrations:
 

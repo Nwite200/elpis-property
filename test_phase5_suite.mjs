@@ -357,7 +357,7 @@ function webhookBody(id, transactionRef, amountNaira, extra = {}) {
 // Suite
 // ---------------------------------------------------------------------------
 console.log('\n========================================================');
-console.log('   elpis LEGACY — PHASE 5 VERIFICATION SUITE');
+console.log('   Elpis Property — PHASE 5 VERIFICATION SUITE');
 console.log('========================================================\n');
 
 const adaCookie = await login('ada@example.com');
@@ -577,7 +577,7 @@ await test('only an Active provider with a genuine provider-issued account is sh
   assert(activeNoAccount.data.is_active === false, 'Active without an issued account stays pending');
 
   db.prepare(`INSERT OR REPLACE INTO virtual_accounts (client_id, provider, bank_name, account_name, account_number, account_status)
-    VALUES (?, 'wema_alat', 'Wema Bank', 'Ada Nwosu / elpis Legacy', '0123456789', 'active')`).run(adaId);
+    VALUES (?, 'wema_alat', 'Wema Bank', 'Ada Nwosu / Elpis Property', '0123456789', 'active')`).run(adaId);
   const active = await request('/api/client/virtual-account', { headers: { Cookie: adaCookie } });
   assert(active.data.is_active === true, 'genuine provider account is shown');
   assert(active.data.account_number === '0123456789', 'account number returned');
