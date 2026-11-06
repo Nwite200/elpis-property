@@ -1,39 +1,39 @@
-// Bliss Legacy Limited — Reusable Frontend Components & Utilities
-window.Bliss = window.Bliss || {};
+// Elpis Property Limited — Reusable Frontend Components & Utilities
+window.Elpis = window.Elpis || {};
 
-Bliss.money = function(n) {
+Elpis.money = function(n) {
   if (n === undefined || n === null || isNaN(n)) return "₦0";
   return "₦" + Number(n).toLocaleString("en-NG");
 };
 
-Bliss.config = function() {
+Elpis.config = function() {
   return window.BLIS_CONFIG || {};
 };
 
-Bliss.properties = function() {
+Elpis.properties = function() {
   return window.BLIS_PROPERTIES || [];
 };
 
-Bliss.branches = function() {
+Elpis.branches = function() {
   return window.BLIS_BRANCHES || [];
 };
 
-Bliss.findProperty = function(idOrSlug) {
+Elpis.findProperty = function(idOrSlug) {
   if (!idOrSlug) return null;
-  const list = Bliss.properties();
+  const list = Elpis.properties();
   return list.find(p => p.id === idOrSlug || p.slug === idOrSlug) || null;
 };
 
-Bliss.whatsappLink = function(msg) {
-  const c = Bliss.config();
+Elpis.whatsappLink = function(msg) {
+  const c = Elpis.config();
   const num = String(c.whatsappNumber || "").replace(/\D/g, "");
   if (!num) return null;
-  const text = msg || "Hello Bliss Legacy Limited, I would like to make an enquiry regarding your properties.";
+  const text = msg || "Hello Elpis Property Limited, I would like to make an enquiry regarding your properties.";
   return `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
 };
 
-Bliss.enquireWhatsApp = function(msg) {
-  const url = Bliss.whatsappLink(msg);
+Elpis.enquireWhatsApp = function(msg) {
+  const url = Elpis.whatsappLink(msg);
   if (!url) {
     alert("WhatsApp contact has not been configured yet. Please use the phone or email shown on the site.");
     return;
@@ -41,8 +41,8 @@ Bliss.enquireWhatsApp = function(msg) {
   window.open(url, "_blank", "noopener,noreferrer");
 };
 
-Bliss.renderHeader = function(activePage) {
-  const c = Bliss.config();
+Elpis.renderHeader = function(activePage) {
+  const c = Elpis.config();
   const isDetails = activePage === 'property-detail';
   const homePrefix = isDetails ? 'index.html' : '';
 
@@ -63,7 +63,7 @@ Bliss.renderHeader = function(activePage) {
   <header class="site-header" id="siteHeader">
     <div class="container nav-wrapper">
       <a class="brand" href="${homePrefix}#home" aria-label="${c.companyName} Home">
-        <img src="assets/images/bliss-legacy-logo.png" alt="${c.companyName} Official Logo" class="brand-img" onerror="this.src='bliss-legacy-logo.png'">
+        <img src="assets/images/Elpis-legacy-logo.png" alt="${c.companyName} Official Logo" class="brand-img" onerror="this.src='Elpis-legacy-logo.png'">
       </a>
 
       <nav class="nav-links" id="navLinks">
@@ -88,8 +88,8 @@ Bliss.renderHeader = function(activePage) {
   </header>`;
 };
 
-Bliss.renderFooter = function() {
-  const c = Bliss.config();
+Elpis.renderFooter = function() {
+  const c = Elpis.config();
   const currentYear = new Date().getFullYear();
   const waDigits = String(c.whatsappNumber || "").replace(/\D/g, "");
   const waDisplay = waDigits.startsWith("234") && waDigits.length === 13
@@ -102,10 +102,10 @@ Bliss.renderFooter = function() {
       <div class="footer-grid">
         <div class="footer-col footer-col-brand">
           <a href="index.html#home" class="footer-brand-link">
-            <img class="footer-logo" src="assets/images/bliss-legacy-logo.png" alt="${c.companyName}" onerror="this.src='bliss-legacy-logo.png'">
+            <img class="footer-logo" src="assets/images/Elpis-legacy-logo.png" alt="${c.companyName}" onerror="this.src='Elpis-legacy-logo.png'">
           </a>
           <p class="footer-bio">
-            Discover exceptional property opportunities with Bliss Legacy Limited. We make property ownership and investment straightforward, transparent and rewarding across Nigeria.
+            Discover exceptional property opportunities with Elpis Property Limited. We make property ownership and investment straightforward, transparent and rewarding across Nigeria.
           </p>
           <div class="footer-trust-badge">
             <span class="badge-dot"></span> Registered & Verified Properties
@@ -117,7 +117,7 @@ Bliss.renderFooter = function() {
           <ul class="footer-links-list">
             <li><a href="index.html#home">Home</a></li>
             <li><a href="index.html#properties">Explore Properties</a></li>
-            <li><a href="index.html#about">About Bliss Legacy</a></li>
+            <li><a href="index.html#about">About Elpis Property</a></li>
             <li><a href="index.html#branches">Our Branches</a></li>
             <li><a href="index.html#why">Why Choose Us</a></li>
             <li><a href="index.html#contact">Contact & Enquiries</a></li>
@@ -145,7 +145,7 @@ Bliss.renderFooter = function() {
             </div>
             <div class="footer-contact-item">
               <span class="contact-lbl">WhatsApp:</span>
-              <a class="contact-val" href="${Bliss.whatsappLink() || '#contact'}" target="_blank" rel="noopener">${waDisplay || 'WhatsApp not configured'}</a>
+              <a class="contact-val" href="${Elpis.whatsappLink() || '#contact'}" target="_blank" rel="noopener">${waDisplay || 'WhatsApp not configured'}</a>
             </div>
             <div class="footer-contact-item">
               <span class="contact-lbl">Email Address:</span>
@@ -179,7 +179,7 @@ Bliss.renderFooter = function() {
   </footer>`;
 };
 
-Bliss.initNav = function() {
+Elpis.initNav = function() {
   const menuBtn = document.getElementById("menuBtn");
   const navLinks = document.getElementById("navLinks");
   const siteHeader = document.getElementById("siteHeader");
@@ -214,7 +214,7 @@ Bliss.initNav = function() {
   if (footerWa) {
     footerWa.addEventListener("click", (e) => {
       e.preventDefault();
-      Bliss.enquireWhatsApp("Hello Bliss Legacy Limited, I would like to make an enquiry about your properties.");
+      Elpis.enquireWhatsApp("Hello Elpis Property Limited, I would like to make an enquiry about your properties.");
     });
   }
 
@@ -222,13 +222,13 @@ Bliss.initNav = function() {
   document.querySelectorAll(".wa-link").forEach(a => {
     a.addEventListener("click", (e) => {
       e.preventDefault();
-      const msg = a.getAttribute("data-message") || "Hello Bliss Legacy Limited, I would like to make a property enquiry.";
-      Bliss.enquireWhatsApp(msg);
+      const msg = a.getAttribute("data-message") || "Hello Elpis Property Limited, I would like to make a property enquiry.";
+      Elpis.enquireWhatsApp(msg);
     });
   });
 };
 
-Bliss.observeFade = function() {
+Elpis.observeFade = function() {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
