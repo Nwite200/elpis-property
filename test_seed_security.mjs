@@ -36,7 +36,7 @@ for (const suffix of ['', '-wal', '-shm']) rmSync(TEMP_DB + suffix, { force: tru
 mkdirSync(dirname(TEMP_DB), { recursive: true });
 
 console.log('\n========================================================');
-console.log('   BLISS LEGACY — SEED / WIPE ENVIRONMENT SECURITY');
+console.log('   elpis LEGACY — SEED / WIPE ENVIRONMENT SECURITY');
 console.log('========================================================\n');
 
 test('seed refuses a production environment', () => {
@@ -74,8 +74,8 @@ test('wipe removes only test accounts and their seeded data', () => {
   db.exec('PRAGMA foreign_keys = ON;');
   const roleId = db.prepare("SELECT id FROM roles WHERE name='Marketer'").get().id;
   db.prepare(`INSERT INTO users (email, password_hash, full_name, role_id, branch_id, is_active, is_test)
-    VALUES ('wipe.test@bliss.test', 'x', 'Wipe Test', ?, 1, 1, 1)`).run(roleId);
-  const testUser = db.prepare("SELECT id FROM users WHERE email='wipe.test@bliss.test'").get().id;
+    VALUES ('wipe.test@elpisproperty.test', 'x', 'Wipe Test', ?, 1, 1, 1)`).run(roleId);
+  const testUser = db.prepare("SELECT id FROM users WHERE email='wipe.test@elpisproperty.test'").get().id;
   db.prepare(`INSERT INTO clients (client_reference, full_name, phone_number, created_by, original_marketer_id, is_deleted)
     VALUES ('TEST-WIPE-1', 'Wipe Client', '+2348000000001', ?, ?, 0)`).run(testUser, testUser);
   db.prepare(`INSERT INTO leads (lead_reference, full_name, phone_number, branch_id, created_by)
@@ -88,7 +88,7 @@ test('wipe removes only test accounts and their seeded data', () => {
   assert(result.status === 0, `wipe failed: ${result.stderr || result.stdout}`);
 
   const check = new DatabaseSync(TEMP_DB);
-  assert(check.prepare("SELECT COUNT(*) AS c FROM users WHERE email='wipe.test@bliss.test'").get().c === 0, 'test user survived');
+  assert(check.prepare("SELECT COUNT(*) AS c FROM users WHERE email='wipe.test@elpisproperty.test'").get().c === 0, 'test user survived');
   assert(check.prepare("SELECT COUNT(*) AS c FROM clients WHERE client_reference='TEST-WIPE-1'").get().c === 0, 'test client survived');
   assert(check.prepare("SELECT COUNT(*) AS c FROM leads WHERE lead_reference='TEST-WIPE-LEAD'").get().c === 0, 'test lead survived');
   assert(check.prepare('SELECT COUNT(*) AS c FROM users WHERE is_test=0').get().c === nonTestUsers, 'wipe removed a non-test user');

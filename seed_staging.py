@@ -27,7 +27,7 @@ from datetime import date, timedelta
 
 from seed_guard import STAGING_DB_ID, require_staging
 
-DATABASE = "bliss-legacy-staging-db"
+DATABASE = "elpis-property-staging-db"
 PASSWORD = {}
 
 
@@ -100,10 +100,10 @@ def build_statements():
 
     # ---- staff -----------------------------------------------------------
     users = [
-        ("staging.bm.ajah@blisslegacy.test", "Staging Ajah Branch Manager", 2, 2, 0, "NULL"),
-        ("staging.marketer.ajah@blisslegacy.test", "Staging Ajah Marketer (no Team Lead)", 4, 2, 0,
-         "(SELECT id FROM users WHERE email='staging.bm.ajah@blisslegacy.test')"),
-        ("staging.commission@blisslegacy.test", "Staging Commission Access Only", 5, 6, 1, "NULL"),
+        ("staging.bm.ajah@elpisproperty.test", "Staging Ajah Branch Manager", 2, 2, 0, "NULL"),
+        ("staging.marketer.ajah@elpisproperty.test", "Staging Ajah Marketer (no Team Lead)", 4, 2, 0,
+         "(SELECT id FROM users WHERE email='staging.bm.ajah@elpisproperty.test')"),
+        ("staging.commission@elpisproperty.test", "Staging Commission Access Only", 5, 6, 1, "NULL"),
     ]
     for email, name, role_id, branch_id, commission_access, manager_sql in users:
         PASSWORD[email] = secrets.token_urlsafe(18)
@@ -121,14 +121,14 @@ def build_statements():
 
     statements.append(
         """INSERT INTO teams (name, branch_id, team_lead_user_id, is_active)
-           SELECT 'Staging Ikeja Team', 1, (SELECT id FROM users WHERE email='staging.tl@blisslegacy.test'), 1
+           SELECT 'Staging Ikeja Team', 1, (SELECT id FROM users WHERE email='staging.tl@elpisproperty.test'), 1
            WHERE NOT EXISTS (SELECT 1 FROM teams WHERE name='Staging Ikeja Team' AND branch_id=1)"""
     )
     statements.append(
         """INSERT OR IGNORE INTO team_members (team_id, user_id)
            SELECT t.id, u.id FROM teams t, users u
            WHERE t.name='Staging Ikeja Team' AND t.branch_id=1
-             AND u.email IN ('staging.tl@blisslegacy.test','staging.marketer@blisslegacy.test')"""
+             AND u.email IN ('staging.tl@elpisproperty.test','staging.marketer@elpisproperty.test')"""
     )
 
     # ---- property plans --------------------------------------------------
@@ -149,7 +149,7 @@ def build_statements():
                      is_enabled, notes, created_by)
                    VALUES ({property_id}, {q(plan_type)}, {price}, {deposit}, {installment},
                      {months if months else 'NULL'}, {count}, 1,
-                     'STAGING TEST plan — fictional data', (SELECT id FROM users WHERE email='staging.md@blisslegacy.test'))
+                     'STAGING TEST plan — fictional data', (SELECT id FROM users WHERE email='staging.md@elpisproperty.test'))
                    ON CONFLICT(property_id, plan_type) DO UPDATE SET total_price_kobo=excluded.total_price_kobo,
                      deposit_kobo=excluded.deposit_kobo, installment_kobo=excluded.installment_kobo,
                      duration_months=excluded.duration_months,
@@ -176,23 +176,23 @@ def build_statements():
     # reference, name, plan, branch, marketer email, team lead email, status,
     # phone, performing/defaulting
     clients = [
-        ("TEST-STG-C01", "STAGING TEST Outright Buyer", "outright", 1, "staging.marketer@blisslegacy.test",
-         "staging.tl@blisslegacy.test", "+2348039001001", "performing", 1),
-        ("TEST-STG-C02", "STAGING TEST Part Payment Buyer", "part_payment", 1, "staging.marketer@blisslegacy.test",
-         "staging.tl@blisslegacy.test", "+2348039001002", "performing", 1),
-        ("TEST-STG-C03", "STAGING TEST Daily Saver", "daily", 2, "staging.marketer.ajah@blisslegacy.test",
+        ("TEST-STG-C01", "STAGING TEST Outright Buyer", "outright", 1, "staging.marketer@elpisproperty.test",
+         "staging.tl@elpisproperty.test", "+2348039001001", "performing", 1),
+        ("TEST-STG-C02", "STAGING TEST Part Payment Buyer", "part_payment", 1, "staging.marketer@elpisproperty.test",
+         "staging.tl@elpisproperty.test", "+2348039001002", "performing", 1),
+        ("TEST-STG-C03", "STAGING TEST Daily Saver", "daily", 2, "staging.marketer.ajah@elpisproperty.test",
          None, "+2348039001003", "defaulting", 2),
-        ("TEST-STG-C04", "STAGING TEST Weekly Saver", "weekly", 2, "staging.marketer.ajah@blisslegacy.test",
+        ("TEST-STG-C04", "STAGING TEST Weekly Saver", "weekly", 2, "staging.marketer.ajah@elpisproperty.test",
          None, "+2348039001004", "performing", 2),
-        ("TEST-STG-C05", "STAGING TEST Monthly Saver", "monthly", 1, "staging.marketer@blisslegacy.test",
-         "staging.tl@blisslegacy.test", "+2348039001005", "defaulting", 1),
-        ("TEST-STG-C06", "STAGING TEST Pending Clearance", "monthly", 1, "staging.marketer@blisslegacy.test",
-         "staging.tl@blisslegacy.test", "+2348039001006", "performing", 1),
-        ("TEST-STG-C07", "STAGING TEST Cleared Client", "outright", 2, "staging.marketer.ajah@blisslegacy.test",
+        ("TEST-STG-C05", "STAGING TEST Monthly Saver", "monthly", 1, "staging.marketer@elpisproperty.test",
+         "staging.tl@elpisproperty.test", "+2348039001005", "defaulting", 1),
+        ("TEST-STG-C06", "STAGING TEST Pending Clearance", "monthly", 1, "staging.marketer@elpisproperty.test",
+         "staging.tl@elpisproperty.test", "+2348039001006", "performing", 1),
+        ("TEST-STG-C07", "STAGING TEST Cleared Client", "outright", 2, "staging.marketer.ajah@elpisproperty.test",
          None, "+2348039001007", "performing", 2),
-        ("TEST-STG-C08", "STAGING TEST Bad Phone Pending", "weekly", 1, "staging.marketer@blisslegacy.test",
-         "staging.tl@blisslegacy.test", "08039001008", "defaulting", 1),
-        ("TEST-STG-C09", "STAGING TEST Missing Phone Cleared", "daily", 2, "staging.marketer.ajah@blisslegacy.test",
+        ("TEST-STG-C08", "STAGING TEST Bad Phone Pending", "weekly", 1, "staging.marketer@elpisproperty.test",
+         "staging.tl@elpisproperty.test", "08039001008", "defaulting", 1),
+        ("TEST-STG-C09", "STAGING TEST Missing Phone Cleared", "daily", 2, "staging.marketer.ajah@elpisproperty.test",
          None, "", "performing", 2),
     ]
     plan_prices = {1: 20_000_000_00, 2: 12_000_000_00}
@@ -208,7 +208,7 @@ def build_statements():
                  interested_property_id, payment_plan_type, payment_plan_total_kobo, payment_plan_deposit_kobo,
                  payment_plan_installment_kobo, payment_plan_number_of_installments, payment_plan_locked_at,
                  property_payment_plan_id)
-               VALUES ({q(ref)}, {q(name)}, {q(phone)}, {q(ref.lower() + '@blisslegacy.test')}, 'Active Buyer',
+               VALUES ({q(ref)}, {q(name)}, {q(phone)}, {q(ref.lower() + '@elpisproperty.test')}, 'Active Buyer',
                  'New Sale', {branch_id}, (SELECT id FROM users WHERE email={q(marketer_email)}),
                  (SELECT id FROM users WHERE email={q(marketer_email)}), {tl_sql}, {price},
                  {property_id}, {q(plan_type)}, {price}, {deposit}, {installment}, {count},
@@ -217,7 +217,7 @@ def build_statements():
         statements.append(
             f"""INSERT INTO client_assignments (client_id, relationship_manager_id, branch_id, team_lead_id, assigned_by, is_primary)
                SELECT c.id, (SELECT id FROM users WHERE email={q(marketer_email)}), {branch_id}, {tl_sql},
-                 (SELECT id FROM users WHERE email='staging.bm.ajah@blisslegacy.test'), 1
+                 (SELECT id FROM users WHERE email='staging.bm.ajah@elpisproperty.test'), 1
                FROM clients c WHERE c.client_reference={q(ref)}
                  AND NOT EXISTS (SELECT 1 FROM client_assignments ca WHERE ca.client_id=c.id AND ca.is_primary=1)"""
         )
@@ -275,13 +275,13 @@ def build_statements():
     ]
     for ref, status, note in care:
         cleared_sql = "datetime('now','-5 days')" if status == "cleared" else "NULL"
-        cleared_by = "(SELECT id FROM users WHERE email='care.national.staging@blisslegacy.test')" if status == "cleared" else "NULL"
+        cleared_by = "(SELECT id FROM users WHERE email='care.national.staging@elpisproperty.test')" if status == "cleared" else "NULL"
         statements.append(
             f"""INSERT INTO client_care_records (client_id, care_status, assigned_user_id, clearance_note,
                  cleared_by, cleared_at, last_call_at, next_follow_up_date, updated_by)
-               SELECT c.id, {q(status)}, (SELECT id FROM users WHERE email='care.national.staging@blisslegacy.test'),
+               SELECT c.id, {q(status)}, (SELECT id FROM users WHERE email='care.national.staging@elpisproperty.test'),
                  {q(note)}, {cleared_by}, {cleared_sql}, datetime('now','-2 days'), {q(day(3))},
-                 (SELECT id FROM users WHERE email='care.national.staging@blisslegacy.test')
+                 (SELECT id FROM users WHERE email='care.national.staging@elpisproperty.test')
                FROM clients c WHERE c.client_reference={q(ref)}
                ON CONFLICT(client_id) DO UPDATE SET care_status=excluded.care_status,
                  clearance_note=excluded.clearance_note, cleared_by=excluded.cleared_by,
@@ -289,7 +289,7 @@ def build_statements():
         )
         statements.append(
             f"""INSERT INTO client_care_calls (client_id, care_user_id, call_type, note, outcome, next_follow_up_date)
-               SELECT c.id, (SELECT id FROM users WHERE email='care.national.staging@blisslegacy.test'),
+               SELECT c.id, (SELECT id FROM users WHERE email='care.national.staging@elpisproperty.test'),
                  'call', 'STAGING TEST care call', 'Contacted', {q(day(3))}
                FROM clients c WHERE c.client_reference={q(ref)}"""
         )
@@ -305,7 +305,7 @@ def build_statements():
                  provider_message_id, attempts, idempotency_key, sent_at, delivered_at, failed_at, created_by)
                SELECT c.id, 'seed_status', c.phone_number, {q('STAGING TEST SMS — ' + status)}, {q(status)}, 'mock',
                  {q('mock-' + status + '-001')}, 1, {q('TEST-STG-SMS-' + status)}, {delivered}, {delivered},
-                 {failed}, (SELECT id FROM users WHERE email='staging.md@blisslegacy.test')
+                 {failed}, (SELECT id FROM users WHERE email='staging.md@elpisproperty.test')
                FROM clients c WHERE c.client_reference={q(ref)}
                ON CONFLICT(idempotency_key) DO NOTHING"""
         )
@@ -318,19 +318,19 @@ def build_statements():
         ref = f"TEST-STG-LEAD-{index:02d}"
         temperature = temperatures[(index - 1) % 3]
         branch_id = 1 if index % 2 else 2
-        marketer = "staging.marketer@blisslegacy.test" if branch_id == 1 else "staging.marketer.ajah@blisslegacy.test"
-        tl_sql = "(SELECT id FROM users WHERE email='staging.tl@blisslegacy.test')" if branch_id == 1 else "NULL"
+        marketer = "staging.marketer@elpisproperty.test" if branch_id == 1 else "staging.marketer.ajah@elpisproperty.test"
+        tl_sql = "(SELECT id FROM users WHERE email='staging.tl@elpisproperty.test')" if branch_id == 1 else "NULL"
         lost_reason = "Budget deferred" if status == "Lost" else None
         statements.append(
             f"""INSERT INTO leads (lead_reference, full_name, phone_number, email_address, source, status,
                  lead_temperature, temperature_updated_at, lost_reason, property_id, assigned_marketer_id,
                  team_lead_id, branch_id, estimated_value_kobo, notes, next_follow_up_date, created_by, is_demo)
                VALUES ({q(ref)}, {q('STAGING TEST ' + status + ' Lead')},
-                 {q('+2348039100' + f'{index:03d}')}, {q(ref.lower() + '@blisslegacy.test')}, 'STAGING TEST seed',
+                 {q('+2348039100' + f'{index:03d}')}, {q(ref.lower() + '@elpisproperty.test')}, 'STAGING TEST seed',
                  {q(status)}, {q(temperature)}, datetime('now','-2 days'), {q(lost_reason)}, {1 if index % 2 else 2},
                  (SELECT id FROM users WHERE email={q(marketer)}), {tl_sql}, {branch_id},
                  {(5_000_000 + index * 500_000) * 100}, 'STAGING TEST lead for audit coverage',
-                 {q(day(index))}, (SELECT id FROM users WHERE email='staging.bm.ajah@blisslegacy.test'), 0)"""
+                 {q(day(index))}, (SELECT id FROM users WHERE email='staging.bm.ajah@elpisproperty.test'), 0)"""
         )
         for step in range(1, 3):
             statements.append(
