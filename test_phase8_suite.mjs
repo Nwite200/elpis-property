@@ -240,7 +240,7 @@ async function test(name, fn) {
 function assert(condition, message) { if (!condition) throw new Error(message); }
 
 console.log('\n========================================================');
-console.log('   elpis LEGACY — PHASE 8 INTEGRATION & SECURITY SUITE');
+console.log('   Elpis Property — PHASE 8 INTEGRATION & SECURITY SUITE');
 console.log('========================================================\n');
 
 const mdCookie = await login('md.p8@elpisproperty.test');
@@ -789,7 +789,7 @@ await test('single global logo intro supports hype/classic, full/short replay an
 
 await test('PWA manifest, service worker and install flow are wired for iOS and Android', async () => {
   const manifest = JSON.parse(readFileSync('manifest.json', 'utf8'));
-  assert(manifest.name === 'elpis Legacy Limited' && manifest.short_name === 'elpis Legacy', 'PWA manifest branding incorrect');
+  assert(manifest.name === 'Elpis Property Limited' && manifest.short_name === 'Elpis Property', 'PWA manifest branding incorrect');
   assert(manifest.start_url === '/' && manifest.scope === '/' && manifest.display === 'standalone', 'PWA start/scope/display incorrect');
   assert(manifest.icons.some(icon => icon.sizes === '192x192'), '192px PWA icon missing');
   assert(manifest.icons.some(icon => icon.sizes === '512x512'), '512px PWA icon missing');
@@ -1427,7 +1427,7 @@ await test('ALATPay static wallet creation, signature validation, status verific
   globalThis.fetch = async (input, init = {}) => {
     const url = String(input);
     if (url.includes('/alatpay-wallet/api/v1/staticaccount/validateAndCreate')) {
-      return mockJson({ status: true, data: { accountNumber: '0412345678', accountName: 'elpis LEGACY - TEST CLIENT', bankName: 'Wema Bank', id: 'sw-account-1' } });
+      return mockJson({ status: true, data: { accountNumber: '0412345678', accountName: 'Elpis Property - TEST CLIENT', bankName: 'Wema Bank', id: 'sw-account-1' } });
     }
     if (url.includes('/alatpay-wallet/api/v1/staticaccount') && String(init.method || 'GET').toUpperCase() === 'POST') {
       return mockJson({ status: true, data: { id: 'sw-init-1', otpTrackingID: 'otp-track-1', message: 'An OTP has been sent to 08*******86' } });
@@ -1459,13 +1459,13 @@ await test('ALATPay static wallet creation, signature validation, status verific
       method: 'POST', headers: { Cookie: mdCookie }, body: { otp: '123456' }, env: alatEnv
     });
     assert(validate.status === 200 && validate.data.status === 'active' && validate.data.account_number === '0412345678', 'static wallet validate expected active account');
-    assert(validate.data.account_name === 'Phase 8 Client / elpis Legacy Limited', `unexpected static wallet account name: ${validate.data.account_name}`);
+    assert(validate.data.account_name === 'Phase 8 Client / Elpis Property Limited', `unexpected static wallet account name: ${validate.data.account_name}`);
     const staffWallet = await request(`/api/finance/clients/${adaId}/static-wallet`, { headers: { Cookie: mdCookie }, env: alatEnv });
     assert(staffWallet.data.wallet && staffWallet.data.wallet.status === 'active', 'staff static wallet view missing');
-    assert(staffWallet.data.wallet.account_name === 'Phase 8 Client / elpis Legacy Limited', 'staff static wallet account name was not normalized');
+    assert(staffWallet.data.wallet.account_name === 'Phase 8 Client / Elpis Property Limited', 'staff static wallet account name was not normalized');
     const clientWallet = await request('/api/client/virtual-account', { headers: { Cookie: clientCookie }, env: alatEnv });
     assert(clientWallet.data.is_active === true && clientWallet.data.is_static === true && clientWallet.data.account_number === '0412345678', 'client static wallet view missing');
-    assert(clientWallet.data.account_name === 'Phase 8 Client / elpis Legacy Limited', 'client static wallet account name was not normalized');
+    assert(clientWallet.data.account_name === 'Phase 8 Client / Elpis Property Limited', 'client static wallet account name was not normalized');
 
     const payload = {
       Value: { Data: {

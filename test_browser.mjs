@@ -85,7 +85,7 @@ if (!existsSync(CHROME)) {
 }
 
 console.log('\n========================================================');
-console.log('   elpis LEGACY — BROWSER DRILL-DOWN / COLOUR / CHAT');
+console.log('   Elpis Property — BROWSER DRILL-DOWN / COLOUR / CHAT');
 console.log('========================================================\n');
 
 const db = new DatabaseSync(LIVE_DB);
