@@ -1,4 +1,4 @@
-# Bliss Legacy Limited — Role, Onboarding and Administration Audit
+# elpis Legacy Limited — Role, Onboarding and Administration Audit
 
 **Method:** direct inspection of `migrations/*.sql`, `src/index.js`, all HTML pages and `assets/js/*`. Local D1 role rows and staff accounts were queried. No feature is marked implemented because an earlier plan mentioned it.
 
@@ -326,13 +326,13 @@ See the final response for the local URLs and credentials. Do not reuse these pa
 
 | Role | Local account |
 |---|---|
-| Managing Director | `md@bliss.com` |
-| Branch Manager (Ikeja) | `bm.ikeja@bliss.com` |
-| Branch Manager (Ajah) | `bm.ajah@bliss.com` |
-| Team Lead (Ikeja) | `tl.ikeja@bliss.com` |
-| Team Lead (Ajah) | `tl.ajah@bliss.com` |
-| Marketer | `mkt.ikeja@bliss.com`, `mkt.ikeja2@bliss.com`, `mkt.ajah@bliss.com` |
-| Finance Officer | `finance@bliss.com` |
+| Managing Director | `md@elpisproperty.test` |
+| Branch Manager (Ikeja) | `bm.ikeja@elpisproperty.test` |
+| Branch Manager (Ajah) | `bm.ajah@elpisproperty.test` |
+| Team Lead (Ikeja) | `tl.ikeja@elpisproperty.test` |
+| Team Lead (Ajah) | `tl.ajah@elpisproperty.test` |
+| Marketer | `mkt.ikeja@elpisproperty.test`, `mkt.ikeja2@elpisproperty.test`, `mkt.ajah@elpisproperty.test` |
+| Finance Officer | `finance@elpisproperty.test` |
 | Client | `ada@example.com` |
 
 **Super Admin:** no account exists because the role does not exist.
