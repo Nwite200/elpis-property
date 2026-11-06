@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#00B522" />
-  <title>Payment History & Receipts | Bliss Legacy Limited</title>
+  <meta name="theme-color" content="#C6A45C" />
+  <title>Payment History & Receipts | Elpis Property Limited</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -88,7 +88,7 @@
     }
     .status-badge.status-verified {
       background-color: #E8F9EB;
-      color: #008F1B;
+      color: #A9853F;
     }
     .status-badge.status-pending {
       background-color: #FEF8E7;
@@ -128,7 +128,7 @@
   <link rel="manifest" href="manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Bliss Legacy">
+  <meta name="apple-mobile-web-app-title" content="Elpis Property">
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
@@ -138,7 +138,7 @@
   <div class="portal-layout">
     <aside class="portal-sidebar">
       <a href="index.html">
-        <img src="assets/images/bliss-legacy-logo.png" alt="Bliss Legacy" class="brand-logo" onerror="this.src='bliss-legacy-logo.png'">
+        <img src="assets/images/Elpis-legacy-logo.png" alt="Elpis Property" class="brand-logo" onerror="this.src='Elpis-legacy-logo.png'">
       </a>
       <span class="nav-section-title">Client Workspace</span>
       <a href="client-dashboard.html">📊 Overview</a>
@@ -227,7 +227,7 @@
           if (!res.ok) { window.location.href = '/client-login.html'; return; }
           const data = await res.json();
 
-          document.getElementById('verifiedBannerAmt').textContent = Bliss.money(data.total_verified_ngn || 0);
+          document.getElementById('verifiedBannerAmt').textContent = Elpis.money(data.total_verified_ngn || 0);
           document.getElementById('txCountBadge').textContent = `${(data.payments || []).length} transaction(s)`;
 
           const tbody = document.getElementById('paymentsTbody');
@@ -245,7 +245,7 @@
                 <td>${dateStr}</td>
                 <td>${p.method || 'Bank Transfer'}</td>
                 <td style="font-weight:800;color:${p.status === 'verified' ? 'var(--green-dark)' : 'var(--ink)'}">
-                  ${Bliss.money(p.amount)}
+                  ${Elpis.money(p.amount)}
                 </td>
                 <td>
                   <span class="status-badge ${statusClass}">${p.status.toUpperCase()}</span>
