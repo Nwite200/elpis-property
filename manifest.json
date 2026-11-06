@@ -11,7 +11,7 @@
   "display_override": ["standalone", "minimal-ui"],
   "orientation": "any",
   "background_color": "#F5F7F5",
-  "theme_color": "#00B522",
+  "theme_color": "#05063F",
   "categories": ["business", "finance", "lifestyle"],
   "prefer_related_applications": false,
   "icons": [
