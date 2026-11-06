@@ -1,4 +1,4 @@
-"""Deterministic local demo seed for the Bliss Legacy Phase 5 portal.
+"""Deterministic local demo seed for the elpis Legacy Phase 5 portal.
 
 Run after applying local D1 migrations:
 
@@ -168,11 +168,11 @@ def seed():
     print("Seeding Phase 5 demo users and data…")
 
     finance_user_id = ensure_user(
-        cur, "finance@bliss.com", "Head Finance Officer", 5, 1
+        cur, "finance@elpisproperty.test", "Head Finance Officer", 5, 1
     )
     ada_user_id = ensure_user(cur, "ada@example.com", "Ada Nwosu", 6, 1)
     musa_user_id = ensure_user(cur, "musa@example.com", "Musa Dike", 6, 1)
-    demo_user_id = ensure_user(cur, "demo@bliss.com", "Demo Investor", 6, 1)
+    demo_user_id = ensure_user(cur, "demo@elpisproperty.test", "Demo Investor", 6, 1)
 
     ada_client_id = ensure_client(
         cur,
@@ -219,7 +219,7 @@ def seed():
         {
             "full_name": "Demo Investor",
             "phone_number": "08099998888",
-            "email_address": "demo@bliss.com",
+            "email_address": "demo@elpisproperty.test",
             "residential_address": "Demo Street, Abuja",
             "state": "FCT",
             "city": "Abuja",
@@ -254,7 +254,7 @@ def seed():
         INSERT INTO receipts (
             payment_id, client_id, receipt_ref, amount, currency,
             amount_kobo, remaining_balance_kobo, is_demo, created_at
-        ) VALUES (?, ?, 'RCP-BLISS-001', 5000000, 'NGN',
+        ) VALUES (?, ?, 'RCP-elpis-001', 5000000, 'NGN',
                   500000000, 700000000, 0, datetime('now', '-2 days'))
         """,
         (ada_payment_1, ada_client_id),
@@ -305,7 +305,7 @@ def seed():
         """
         INSERT INTO notifications (client_id, type, title, message, is_read, created_at)
         VALUES (?, 'payment.verified', 'Official Receipt Issued',
-                'Your payment of NGN 5,000,000 has been verified. Official Receipt #RCP-BLISS-001 is now ready.',
+                'Your payment of NGN 5,000,000 has been verified. Official Receipt #RCP-elpis-001 is now ready.',
                 0, datetime('now', '-2 days'))
         """,
         (ada_client_id,),

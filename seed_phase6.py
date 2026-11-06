@@ -101,15 +101,15 @@ def seed():
     cur = conn.cursor()
 
     staff = [
-        ("md@bliss.com", "Managing Director", 1, None, "08060000000", "Managing Director"),
-        ("bm.ikeja@bliss.com", "Ikeja Branch Manager", 2, 1, "08060000001", "Branch Manager"),
-        ("bm.ajah@bliss.com", "Ajah Branch Manager", 2, 2, "08060000002", "Branch Manager"),
-        ("tl.ikeja@bliss.com", "Ikeja Team Lead", 3, 1, "08060000003", "Team Lead"),
-        ("tl.ajah@bliss.com", "Ajah Team Lead", 3, 2, "08060000004", "Team Lead"),
-        ("mkt.ikeja@bliss.com", "Ikeja Marketer", 4, 1, "08060000005", "Marketer"),
-        ("mkt.ikeja2@bliss.com", "Ikeja Marketer Two", 4, 1, "08060000006", "Marketer"),
-        ("mkt.ajah@bliss.com", "Ajah Marketer", 4, 2, "08060000007", "Marketer"),
-        ("finance@bliss.com", "Head Finance Officer", 5, 1, "08060000008", "Finance Officer"),
+        ("md@elpisproperty.test", "Managing Director", 1, None, "08060000000", "Managing Director"),
+        ("bm.ikeja@elpisproperty.test", "Ikeja Branch Manager", 2, 1, "08060000001", "Branch Manager"),
+        ("bm.ajah@elpisproperty.test", "Ajah Branch Manager", 2, 2, "08060000002", "Branch Manager"),
+        ("tl.ikeja@elpisproperty.test", "Ikeja Team Lead", 3, 1, "08060000003", "Team Lead"),
+        ("tl.ajah@elpisproperty.test", "Ajah Team Lead", 3, 2, "08060000004", "Team Lead"),
+        ("mkt.ikeja@elpisproperty.test", "Ikeja Marketer", 4, 1, "08060000005", "Marketer"),
+        ("mkt.ikeja2@elpisproperty.test", "Ikeja Marketer Two", 4, 1, "08060000006", "Marketer"),
+        ("mkt.ajah@elpisproperty.test", "Ajah Marketer", 4, 2, "08060000007", "Marketer"),
+        ("finance@elpisproperty.test", "Head Finance Officer", 5, 1, "08060000008", "Finance Officer"),
     ]
     ids = {}
     for email, name, role_id, branch_id, phone, title in staff:
@@ -117,23 +117,23 @@ def seed():
         ensure_profile(cur, ids[email], phone, title)
 
     t1 = ensure_team(
-        cur, "Ikeja Team Alpha", 1, ids["tl.ikeja@bliss.com"],
-        [ids["tl.ikeja@bliss.com"], ids["mkt.ikeja@bliss.com"], ids["mkt.ikeja2@bliss.com"]],
+        cur, "Ikeja Team Alpha", 1, ids["tl.ikeja@elpisproperty.test"],
+        [ids["tl.ikeja@elpisproperty.test"], ids["mkt.ikeja@elpisproperty.test"], ids["mkt.ikeja2@elpisproperty.test"]],
     )
     t2 = ensure_team(
-        cur, "Ajah Team", 2, ids["tl.ajah@bliss.com"],
-        [ids["tl.ajah@bliss.com"], ids["mkt.ajah@bliss.com"]],
+        cur, "Ajah Team", 2, ids["tl.ajah@elpisproperty.test"],
+        [ids["tl.ajah@elpisproperty.test"], ids["mkt.ajah@elpisproperty.test"]],
     )
 
     # Preserve existing attribution but give demo clients a team lead so the
     # Team Lead dashboard has an authorised portfolio to display.
     cur.execute(
         "UPDATE clients SET team_lead_id=? WHERE assigned_branch_id=1 AND is_deleted=0 AND team_lead_id IS NULL",
-        (ids["tl.ikeja@bliss.com"],),
+        (ids["tl.ikeja@elpisproperty.test"],),
     )
     cur.execute(
         "UPDATE clients SET team_lead_id=? WHERE assigned_branch_id=2 AND is_deleted=0 AND team_lead_id IS NULL",
-        (ids["tl.ajah@bliss.com"],),
+        (ids["tl.ajah@elpisproperty.test"],),
     )
 
     conn.commit()
