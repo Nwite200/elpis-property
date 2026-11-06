@@ -1,17 +1,17 @@
-// Bliss Legacy Limited — Dedicated Public Property Details Logic
+// elpis Legacy Limited — Dedicated Public Property Details Logic
 document.addEventListener('DOMContentLoaded', async () => {
-  if (window.BLISS_CONFIG_READY) await window.BLISS_CONFIG_READY;
+  if (window.elpis_CONFIG_READY) await window.elpis_CONFIG_READY;
   // Render persistent site header and footer
   const headerSlot = document.getElementById('header-slot');
   const footerSlot = document.getElementById('footer-slot');
-  if (headerSlot) headerSlot.innerHTML = Bliss.renderHeader('property-detail');
-  if (footerSlot) footerSlot.innerHTML = Bliss.renderFooter();
-  Bliss.initNav();
+  if (headerSlot) headerSlot.innerHTML = elpis.renderHeader('property-detail');
+  if (footerSlot) footerSlot.innerHTML = elpis.renderFooter();
+  elpis.initNav();
 
   const container = document.getElementById('propertyContainer');
   const params = new URLSearchParams(window.location.search);
   const propertyId = params.get('id');
-  let p = Bliss.findProperty(propertyId);
+  let p = elpis.findProperty(propertyId);
 
   // Live D1 listings use numeric IDs. Load them from the public API so the
   // homepage never links a live property to a "Property Not Found" page.
@@ -58,13 +58,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Set document title
-  document.title = `${p.name} | Bliss Legacy Limited`;
+  document.title = `${p.name} | elpis Legacy Limited`;
 
   const coverImage = (p.images && p.images[0]) || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80';
   const allImages = (p.images && p.images.length) ? p.images : [coverImage];
 
   // Pre-formatted WhatsApp message
-  const waMessage = `Hello Bliss Legacy Limited, I am interested in ${p.name} located at ${p.location} (${p.branch} Branch), listed at ${Bliss.money(p.price)}. Please provide more details.`;
+  const waMessage = `Hello elpis Legacy Limited, I am interested in ${p.name} located at ${p.location} (${p.branch} Branch), listed at ${elpis.money(p.price)}. Please provide more details.`;
 
   container.innerHTML = `
     <!-- Breadcrumb & Back Link -->
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     <!-- Demo Content Alert -->
     <div class="demo-alert-bar">
       <span class="demo-pill">Demonstration Listing</span>
-      <span class="demo-msg">This listing is demonstration content for Bliss Legacy Limited. Titles and pricing are verified sample parameters.</span>
+      <span class="demo-msg">This listing is demonstration content for elpis Legacy Limited. Titles and pricing are verified sample parameters.</span>
     </div>
 
     <!-- Property Header Info -->
@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="header-right">
         <div class="prop-price-card">
           <span class="price-type">Outright Investment Price</span>
-          <span class="price-val">${Bliss.money(p.price)}</span>
+          <span class="price-val">${elpis.money(p.price)}</span>
           <span class="units-status">✓ ${p.units} of ${p.totalUnits || 10} Units Available</span>
         </div>
       </div>
@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <h2 class="section-subtitle">Property Overview & Description</h2>
           <div class="prop-text-body">
             <p>${p.description}</p>
-            <p>Every development under Bliss Legacy Limited undergoes rigorous title verification, architectural quality auditing, and clear legal boundary mapping. Clients enjoy transparent purchasing procedures without hidden agency commissions or dispute burdens.</p>
+            <p>Every development under elpis Legacy Limited undergoes rigorous title verification, architectural quality auditing, and clear legal boundary mapping. Clients enjoy transparent purchasing procedures without hidden agency commissions or dispute burdens.</p>
           </div>
         </section>
 
@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div>
               <h3 class="trust-box-title">Verified Title & Buyer Protection</h3>
               <p class="trust-box-desc">
-                Bliss Legacy Limited guarantees complete documentation transparency on this property. Title verification documents, survey plans, and allocation protocols are provided upon inspection and formal inquiry.
+                elpis Legacy Limited guarantees complete documentation transparency on this property. Title verification documents, survey plans, and allocation protocols are provided upon inspection and formal inquiry.
               </p>
             </div>
           </div>
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="enquiry-success" id="detailFormSuccess" style="display:none">
             <div class="success-icon">✓</div>
             <h4>Enquiry Received!</h4>
-            <p>Thank you for your interest in <strong>${p.name}</strong>. A dedicated Bliss Legacy consultant from the <strong>${p.branch} Branch</strong> will contact you promptly.</p>
+            <p>Thank you for your interest in <strong>${p.name}</strong>. A dedicated elpis Legacy consultant from the <strong>${p.branch} Branch</strong> will contact you promptly.</p>
             <button class="btn btn-outline btn-sm" id="resetEnqFormBtn" style="margin-top:12px">Send Another Inquiry</button>
           </div>
         </div>
@@ -292,7 +292,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (detailWa) {
     detailWa.addEventListener('click', (e) => {
       e.preventDefault();
-      Bliss.enquireWhatsApp(waMessage);
+      elpis.enquireWhatsApp(waMessage);
     });
   }
 
@@ -356,7 +356,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Render Related Properties (excluding current property)
   const relatedGrid = document.getElementById('relatedGrid');
   if (relatedGrid) {
-    const related = Bliss.properties().filter(item => item.id !== p.id).slice(0, 3);
+    const related = elpis.properties().filter(item => item.id !== p.id).slice(0, 3);
     relatedGrid.innerHTML = related.map(item => {
       const img = (item.images && item.images[0]) || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80';
       return `
@@ -376,12 +376,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="prop-pricing-row">
               <div class="price-box">
                 <span class="price-lbl">Price</span>
-                <span class="price-amt">${Bliss.money(item.price)}</span>
+                <span class="price-amt">${elpis.money(item.price)}</span>
               </div>
             </div>
             <div class="prop-actions-row">
               <a href="property.html?id=${item.id}" class="btn btn-card-details">View Details</a>
-              <a href="#" class="btn btn-card-enquire wa-link" data-message="Hello Bliss Legacy, I am interested in ${item.name}.">Enquire</a>
+              <a href="#" class="btn btn-card-enquire wa-link" data-message="Hello elpis Legacy, I am interested in ${item.name}.">Enquire</a>
             </div>
           </div>
         </article>
@@ -391,11 +391,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     relatedGrid.querySelectorAll('.wa-link').forEach(a => {
       a.addEventListener('click', (e) => {
         e.preventDefault();
-        const msg = a.getAttribute('data-message') || 'Hello Bliss Legacy.';
-        Bliss.enquireWhatsApp(msg);
+        const msg = a.getAttribute('data-message') || 'Hello elpis Legacy.';
+        elpis.enquireWhatsApp(msg);
       });
     });
   }
 
-  Bliss.observeFade();
+  elpis.observeFade();
 });
