@@ -75,7 +75,7 @@ async function verifyPassword(password, stored) {
   return hash === expected;
 }
 
-const IDENTITY_HASH_SALT = "ELPIS-legacy-identity-v1:";
+const IDENTITY_HASH_SALT = "ELPIS-property-identity-v1:";
 
 function normalizeIdentityType(value) {
   const raw = String(value || "").trim().toLowerCase();
@@ -234,7 +234,7 @@ async function recentAuditCount(env, action, targetId, minutes) {
 }
 
 function referralCodeCandidate() {
-  return "BL-" + crypto.randomUUID().replace(/-/g, "").slice(0, 8).toUpperCase();
+  return "ELP-" + crypto.randomUUID().replace(/-/g, "").slice(0, 8).toUpperCase();
 }
 
 async function allocateReferralCode(env) {
@@ -243,7 +243,7 @@ async function allocateReferralCode(env) {
     const existing = await env.DB.prepare("SELECT id FROM users WHERE referral_code=?").bind(code).first();
     if (!existing) return code;
   }
-  return "BL-" + Date.now().toString(36).toUpperCase().slice(-8);
+  return "ELP-" + Date.now().toString(36).toUpperCase().slice(-8);
 }
 
 async function resolveReferralStaff(env, rawCode) {
@@ -579,15 +579,15 @@ async function createAlatpayVirtualAccount(env, client, amountKobo, actorId) {
   const parts = String(client.full_name || "ELPIS Client").trim().split(/\s+/);
   const firstName = parts.shift() || "ELPIS";
   const lastName = parts.join(" ") || "Client";
-  const orderId = "BL-" + String(client.client_reference || client.id) + "-" + Date.now().toString(36).toUpperCase();
+  const orderId = "ELP-" + String(client.client_reference || client.id) + "-" + Date.now().toString(36).toUpperCase();
   const payload = {
     businessId: settings.businessId,
     amount,
     currency: "NGN",
     orderId,
-    description: "ELPIS Legacy property payment",
+    description: "Elpis Property property payment",
     customer: {
-      email: client.email_address || env.ALATPAY_DEFAULT_EMAIL || "hrELPISlegacy@gmail.com",
+      email: client.email_address || env.ALATPAY_DEFAULT_EMAIL || "hrElpisProperty@gmail.com",
       phone: client.phone_number || "",
       firstName,
       lastName,
@@ -820,7 +820,7 @@ async function validateAlatpayStaticWallet(env, client, otp, actorId) {
     clientId: client.id,
     templateKey: "static_wallet_ready",
     phone: client.phone_number,
-    body: `Your permanent ALATPay account is ${accountNumber} (${data.bankName || data.bank_name || "Wema Bank"}). Use it for any amount. ELPIS Legacy.`,
+    body: `Your permanent ALATPay account is ${accountNumber} (${data.bankName || data.bank_name || "Wema Bank"}). Use it for any amount. Elpis Property.`,
     idempotencyKey: `client:${client.id}:static_wallet_ready`,
     createdBy: actorId || null
   }).catch(() => {});
@@ -3148,8 +3148,8 @@ function formatNGN(kobo) {
 }
 
 // Permanent / dedicated payment accounts are displayed as
-// "Client Name / ELPIS Legacy Limited" on every client-facing screen.
-const VIRTUAL_ACCOUNT_COMPANY_NAME = "ELPIS Legacy Limited";
+// "Client Name / Elpis Property Limited" on every client-facing screen.
+const VIRTUAL_ACCOUNT_COMPANY_NAME = "Elpis Property Limited";
 function clientVirtualAccountName(client) {
   const name = String((client && client.full_name) || "").trim() || "ELPIS Client";
   return `${name} / ${VIRTUAL_ACCOUNT_COMPANY_NAME}`;
@@ -3481,7 +3481,7 @@ function buildReceiptPdf({ receiptRef, clientName, clientRef, propertyTitle, pro
   commands.push(`q 1 1 1 rg 34 746 140 92 re f Q`);
   if (logoBytes) commands.push(`q 126 0 0 84 40 750 cm /Im0 Do Q`);
   commands.push(`BT /F2 19 Tf 1 1 1 rg 360 808 Td ${pdfText("OFFICIAL RECEIPT")} Tj ET`);
-  commands.push(`BT /F1 9 Tf 1 1 1 rg 360 792 Td ${pdfText("ELPIS Legacy Limited")} Tj ET`);
+  commands.push(`BT /F1 9 Tf 1 1 1 rg 360 792 Td ${pdfText("Elpis Property Limited")} Tj ET`);
   commands.push(`BT /F1 9 Tf 1 1 1 rg 360 778 Td ${pdfText("Real Estate & Property Investment")} Tj ET`);
 
   commands.push(`BT /F2 16 Tf ${ink} rg 48 682 Td ${pdfText("Payment Receipt")} Tj ET`);
@@ -3512,7 +3512,7 @@ function buildReceiptPdf({ receiptRef, clientName, clientRef, propertyTitle, pro
   commands.push(`BT /F2 14 Tf ${ink} rg 48 418 Td ${pdfText("NGN " + (remainingKobo / 100).toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 }))} Tj ET`);
 
   commands.push(`q 0.850 0.870 0.850 RG 0.6 w 48 150 m 547 150 l S Q`);
-  commands.push(`BT /F2 9 Tf ${ink} rg 48 128 Td ${pdfText("ELPIS Legacy Limited")} Tj ET`);
+  commands.push(`BT /F2 9 Tf ${ink} rg 48 128 Td ${pdfText("Elpis Property Limited")} Tj ET`);
   commands.push(`BT /F1 8 Tf ${muted} rg 48 112 Td ${pdfText("This receipt is computer-generated from verified D1 transaction records and stored in Cloudflare R2.")} Tj ET`);
   commands.push(`BT /F1 8 Tf ${muted} rg 48 98 Td ${pdfText("Only verified transactions are receipted. Reversals and refunds are separate immutable adjustments.")} Tj ET`);
   if (demo) {
@@ -3548,7 +3548,7 @@ function buildCommissionReceiptPdf({ receiptRef, paymentRef, recipientName, plan
   commands.push(`q 1 1 1 rg 34 746 140 92 re f Q`);
   if (logoBytes) commands.push(`q 126 0 0 84 40 750 cm /Im0 Do Q`);
   commands.push(`BT /F2 19 Tf 1 1 1 rg 360 808 Td ${pdfText("COMMISSION RECEIPT")} Tj ET`);
-  commands.push(`BT /F1 9 Tf 1 1 1 rg 360 792 Td ${pdfText("ELPIS Legacy Limited")} Tj ET`);
+  commands.push(`BT /F1 9 Tf 1 1 1 rg 360 792 Td ${pdfText("Elpis Property Limited")} Tj ET`);
   commands.push(`BT /F1 9 Tf 1 1 1 rg 360 778 Td ${pdfText("Commission Payment Record")} Tj ET`);
   const row = (label, value, y, bold) => {
     commands.push(`BT /F2 10 Tf ${muted} rg 48 ${y} Td ${pdfText(label)} Tj ET`);
@@ -3567,7 +3567,7 @@ function buildCommissionReceiptPdf({ receiptRef, paymentRef, recipientName, plan
   commands.push(`BT /F2 10 Tf ${muted} rg 64 518 Td ${pdfText("COMMISSION AMOUNT PAID")} Tj ET`);
   commands.push(`BT /F2 24 Tf ${green} rg 64 486 Td ${pdfText("NGN " + (amountKobo / 100).toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 }))} Tj ET`);
   commands.push(`q 0.850 0.870 0.850 RG 0.6 w 48 150 m 547 150 l S Q`);
-  commands.push(`BT /F2 9 Tf ${ink} rg 48 128 Td ${pdfText("ELPIS Legacy Limited")} Tj ET`);
+  commands.push(`BT /F2 9 Tf ${ink} rg 48 128 Td ${pdfText("Elpis Property Limited")} Tj ET`);
   commands.push(`BT /F1 8 Tf ${muted} rg 48 112 Td ${pdfText("This commission payment record is generated from approved D1 commission data.")} Tj ET`);
   commands.push(`BT /F1 8 Tf ${muted} rg 48 98 Td ${pdfText("Commission payments are separate from client payment receipts.")} Tj ET`);
   const content = latin1(commands.join("\n"));
@@ -3594,7 +3594,7 @@ function buildFinancialReportPdf({ title, reportRef, generatedAt, generatedBy, f
   commands.push(`q 1 1 1 rg 34 746 140 92 re f Q`);
   if (logoBytes) commands.push(`q 126 0 0 84 40 750 cm /Im0 Do Q`);
   commands.push(`BT /F2 18 Tf 1 1 1 rg 350 808 Td ${pdfText(title)} Tj ET`);
-  commands.push(`BT /F1 9 Tf 1 1 1 rg 350 792 Td ${pdfText("ELPIS Legacy Limited")} Tj ET`);
+  commands.push(`BT /F1 9 Tf 1 1 1 rg 350 792 Td ${pdfText("Elpis Property Limited")} Tj ET`);
   commands.push(`BT /F1 9 Tf 1 1 1 rg 350 778 Td ${pdfText("Financial Report")} Tj ET`);
   let y = 706;
   const line = (text, size, font, color) => {
@@ -3635,7 +3635,7 @@ function buildFinancialReportPdf({ title, reportRef, generatedAt, generatedBy, f
 async function getReceiptLogoBytes(env) {
   try {
     if (!env.ASSETS || typeof env.ASSETS.fetch !== "function") return null;
-    const res = await env.ASSETS.fetch(new URL("/assets/images/ELPIS-legacy-logo.jpg", "https://ELPIS.local"));
+    const res = await env.ASSETS.fetch(new URL("/assets/images/elpis-property-logo-original.png", "https://elpisproperty.org"));
     if (!res || !res.ok) return null;
     const buf = await res.arrayBuffer();
     return new Uint8Array(buf);
@@ -4066,7 +4066,7 @@ async function getSmsSettings(env) {
   return {
     enabled: String(values.sms_enabled || "0") === "1",
     provider: String(env.SMS_PROVIDER || values.sms_provider || "termii").toLowerCase(),
-    senderId: String(env.SMS_SENDER_ID || values.sms_sender_id || "ELPISLegacy"),
+    senderId: String(env.SMS_SENDER_ID || values.sms_sender_id || "ElpisProperty"),
     lowCreditThreshold: Number(values.sms_low_credit_threshold || 1000),
     remindersEnabled: String(values.sms_reminders_enabled || "0") === "1",
     defaultingRemindersEnabled: String(values.sms_defaulting_reminders_enabled || "0") === "1",
@@ -4284,7 +4284,7 @@ async function sendPaymentReceivedSms(env, paymentId) {
   const paidKobo = Number(total ? total.paid : 0);
   const balanceKobo = Math.max(0, toKobo(row.agreed_purchase_price || 0) - paidKobo);
   const template = await getSmsTemplate(env, "payment_received");
-  let body = renderSmsTemplate(template ? template.body : "Payment received: NGN {amount}. New balance: NGN {balance}. Ref: {reference}. ELPIS Legacy.", {
+  let body = renderSmsTemplate(template ? template.body : "Payment received: NGN {amount}. New balance: NGN {balance}. Ref: {reference}. Elpis Property.", {
     name: row.full_name,
     amount: fromKobo(Number(row.amount_kobo || toKobo(row.amount))).toLocaleString("en-NG"),
     balance: fromKobo(balanceKobo).toLocaleString("en-NG"),
@@ -4312,7 +4312,7 @@ async function sendAccountCreatedSms(env, clientId, actorId) {
   if (!client) return { skipped: true };
   const wallet = await getClientStaticWallet(env, client.id, getPaymentMode(env));
   const template = await getSmsTemplate(env, "account_created");
-  let body = renderSmsTemplate(template ? template.body : "Welcome {name}. Your ELPIS Legacy client reference is {reference}.", {
+  let body = renderSmsTemplate(template ? template.body : "Welcome {name}. Your Elpis Property client reference is {reference}.", {
     name: client.full_name, reference: client.client_reference
   });
   if (wallet && wallet.status === "active" && wallet.account_number) {
@@ -4362,7 +4362,7 @@ async function sendEmailThroughProvider(env, to, subject, text) {
       body: JSON.stringify({
         from: env.EMAIL_FROM || env.RESEND_FROM,
         to: [recipient],
-        subject: String(subject || "ELPIS Legacy verification").slice(0, 180),
+        subject: String(subject || "Elpis Property verification").slice(0, 180),
         text: String(text || "").slice(0, 4000)
       })
     });
@@ -4433,14 +4433,14 @@ async function createClientVerificationOtp(env, client, requestedChannel, actorI
   try {
     if (channel === "email") {
       const result = await sendEmailThroughProvider(
-        env, destination, "Your ELPIS Legacy verification code",
-        `Hello ${client.full_name || "Client"},\n\nYour ELPIS Legacy verification code is ${code}.\nIt expires in 10 minutes. Do not share this code.\n\nELPIS Legacy Limited`
+        env, destination, "Your Elpis Property verification code",
+        `Hello ${client.full_name || "Client"},\n\nYour Elpis Property verification code is ${code}.\nIt expires in 10 minutes. Do not share this code.\n\nElpis Property Limited`
       );
       deliveryStatus = "sent";
       providerMessageId = result.providerMessageId || null;
     } else {
       const template = await getSmsTemplate(env, "client_verification_otp");
-      const body = renderSmsTemplate(template ? template.body : "Your ELPIS Legacy verification code is {code}. It expires in 10 minutes.", { code });
+      const body = renderSmsTemplate(template ? template.body : "Your Elpis Property verification code is {code}. It expires in 10 minutes.", { code });
       const queued = await enqueueSms(env, {
         clientId: client.id,
         templateKey: "client_verification_otp",
@@ -4616,7 +4616,7 @@ async function dispatchSmsSchedules(env) {
       const daysUntil = diffDays(today, state.next_due_date);
       if (daysUntil >= 0 && daysUntil <= settings.reminderDays) {
         const template = await getSmsTemplate(env, "payment_reminder");
-        const body = renderSmsTemplate(template ? template.body : "Reminder: NGN {amount} is due on {due_date}. ELPIS Legacy.", {
+        const body = renderSmsTemplate(template ? template.body : "Reminder: NGN {amount} is due on {due_date}. Elpis Property.", {
           amount: fromKobo(state.next_installment_kobo).toLocaleString("en-NG"),
           due_date: state.next_due_date,
           property: schedule.property_title,
@@ -5130,7 +5130,7 @@ async function handleFetch(request, env) {
       await createNotification(env, {
         userId,
         type: "client.welcome",
-        title: "Welcome to ELPIS Legacy",
+        title: "Welcome to Elpis Property",
         message: `Your client portal account is ready. Your client reference is ${clientRef}.`,
         metadata: { client_id: clientId, client_reference: clientRef }
       });
@@ -6115,7 +6115,7 @@ async function handleFetch(request, env) {
       const hideDemo = String(await getAppSetting(env, "hide_demo_properties", "1")) !== "0";
       return json({
         config: {
-          companyName: config.company_name || "ELPIS Legacy Limited",
+          companyName: config.company_name || "Elpis Property Limited",
           tagline: config.tagline || "Your Future Begins With the Right Property.",
           phone: config.phone || "",
           whatsappNumber: config.whatsapp_number || "",
@@ -10809,7 +10809,7 @@ async function handleFetch(request, env) {
       let text = String(body.body || "").trim();
       if (!text && body.template_key) {
         const template = await getSmsTemplate(env, String(body.template_key));
-        text = renderSmsTemplate(template ? template.body : "ELPIS Legacy test message.", {
+        text = renderSmsTemplate(template ? template.body : "Elpis Property test message.", {
           name: actor.full_name, amount: "1,000", balance: "1,000", paid: "1,000", total: "2,000",
           property: "Test property", date: todayOnly(), reference: "TEST", due_date: todayOnly(),
           next_due: todayOnly(), days: "1"
