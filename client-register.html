@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register Client | Bliss Legacy Limited</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/motion.css">
+  <script src="assets/js/intro-config.js"></script>
+  <script src="assets/js/motion.js"></script>
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Bliss Legacy">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
+  <meta name="theme-color" content="#00B522" />
+</head>
+<body>
+  <div class="dash">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand"><img src="assets/images/bliss-legacy-logo.png" alt="Bliss Legacy"></div>
+      <div class="section-label">Clients</div>
+      <a href="clients.html">All Clients</a>
+      <a href="#" class="active">Register Client</a>
+      <div class="section-label">Account</div>
+      <a href="#" id="logoutBtn">Logout</a>
+    </aside>
+    <main class="dash-main">
+      <div class="dash-top"><h1>Register Client</h1></div>
+      <div class="card" style="max-width:760px">
+        <form id="clientForm" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div style="grid-column:1/-1"><label class="field-label">Full name <span class="req">*</span></label><input id="full_name" type="text" required></div>
+          <div style="grid-column:1/-1"><label class="field-label">Phone number <span class="req">*</span></label><input id="phone_number" type="tel" required></div>
+          <div style="grid-column:1/-1"><label class="field-label">Alternate phone number</label><input id="alternate_phone" type="tel"></div>
+          <div style="grid-column:1/-1"><label class="field-label">Email address</label><input id="email_address" type="email"></div>
+          <div style="grid-column:1/-1"><label class="field-label">Residential address</label><input id="residential_address" type="text"></div>
+          <div style="grid-column:1/-1"><label class="field-label">State</label><input id="state" type="text"></div>
+          <div style="grid-column:1/-1"><label class="field-label">City</label><input id="city" type="text"></div>
+          <div><label class="field-label">Next of kin name</label><input id="next_of_kin_name" type="text"></div>
+          <div><label class="field-label">Next of kin phone</label><input id="next_of_kin_phone" type="tel"></div>
+          <div><label class="field-label">Next of kin relationship</label><input id="next_of_kin_relationship" type="text" placeholder="e.g. Spouse, sibling"></div>
+          <div><label class="field-label">Next of kin address</label><input id="next_of_kin_address" type="text"></div>
+          <div>
+            <label class="field-label">Identity type</label>
+            <select id="identity_type">
+              <option value="">Not provided</option>
+              <option value="NIN">NIN (National Identification Number)</option>
+              <option value="International Passport">International Passport</option>
+              <option value="Driver's License">Driver's Licence</option>
+              <option value="Permanent Voter's Card">Permanent Voter's Card</option>
+            </select>
+          </div>
+          <div><label class="field-label">Identity number</label><input id="identity_number" type="text" autocomplete="off" placeholder="Stored masked; never shown in full"></div>
+          <div style="grid-column:1/-1"><label class="field-label">Referral code (optional)</label><input id="referral_code" type="text" placeholder="Staff referral code"></div>
+          <div style="grid-column:1/-1"><label class="field-label">Preferred channel</label><select id="preferred_channel"><option>WhatsApp</option><option>Email</option><option>Phone</option><option>WhatsApp + Email</option></select></div>
+          <div style="grid-column:1/-1"><label class="field-label">Sale type</label><select id="sale_type"><option>New Sale</option><option>Resale</option><option>Referral</option><option>Other</option></select></div>
+          <div style="grid-column:1/-1"><label class="field-label">Interested property</label><select id="interested_property_id"><option value="">No property selected</option></select></div>
+          <div style="grid-column:1/-1" id="planOfferingWrap">
+            <label class="field-label">Payment plan offered for this property</label>
+            <div id="planOffering" class="quick-links"><span class="small muted">Select a property to see its payment plans.</span></div>
+            <input type="hidden" id="property_plan_id">
+          </div>
+          <div style="grid-column:1/-1"><label class="field-label">Agreed purchase price (₦)</label><input id="agreed_purchase_price" type="number" placeholder="Locked automatically when a property plan is selected"></div>
+          <div style="grid-column:1/-1" style="display:flex;gap:12px;align-items:end">
+            <div style="flex:1"><label class="field-label">Assigned branch</label><select id="assigned_branch_id"></select></div>
+            <div style="flex:1"><label class="field-label">Status</label><select id="status"><option>Prospect</option><option>Interested</option><option>Negotiation</option><option>Reserved</option><option>Active Buyer</option><option>Completed</option><option>Cancelled</option><option>Inactive</option></select></div>
+          </div>
+          <div style="grid-column:1/-1"><label class="field-label">ALATPay BVN for static wallet (optional — not stored)</label><input id="static_wallet_bvn" type="password" inputmode="numeric" maxlength="11" autocomplete="off" placeholder="Leave blank to create the wallet later"><div class="small muted">Required by ALATPay for a permanent account. OTP validation happens afterwards; this form never stores the BVN.</div></div>
+          <div style="grid-column:1/-1"><label class="field-label">Notes</label><textarea id="notes" rows="3"></textarea></div>
+          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
+            <a class="btn btn-outline" href="clients.html">Cancel</a>
+            <button class="btn btn-green" type="submit">Register Client</button>
+          </div>
+          <div id="formMsg" style="color:#c0392b;font-size:13px;margin-top:8px"></div>
+        </form>
+      </div>
+    </main>
+  </div>
+  <script src="assets/js/client-register.js"></script>
+  <script src="assets/js/mobile-nav.js"></script>
+  <script src="assets/js/pwa.js"></script>
+</body>
+</html>
