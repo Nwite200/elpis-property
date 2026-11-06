@@ -108,16 +108,16 @@ function upsertClient(ref, data) {
 // ---------------------------------------------------------------------------
 // Deterministic seed
 // ---------------------------------------------------------------------------
-const mdId = upsertUser('md@bliss.com', 'Managing Director', 1, null);
-const bmId = upsertUser('bm.ikeja@bliss.com', 'Ikeja Branch Manager', 2, 1);
-const bm2Id = upsertUser('bm.ajah@bliss.com', 'Ajah Branch Manager', 2, 2);
-const tlId = upsertUser('tl.ikeja@bliss.com', 'Ikeja Team Lead', 3, 1);
-const mktId = upsertUser('mkt.ikeja@bliss.com', 'Ikeja Marketer', 4, 1);
-const mkt2Id = upsertUser('mkt.ajah@bliss.com', 'Ajah Marketer', 4, 2);
-const finId = upsertUser('finance@bliss.com', 'Head Finance Officer', 5, 1);
+const mdId = upsertUser('md@elpisproperty.test', 'Managing Director', 1, null);
+const bmId = upsertUser('bm.ikeja@elpisproperty.test', 'Ikeja Branch Manager', 2, 1);
+const bm2Id = upsertUser('bm.ajah@elpisproperty.test', 'Ajah Branch Manager', 2, 2);
+const tlId = upsertUser('tl.ikeja@elpisproperty.test', 'Ikeja Team Lead', 3, 1);
+const mktId = upsertUser('mkt.ikeja@elpisproperty.test', 'Ikeja Marketer', 4, 1);
+const mkt2Id = upsertUser('mkt.ajah@elpisproperty.test', 'Ajah Marketer', 4, 2);
+const finId = upsertUser('finance@elpisproperty.test', 'Head Finance Officer', 5, 1);
 const adaUserId = upsertUser('ada@example.com', 'Ada Nwosu', 6, 1);
 const musaUserId = upsertUser('musa@example.com', 'Musa Dike', 6, 1);
-const demoUserId = upsertUser('demo@bliss.com', 'Demo Investor', 6, 1);
+const demoUserId = upsertUser('demo@elpisproperty.test', 'Demo Investor', 6, 1);
 const noPlanUserId = upsertUser('noplan@example.com', 'No Plan Client', 6, 1);
 
 const prop = db.prepare("SELECT id FROM properties WHERE reference='BLP-TEST-001'").get();
@@ -143,7 +143,7 @@ const musaId = upsertClient('BLC-MW2F7LG0', {
   marketerId: mktId, teamLeadId: tlId, agreedPrice: 20000000, propertyId: propId, userId: musaUserId
 });
 const demoClientId = upsertClient('DEMO-CLIENT-001', {
-  full_name: 'Demo Investor', phone_number: '08099998888', email_address: 'demo@bliss.com',
+  full_name: 'Demo Investor', phone_number: '08099998888', email_address: 'demo@elpisproperty.test',
   address: 'Demo Street, Abuja', state: 'FCT', city: 'Abuja', branchId: 1, createdBy: mktId,
   marketerId: mktId, agreedPrice: 15000000, propertyId: propId, userId: demoUserId
 });
@@ -174,7 +174,7 @@ db.prepare("UPDATE provider_configs SET status='Awaiting onboarding', environmen
 const adaPayment1 = Number(db.prepare(`INSERT INTO payments (client_id, property_id, transaction_ref, amount, amount_kobo, method, status, is_demo, verified_at, verified_by, created_at)
   VALUES (?, ?, 'TX-VERIFIED-ADA-01', 5000000, 500000000, 'Bank Transfer', 'verified', 0, datetime('now','-2 days'), ?, datetime('now','-2 days'))`).run(adaId, propId, finId).lastInsertRowid);
 db.prepare(`INSERT INTO receipts (payment_id, client_id, receipt_ref, amount, amount_kobo, remaining_balance_kobo, is_demo)
-  VALUES (?, ?, 'RCP-BLISS-001', 5000000, 500000000, 700000000, 0)`).run(adaPayment1, adaId);
+  VALUES (?, ?, 'RCP-elpis-001', 5000000, 500000000, 700000000, 0)`).run(adaPayment1, adaId);
 const adaPayment2 = Number(db.prepare(`INSERT INTO payments (client_id, property_id, transaction_ref, amount, amount_kobo, method, status, is_demo, created_at)
   VALUES (?, ?, 'TX-PENDING-ADA-02', 2000000, 200000000, 'Bank Transfer', 'pending', 0, datetime('now','-3 hours'))`).run(adaId, propId).lastInsertRowid);
 const adaPayment3 = Number(db.prepare(`INSERT INTO payments (client_id, property_id, transaction_ref, amount, amount_kobo, method, status, is_demo, created_at)
@@ -194,7 +194,7 @@ db.prepare(`INSERT INTO receipts (payment_id, client_id, receipt_ref, amount, am
 // ---------------------------------------------------------------------------
 const r2 = new Map();
 const queuedMessages = [];
-const logoBytes = new Uint8Array(readFileSync('assets/images/bliss-legacy-logo.jpg'));
+const logoBytes = new Uint8Array(readFileSync('assets/images/elpis-legacy-logo.jpg'));
 
 function makeEnv(overrides = {}) {
   return {
@@ -253,7 +253,7 @@ function makeEnv(overrides = {}) {
     ASSETS: {
       async fetch(input) {
         const url = typeof input === 'string' ? input : (input.url || String(input));
-        if (url.includes('bliss-legacy-logo')) {
+        if (url.includes('elpis-legacy-logo')) {
           return new Response(logoBytes, { status: 200, headers: { 'Content-Type': 'image/jpeg' } });
         }
         return new Response('Not found', { status: 404 });
@@ -357,19 +357,19 @@ function webhookBody(id, transactionRef, amountNaira, extra = {}) {
 // Suite
 // ---------------------------------------------------------------------------
 console.log('\n========================================================');
-console.log('   BLISS LEGACY — PHASE 5 VERIFICATION SUITE');
+console.log('   elpis LEGACY — PHASE 5 VERIFICATION SUITE');
 console.log('========================================================\n');
 
 const adaCookie = await login('ada@example.com');
 const musaCookie = await login('musa@example.com');
 const noPlanCookie = await login('noplan@example.com');
-const financeCookie = await login('finance@bliss.com');
-const mdCookie = await login('md@bliss.com');
-const bmCookie = await login('bm.ikeja@bliss.com');
-const bm2Cookie = await login('bm.ajah@bliss.com');
-const tlCookie = await login('tl.ikeja@bliss.com');
-const mktCookie = await login('mkt.ikeja@bliss.com');
-const demoCookie = await login('demo@bliss.com');
+const financeCookie = await login('finance@elpisproperty.test');
+const mdCookie = await login('md@elpisproperty.test');
+const bmCookie = await login('bm.ikeja@elpisproperty.test');
+const bm2Cookie = await login('bm.ajah@elpisproperty.test');
+const tlCookie = await login('tl.ikeja@elpisproperty.test');
+const mktCookie = await login('mkt.ikeja@elpisproperty.test');
+const demoCookie = await login('demo@elpisproperty.test');
 
 console.log('--- 1. Client authentication & sessions ---');
 await test('client can sign in with email, client reference and receives a hardened cookie', async () => {
@@ -517,7 +517,7 @@ await test('receipts list exposes verification, balance and download URL', async
   const res = await request('/api/client/receipts', { headers: { Cookie: adaCookie } });
   assert(res.status === 200, 'expected 200');
   adaReceipt = res.data.receipts[0];
-  assert(adaReceipt.receipt_number === 'RCP-BLISS-001', 'receipt number correct');
+  assert(adaReceipt.receipt_number === 'RCP-elpis-001', 'receipt number correct');
   assert(adaReceipt.amount_kobo === 500000000, 'amount correct');
   assert(adaReceipt.remaining_balance_kobo === 700000000, 'remaining balance correct');
   assert(adaReceipt.verification_status === 'Verified', 'verification status correct');
@@ -531,10 +531,10 @@ await test('receipt PDF is generated, stored in R2 and contains the official log
   const text = pdfText(res.data);
   assert(text.startsWith('%PDF-1.4'), 'valid PDF header');
   assert(text.includes('OFFICIAL RECEIPT'), 'receipt title present');
-  assert(text.includes('RCP-BLISS-001'), 'receipt number present');
+  assert(text.includes('RCP-elpis-001'), 'receipt number present');
   assert(text.includes('BLC-MW2ER37J'), 'client reference present');
   assert(text.includes('/DCTDecode'), 'official logo image embedded');
-  const key = `receipts/BLC-MW2ER37J/RCP-BLISS-001.pdf`;
+  const key = `receipts/BLC-MW2ER37J/RCP-elpis-001.pdf`;
   assert(r2.has(key), 'PDF stored in R2');
   const dbKey = db.prepare('SELECT r2_key FROM receipts WHERE id=?').get(adaReceipt.id).r2_key;
   assert(dbKey === key, 'R2 key persisted on receipt row');
@@ -577,7 +577,7 @@ await test('only an Active provider with a genuine provider-issued account is sh
   assert(activeNoAccount.data.is_active === false, 'Active without an issued account stays pending');
 
   db.prepare(`INSERT OR REPLACE INTO virtual_accounts (client_id, provider, bank_name, account_name, account_number, account_status)
-    VALUES (?, 'wema_alat', 'Wema Bank', 'Ada Nwosu / Bliss Legacy', '0123456789', 'active')`).run(adaId);
+    VALUES (?, 'wema_alat', 'Wema Bank', 'Ada Nwosu / elpis Legacy', '0123456789', 'active')`).run(adaId);
   const active = await request('/api/client/virtual-account', { headers: { Cookie: adaCookie } });
   assert(active.data.is_active === true, 'genuine provider account is shown');
   assert(active.data.account_number === '0123456789', 'account number returned');
@@ -1392,7 +1392,7 @@ await test('receipts cannot be generated or retrieved for unverified payments', 
 });
 
 await test('private receipt R2 keys are never exposed by the public file route', async () => {
-  const adaKey = db.prepare("SELECT r2_key FROM receipts WHERE receipt_ref='RCP-BLISS-001'").get().r2_key;
+  const adaKey = db.prepare("SELECT r2_key FROM receipts WHERE receipt_ref='RCP-elpis-001'").get().r2_key;
   assert(Boolean(adaKey), 'live receipt has an R2 key');
   const leaked = await request(`/api/files/${encodeURIComponent(adaKey)}`);
   assert(leaked.status === 404, `live receipt public access expected 404, got ${leaked.status}`);

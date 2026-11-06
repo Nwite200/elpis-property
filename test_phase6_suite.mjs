@@ -88,18 +88,18 @@ function upsertClient(ref, data) {
   return Number(info.lastInsertRowid);
 }
 
-const mdId = upsertUser('md@bliss.com', 'Managing Director', 1, null);
-const bm1Id = upsertUser('bm.ikeja@bliss.com', 'Ikeja Branch Manager', 2, 1);
-const bm2Id = upsertUser('bm.ajah@bliss.com', 'Ajah Branch Manager', 2, 2);
-const tl1Id = upsertUser('tl.ikeja@bliss.com', 'Ikeja Team Lead', 3, 1);
-const tl2Id = upsertUser('tl.ajah@bliss.com', 'Ajah Team Lead', 3, 2);
-const mkt1Id = upsertUser('mkt.ikeja@bliss.com', 'Ikeja Marketer One', 4, 1);
-const mkt2Id = upsertUser('mkt.ikeja2@bliss.com', 'Ikeja Marketer Two', 4, 1);
-const mkt3Id = upsertUser('mkt.ajah@bliss.com', 'Ajah Marketer', 4, 2);
-const finId = upsertUser('finance@bliss.com', 'Head Finance Officer', 5, 1);
+const mdId = upsertUser('md@elpisproperty.test', 'Managing Director', 1, null);
+const bm1Id = upsertUser('bm.ikeja@elpisproperty.test', 'Ikeja Branch Manager', 2, 1);
+const bm2Id = upsertUser('bm.ajah@elpisproperty.test', 'Ajah Branch Manager', 2, 2);
+const tl1Id = upsertUser('tl.ikeja@elpisproperty.test', 'Ikeja Team Lead', 3, 1);
+const tl2Id = upsertUser('tl.ajah@elpisproperty.test', 'Ajah Team Lead', 3, 2);
+const mkt1Id = upsertUser('mkt.ikeja@elpisproperty.test', 'Ikeja Marketer One', 4, 1);
+const mkt2Id = upsertUser('mkt.ikeja2@elpisproperty.test', 'Ikeja Marketer Two', 4, 1);
+const mkt3Id = upsertUser('mkt.ajah@elpisproperty.test', 'Ajah Marketer', 4, 2);
+const finId = upsertUser('finance@elpisproperty.test', 'Head Finance Officer', 5, 1);
 const adaUserId = upsertUser('ada@example.com', 'Ada Nwosu', 6, 1);
 const musaUserId = upsertUser('musa@example.com', 'Musa Dike', 6, 1);
-const demoUserId = upsertUser('demo@bliss.com', 'Demo Investor', 6, 1);
+const demoUserId = upsertUser('demo@elpisproperty.test', 'Demo Investor', 6, 1);
 
 // Isolate Phase 6 fixtures from the local demo ledger so every metric is
 // deterministic. Users, branches and categories are preserved.
@@ -159,7 +159,7 @@ const crossId = upsertClient('BLC-P6-CROSS', {
   teamLeadId: tl2Id, agreedPrice: 8000000, propertyId: prop2.id
 });
 const demoId = upsertClient('DEMO-CLIENT-001', {
-  full_name: 'Demo Investor', phone_number: '08061000004', email_address: 'demo@bliss.com',
+  full_name: 'Demo Investor', phone_number: '08061000004', email_address: 'demo@elpisproperty.test',
   status: 'Active Buyer', branchId: 1, createdBy: mkt1Id, marketerId: mkt1Id,
   teamLeadId: tl1Id, agreedPrice: 15000000, propertyId: prop1.id, userId: demoUserId
 });
@@ -309,18 +309,18 @@ function assert(condition, message) {
 function moneyKobo(value) { return Math.round(Number(value || 0) * 100); }
 
 console.log('\n========================================================');
-console.log('   BLISS LEGACY — PHASE 6 VERIFICATION SUITE');
+console.log('   elpis LEGACY — PHASE 6 VERIFICATION SUITE');
 console.log('========================================================\n');
 
-const mdCookie = await login('md@bliss.com');
-const bm1Cookie = await login('bm.ikeja@bliss.com');
-const bm2Cookie = await login('bm.ajah@bliss.com');
-const tl1Cookie = await login('tl.ikeja@bliss.com');
-const tl2Cookie = await login('tl.ajah@bliss.com');
-const mkt1Cookie = await login('mkt.ikeja@bliss.com');
-const mkt2Cookie = await login('mkt.ikeja2@bliss.com');
-const mkt3Cookie = await login('mkt.ajah@bliss.com');
-const finCookie = await login('finance@bliss.com');
+const mdCookie = await login('md@elpisproperty.test');
+const bm1Cookie = await login('bm.ikeja@elpisproperty.test');
+const bm2Cookie = await login('bm.ajah@elpisproperty.test');
+const tl1Cookie = await login('tl.ikeja@elpisproperty.test');
+const tl2Cookie = await login('tl.ajah@elpisproperty.test');
+const mkt1Cookie = await login('mkt.ikeja@elpisproperty.test');
+const mkt2Cookie = await login('mkt.ikeja2@elpisproperty.test');
+const mkt3Cookie = await login('mkt.ajah@elpisproperty.test');
+const finCookie = await login('finance@elpisproperty.test');
 const adaCookie = await login('ada@example.com');
 
 console.log('--- 1. Role dashboards ---');
@@ -510,39 +510,39 @@ await test('staff list and creation enforce branch and role restrictions', async
 
   const created = await request('/api/staff', {
     method: 'POST', headers: { Cookie: mdCookie }, body: {
-      email: 'qa.lead@bliss.com', password: 'password123', full_name: 'QA Team Lead',
+      email: 'qa.lead@elpisproperty.test', password: 'password123', full_name: 'QA Team Lead',
       role_name: 'Team Lead', branch_id: 1, phone_number: '08063000000', job_title: 'QA Team Lead'
     }
   });
   assert(created.status === 200, `MD staff create expected 200, got ${created.status}: ${JSON.stringify(created.data)}`);
   const duplicate = await request('/api/staff', {
     method: 'POST', headers: { Cookie: mdCookie }, body: {
-      email: 'qa.lead@bliss.com', password: 'password123', full_name: 'Duplicate', role_name: 'Marketer', branch_id: 1
+      email: 'qa.lead@elpisproperty.test', password: 'password123', full_name: 'Duplicate', role_name: 'Marketer', branch_id: 1
     }
   });
   assert(duplicate.status === 409, 'duplicate staff email expected 409');
   const cross = await request('/api/staff', {
     method: 'POST', headers: { Cookie: bm1Cookie }, body: {
-      email: 'cross.staff@bliss.com', password: 'password123', full_name: 'Cross Staff', role_name: 'Marketer', branch_id: 2
+      email: 'cross.staff@elpisproperty.test', password: 'password123', full_name: 'Cross Staff', role_name: 'Marketer', branch_id: 2
     }
   });
   assert(cross.status === 403, 'BM cross-branch staff create expected 403');
   const bmCreated = await request('/api/staff', {
     method: 'POST', headers: { Cookie: bm1Cookie }, body: {
-      email: 'qa.marketer@bliss.com', password: 'password123', full_name: 'QA Marketer', role_name: 'Marketer', branch_id: 1
+      email: 'qa.marketer@elpisproperty.test', password: 'password123', full_name: 'QA Marketer', role_name: 'Marketer', branch_id: 1
     }
   });
   assert(bmCreated.status === 200, 'BM own-branch staff create expected 200');
   const mdRole = await request('/api/staff', {
     method: 'POST', headers: { Cookie: mdCookie }, body: {
-      email: 'second.md@bliss.com', password: 'password123', full_name: 'Second MD', role_name: 'Managing Director', branch_id: 1
+      email: 'second.md@elpisproperty.test', password: 'password123', full_name: 'Second MD', role_name: 'Managing Director', branch_id: 1
     }
   });
   assert(mdRole.status === 403, 'creating a second MD expected 403');
 });
 
 await test('staff update, activity history, deactivation and session invalidation work', async () => {
-  const qaStaff = db.prepare("SELECT id FROM users WHERE email='qa.lead@bliss.com'").get();
+  const qaStaff = db.prepare("SELECT id FROM users WHERE email='qa.lead@elpisproperty.test'").get();
   const updated = await request(`/api/staff/${qaStaff.id}`, {
     method: 'PUT', headers: { Cookie: mdCookie }, body: {
       role_name: 'Marketer', phone_number: '08063000001', job_title: 'QA Marketer',
@@ -559,7 +559,7 @@ await test('staff update, activity history, deactivation and session invalidatio
   });
   assert(crossUpdate.status === 200, 'BM own-branch staff update should succeed');
 
-  const qaCookie = await login('qa.lead@bliss.com');
+  const qaCookie = await login('qa.lead@elpisproperty.test');
   const activeMe = await request('/api/me', { headers: { Cookie: qaCookie } });
   assert(activeMe.status === 200, 'new staff login should work');
   const deactivate = await request(`/api/staff/${qaStaff.id}/status`, {
