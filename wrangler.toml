@@ -1,0 +1,112 @@
+name = "bliss-property"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+workers_dev = true
+preview_urls = false
+
+[assets]
+directory = "./"
+binding = "ASSETS"
+# Staging only: ensure the Worker runs so it can add X-Robots-Tag to HTML.
+run_worker_first = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "bliss-legacy-staging-db"
+database_id = "57cbf77c-f99e-4bf7-9a29-0a3e18a8b89a"
+migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "FILES"
+bucket_name = "bliss-legacy-staging-file"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "42bc72e5a1dd42f18e4469c8f7c8a7f1"
+
+[[queues.producers]]
+binding = "TASKS"
+queue = "bliss-legacy-staging-tasks"
+
+[[queues.consumers]]
+queue = "bliss-legacy-staging-tasks"
+max_batch_size = 10
+max_batch_timeout = 5
+max_retries = 5
+
+[[durable_objects.bindings]]
+name = "CHAT_ROOM"
+class_name = "ChatRoom"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["ChatRoom"]
+
+[triggers]
+crons = ["0 6 * * *"]
+
+[vars]
+ENVIRONMENT = "staging"
+DEMO_MODE_ENABLED = "0"
+DEFAULT_GRACE_DAYS = "0"
+PAYMENT_MODE = "test"
+
+[observability]
+enabled = true
+
+# =============================================================================
+# Production environment (company account 1473f1b95ef866edf0b286046e9e81f3)
+# Bindings are listed explicitly because Wrangler environments do not inherit.
+# CACHE is intentionally omitted: src/index.js never reads env.CACHE, and the
+# requested CACHE_PRODUCTION id 5e35ae0d4ffb48fcb3cff84698c35985 does not exist
+# in this account.
+# =============================================================================
+[env.production]
+name = "bliss-legacy-limited"
+account_id = "1473f1b95ef866edf0b286046e9e81f3"
+workers_dev = true
+preview_urls = false
+
+[env.production.assets]
+directory = "./"
+binding = "ASSETS"
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "bliss-legacy-production-db"
+database_id = "91e013cd-6b82-45a7-b1f4-93c8f1b39af2"
+migrations_dir = "migrations"
+
+[[env.production.r2_buckets]]
+binding = "FILES"
+bucket_name = "bliss-legacy-production-files"
+
+[[env.production.queues.producers]]
+binding = "TASKS"
+queue = "bliss-legacy-production-tasks"
+
+[[env.production.queues.consumers]]
+queue = "bliss-legacy-production-tasks"
+max_batch_size = 10
+max_batch_timeout = 5
+max_retries = 5
+
+[[env.production.durable_objects.bindings]]
+name = "CHAT_ROOM"
+class_name = "ChatRoom"
+
+[[env.production.migrations]]
+tag = "v1"
+new_sqlite_classes = ["ChatRoom"]
+
+[env.production.triggers]
+crons = ["0 6 * * *"]
+
+[env.production.vars]
+ENVIRONMENT = "production"
+DEMO_MODE_ENABLED = "0"
+DEFAULT_GRACE_DAYS = "0"
+PAYMENT_MODE = "live"
+
+[env.production.observability]
+enabled = true
