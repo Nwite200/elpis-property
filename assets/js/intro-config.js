@@ -1,10 +1,10 @@
 // Elpis Property Limited — single source of truth for the logo intro.
 // Change INTRO_STYLE to "classic" for the plain elegant variant.
 // No other code change is required to switch styles.
-window.BLISS_INTRO_CONFIG = {
+window.ELPIS_INTRO_CONFIG = {
   INTRO_STYLE: "hype", // "hype" | "classic"
   LOGO_SRC: "assets/images/elpis-property-logo-original.png",
-  BRAND_NAME: "BLISS LEGACY LIMITED",
+  BRAND_NAME: "ELPIS PROPERTY LIMITED",
   TAGLINE: "Your Future Begins With the Right Property.",
 
   COLORS: {

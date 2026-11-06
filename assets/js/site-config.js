@@ -18,7 +18,7 @@ window.BLIS_CONFIG = {
   ]
 };
 
-window.BLISS_CONFIG_READY = fetch("/api/site-config", { credentials: "same-origin" })
+window.ELPIS_CONFIG_READY = fetch("/api/site-config", { credentials: "same-origin" })
   .then(function (res) { return res.ok ? res.json() : null; })
   .then(function (payload) {
     if (payload && payload.config) {

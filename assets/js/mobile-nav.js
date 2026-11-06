@@ -1,4 +1,4 @@
-// Bliss Legacy Limited — shared mobile navigation fallback for static staff and
+// Elpis Property Limited — shared mobile navigation fallback for static staff and
 // client portal pages that do not use the role-aware staff shell.
 (function () {
   function ready(fn) {
@@ -9,7 +9,7 @@
   ready(function () {
     var sidebar = document.querySelector(".sidebar") || document.querySelector(".portal-sidebar");
     if (!sidebar) return;
-    if (document.querySelector(".sidebar-toggle") || document.querySelector(".bliss-mobile-toggle")) return;
+    if (document.querySelector(".sidebar-toggle") || document.querySelector(".elpis-mobile-toggle")) return;
 
     var style = document.createElement("style");
     style.textContent = [
@@ -19,18 +19,18 @@
       "  transition: transform .25s ease; z-index: 56; }",
       ".portal-sidebar.open { transform: none; }",
       ".portal-main { padding: 22px 16px !important; max-width: 100% !important; }",
-      ".bliss-mobile-toggle { display: inline-grid; place-items: center; position: fixed;",
+      ".elpis-mobile-toggle { display: inline-grid; place-items: center; position: fixed;",
       "  left: 12px; bottom: 16px; z-index: 60; width: 44px; height: 44px; border-radius: 50%;",
       "  border: 1px solid rgba(255,255,255,.2); background: #17231A; color: #FFFFFF;",
       "  font-size: 18px; box-shadow: 0 6px 18px rgba(0,0,0,.22); }",
       "}",
-      "@media (min-width: 901px) { .bliss-mobile-toggle { display: none; } }"
+      "@media (min-width: 901px) { .elpis-mobile-toggle { display: none; } }"
     ].join("\n");
     document.head.appendChild(style);
 
     var toggle = document.createElement("button");
     toggle.type = "button";
-    toggle.className = "bliss-mobile-toggle sidebar-toggle";
+    toggle.className = "elpis-mobile-toggle sidebar-toggle";
     toggle.setAttribute("aria-label", "Toggle navigation");
     toggle.setAttribute("aria-expanded", "false");
     toggle.textContent = "☰";

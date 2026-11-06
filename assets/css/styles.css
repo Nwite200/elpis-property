@@ -1542,7 +1542,7 @@ button, input, select, textarea {
 }
 
 .cta-banner-card::after {
-  content: "BLISS";
+  content: "ELPIS";
   position: absolute;
   right: -30px;
   bottom: -60px;

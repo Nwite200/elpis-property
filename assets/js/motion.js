@@ -1,16 +1,16 @@
-// Bliss Legacy Limited — one global logo intro.
+// Elpis Property Limited — one global logo intro.
 // Replays on every page load, refresh, direct URL, internal navigation,
 // Back/Forward and dashboard view/tab changes. Hype or classic is selected by
 // INTRO_STYLE in assets/js/intro-config.js. Front-end only.
 (function () {
   "use strict";
 
-  var CFG = window.BLISS_INTRO_CONFIG || {};
+  var CFG = window.ELPIS_INTRO_CONFIG || {};
   var STYLE = CFG.INTRO_STYLE === "classic" ? "classic" : "hype";
-  var LOGO_SRC = CFG.LOGO_SRC || "assets/images/bliss-legacy-logo.png";
-  var BRAND_NAME = CFG.BRAND_NAME || "BLISS LEGACY LIMITED";
+  var LOGO_SRC = CFG.LOGO_SRC || "assets/images/elpis-property-logo-original.png";
+  var BRAND_NAME = CFG.BRAND_NAME || "Elpis Property Limited";
   var TAGLINE = CFG.TAGLINE || "Your Future Begins With the Right Property.";
-  var NAV_MARKER = "bliss_internal_navigation";
+  var NAV_MARKER = "elpis_internal_navigation";
   var NAV_MARKER_TTL = 5000;
 
   var reduceMotion = false;
