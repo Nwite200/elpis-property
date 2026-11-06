@@ -1,15 +1,15 @@
-// Bliss Legacy Limited — Main Landing Page Logic
+// Elpis Property Limited — Main Landing Page Logic
 document.addEventListener('DOMContentLoaded', async () => {
-  if (window.BLISS_CONFIG_READY) await window.BLISS_CONFIG_READY;
+  if (window.Elpis_CONFIG_READY) await window.Elpis_CONFIG_READY;
   // Render persistent site header and footer
   const headerSlot = document.getElementById('header-slot');
   const footerSlot = document.getElementById('footer-slot');
-  if (headerSlot) headerSlot.innerHTML = Bliss.renderHeader('home');
-  if (footerSlot) footerSlot.innerHTML = Bliss.renderFooter();
-  Bliss.initNav();
+  if (headerSlot) headerSlot.innerHTML = Elpis.renderHeader('home');
+  if (footerSlot) footerSlot.innerHTML = Elpis.renderFooter();
+  Elpis.initNav();
 
   // Populate configurable contact placeholders
-  const c = Bliss.config();
+  const c = Elpis.config();
   const phoneEl = document.getElementById('contactPhone');
   const emailEl = document.getElementById('contactEmail');
   const addrEl = document.getElementById('contactAddress');
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (waBtn) {
     waBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      Bliss.enquireWhatsApp('Hello Bliss Legacy Limited, I would like to speak with a property consultant regarding available opportunities.');
+      Elpis.enquireWhatsApp('Hello Elpis Property Limited, I would like to speak with a property consultant regarding available opportunities.');
     });
   }
 
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <p class="branch-address">${b.address}</p>
         <div class="branch-footer">
           ${b.phone ? `<a class="branch-action branch-phone" href="tel:${String(b.phone).replace(/[^0-9+]/g, '')}">📞 ${b.phone}</a>` : ''}
-          <a class="branch-action wa-link" href="#" data-message="Hello Bliss Legacy, I would like to visit or speak with an agent at the ${b.name} office.">Contact Office →</a>
+          <a class="branch-action wa-link" href="#" data-message="Hello Elpis Property, I would like to visit or speak with an agent at the ${b.name} office.">Contact Office →</a>
         </div>
       </div>
     `).join('');
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // public catalogue.
   const showDemo = !window.BLIS_CONFIG || window.BLIS_CONFIG.showDemoProperties === true;
   const staticProperties = allProperties.length === 0 && showDemo
-    ? Bliss.properties().map(p => ({ ...p, isDemo: true }))
+    ? Elpis.properties().map(p => ({ ...p, isDemo: true }))
     : [];
   const seen = new Set(allProperties.map(p => `${String(p.name).toLowerCase()}|${String(p.location).toLowerCase()}`));
   for (const item of staticProperties) {
@@ -237,7 +237,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="prop-pricing-row">
               <div class="price-box">
                 <span class="price-lbl">Outright Price</span>
-                <span class="price-amt">${Bliss.money(p.price)}</span>
+                <span class="price-amt">${Elpis.money(p.price)}</span>
               </div>
               <div class="units-box">
                 <span class="units-val">${p.units} Available</span>
@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             <div class="prop-actions-row">
               <a href="property.html?id=${p.id}" class="btn btn-card-details">View Details</a>
-              <a href="#" class="btn btn-card-enquire wa-link" data-message="Hello Bliss Legacy Limited, I am interested in ${p.name} located at ${p.location}, listed at ${Bliss.money(p.price)}. Please provide more details.">
+              <a href="#" class="btn btn-card-enquire wa-link" data-message="Hello Elpis Property Limited, I am interested in ${p.name} located at ${p.location}, listed at ${Elpis.money(p.price)}. Please provide more details.">
                 Enquire Now
               </a>
             </div>
@@ -260,12 +260,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     grid.querySelectorAll('.wa-link').forEach(a => {
       a.addEventListener('click', (e) => {
         e.preventDefault();
-        const msg = a.getAttribute('data-message') || 'Hello Bliss Legacy Limited, I would like to make an enquiry.';
-        Bliss.enquireWhatsApp(msg);
+        const msg = a.getAttribute('data-message') || 'Hello Elpis Property Limited, I would like to make an enquiry.';
+        Elpis.enquireWhatsApp(msg);
       });
     });
 
-    Bliss.observeFade();
+    Elpis.observeFade();
   }
 
   function resetAllFilters() {
@@ -346,5 +346,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  Bliss.observeFade();
+  Elpis.observeFade();
 });
