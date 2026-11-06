@@ -6,7 +6,7 @@
 
 ## Execution update — 2026-11-06
 
-- Production Worker deployed: `https://bliss-property-production.easterntechexpo.workers.dev`
+- Production Worker deployed: `https://elpis-property-production.easterntechexpo.workers.dev`
 - Production D1 migrated through `0022`.
 - Pre-migration production export completed.
 - Demo property marked demo/unpublished; demo staff/client/payment data hidden or deactivated.
@@ -14,7 +14,7 @@
 - Production branch list contains Ikeja, Ajah, Asaba, Ihama, Obakhavba and Head Office, and is served to the signup branch picker.
 - Production Worker is in `PAYMENT_MODE=live` with live ALATPay secret, business ID and webhook secret configured.
 - **ALATPay live API returned HTTP 401 on a read-only business transaction query.** Live payment provisioning is therefore not yet verified.
-- `blisspayment.com.ng` is not present in the Cloudflare account used by this deployment. The existing domain still serves an older site. It cannot be attached until the zone is moved/added to this account and the token has the required zone permission.
+- `elpispayment.com.ng` is not present in the Cloudflare account used by this deployment. The existing domain still serves an older site. It cannot be attached until the zone is moved/added to this account and the token has the required zone permission.
 - SMS remains disabled. No real SMS was sent.
 
 ---
@@ -167,7 +167,7 @@ Current staging SMS state:
 
 - `sms_enabled = 0`
 - provider = `termii`
-- sender ID = `BlissLegacy`
+- sender ID = `elpisLegacy`
 - defaulting reminders = `0`
 - `TERMII_API_KEY` is not present in the current secret list.
 
@@ -175,7 +175,7 @@ The Termii adapter uses the transactional/DND route (`channel: "dnd"`). No real 
 
 Before the test, the SMS provider must confirm:
 
-1. Sender ID `BlissLegacy` is approved for Nigeria.
+1. Sender ID `elpisLegacy` is approved for Nigeria.
 2. The transactional/DND route is enabled for the account.
 3. The DND status of your named test phone number.
 4. `TERMII_API_KEY` is supplied as a Worker secret.

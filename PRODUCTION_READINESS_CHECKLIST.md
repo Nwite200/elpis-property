@@ -1,4 +1,4 @@
-# Bliss Legacy Limited — Production Readiness Checklist
+# elpis Legacy Limited — Production Readiness Checklist
 
 Use this checklist before staging and again before production. Do not tick an item unless the action was actually performed in the target environment.
 
@@ -26,10 +26,10 @@ Use this checklist before staging and again before production. Do not tick an it
 
 - [ ] Create production D1 database and record its ID.
 - [ ] Replace `REPLACE_WITH_D1_DATABASE_ID` in production Wrangler configuration.
-- [ ] Create production R2 bucket `bliss-legacy-files` (or approved name).
+- [ ] Create production R2 bucket `elpis-legacy-files` (or approved name).
 - [ ] Confirm R2 bucket is private.
 - [ ] Create production KV namespace and replace `REPLACE_WITH_KV_NAMESPACE_ID`.
-- [ ] Create Queue `bliss-legacy-tasks` for producer and consumer.
+- [ ] Create Queue `elpis-legacy-tasks` for producer and consumer.
 - [ ] Confirm Workers Static Assets binding `ASSETS` serves only intended files.
 - [ ] Confirm `.assetsignore` excludes `src`, `migrations`, tests, docs, `.dev.vars` and local state.
 - [ ] Confirm Worker compatibility date and runtime limits.
