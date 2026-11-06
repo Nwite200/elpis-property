@@ -112,21 +112,21 @@ db.exec(`
 
 db.prepare("INSERT INTO terms_versions (version_no, title, body_text, is_active) VALUES (1, 'Terms and Conditions', 'Phase 8 test terms and conditions', 1)").run();
 
-const mdId = upsertUser('md.p8@bliss.com', 'Phase 8 MD', 'Managing Director', null);
-const bm1Id = upsertUser('bm.ikeja.p8@bliss.com', 'Phase 8 Ikeja BM', 'Branch Manager', ikeja);
-const bm2Id = upsertUser('bm.ajah.p8@bliss.com', 'Phase 8 Ajah BM', 'Branch Manager', ajah);
-const tlId = upsertUser('tl.ikeja.p8@bliss.com', 'Phase 8 Ikeja TL', 'Team Lead', ikeja);
-const mkt1Id = upsertUser('mkt1.p8@bliss.com', 'Phase 8 Marketer One', 'Marketer', ikeja);
-const mkt2Id = upsertUser('mkt2.p8@bliss.com', 'Phase 8 Marketer Two', 'Marketer', ikeja);
-const mkt3Id = upsertUser('mkt3.p8@bliss.com', 'Phase 8 Ajah Marketer', 'Marketer', ajah);
-const finId = upsertUser('fin.p8@bliss.com', 'Phase 8 Finance', 'Finance Officer', headOffice);
+const mdId = upsertUser('md.p8@elpisproperty.test', 'Phase 8 MD', 'Managing Director', null);
+const bm1Id = upsertUser('bm.ikeja.p8@elpisproperty.test', 'Phase 8 Ikeja BM', 'Branch Manager', ikeja);
+const bm2Id = upsertUser('bm.ajah.p8@elpisproperty.test', 'Phase 8 Ajah BM', 'Branch Manager', ajah);
+const tlId = upsertUser('tl.ikeja.p8@elpisproperty.test', 'Phase 8 Ikeja TL', 'Team Lead', ikeja);
+const mkt1Id = upsertUser('mkt1.p8@elpisproperty.test', 'Phase 8 Marketer One', 'Marketer', ikeja);
+const mkt2Id = upsertUser('mkt2.p8@elpisproperty.test', 'Phase 8 Marketer Two', 'Marketer', ikeja);
+const mkt3Id = upsertUser('mkt3.p8@elpisproperty.test', 'Phase 8 Ajah Marketer', 'Marketer', ajah);
+const finId = upsertUser('fin.p8@elpisproperty.test', 'Phase 8 Finance', 'Finance Officer', headOffice);
 const clientUserId = upsertUser('client.p8@example.com', 'Phase 8 Client', 'Client', ikeja);
-const saId = upsertUser('sa.p8@bliss.com', 'Phase 8 Super Admin', 'Super Admin', headOffice);
-const pmId = upsertUser('pm.ikeja.p8@bliss.com', 'Phase 8 Project Manager', 'Project Manager', ikeja);
-const haId = upsertUser('ha.p8@bliss.com', 'Phase 8 Head Accountant', 'Head Accountant', headOffice);
-const mktNoTeamId = upsertUser('mkt.noteam.p8@bliss.com', 'Phase 8 Ikeja Direct Marketer', 'Marketer', ikeja);
-const careBranchId = upsertUser('care.branch.p8@bliss.com', 'Phase 13 Branch Care', 'Customer Care', ikeja);
-const careNationalId = upsertUser('care.national.p8@bliss.com', 'Phase 13 National Care', 'Customer Care', null);
+const saId = upsertUser('sa.p8@elpisproperty.test', 'Phase 8 Super Admin', 'Super Admin', headOffice);
+const pmId = upsertUser('pm.ikeja.p8@elpisproperty.test', 'Phase 8 Project Manager', 'Project Manager', ikeja);
+const haId = upsertUser('ha.p8@elpisproperty.test', 'Phase 8 Head Accountant', 'Head Accountant', headOffice);
+const mktNoTeamId = upsertUser('mkt.noteam.p8@elpisproperty.test', 'Phase 8 Ikeja Direct Marketer', 'Marketer', ikeja);
+const careBranchId = upsertUser('care.branch.p8@elpisproperty.test', 'Phase 13 Branch Care', 'Customer Care', ikeja);
+const careNationalId = upsertUser('care.national.p8@elpisproperty.test', 'Phase 13 National Care', 'Customer Care', null);
 db.prepare("UPDATE users SET care_scope='branch' WHERE id=?").run(careBranchId);
 db.prepare("UPDATE users SET care_scope='national' WHERE id=?").run(careNationalId);
 db.prepare("UPDATE users SET referral_code='BL-P8-MD' WHERE id=?").run(mdId);
@@ -240,33 +240,33 @@ async function test(name, fn) {
 function assert(condition, message) { if (!condition) throw new Error(message); }
 
 console.log('\n========================================================');
-console.log('   BLISS LEGACY — PHASE 8 INTEGRATION & SECURITY SUITE');
+console.log('   elpis LEGACY — PHASE 8 INTEGRATION & SECURITY SUITE');
 console.log('========================================================\n');
 
-const mdCookie = await login('md.p8@bliss.com');
-const bm1Cookie = await login('bm.ikeja.p8@bliss.com');
-const bm2Cookie = await login('bm.ajah.p8@bliss.com');
-const tlCookie = await login('tl.ikeja.p8@bliss.com');
-const mkt1Cookie = await login('mkt1.p8@bliss.com');
-const mkt2Cookie = await login('mkt2.p8@bliss.com');
-const mkt3Cookie = await login('mkt3.p8@bliss.com');
-const finCookie = await login('fin.p8@bliss.com');
-const saCookie = await login('sa.p8@bliss.com');
-const pmCookie = await login('pm.ikeja.p8@bliss.com');
-const haCookie = await login('ha.p8@bliss.com');
-const mktNoTeamCookie = await login('mkt.noteam.p8@bliss.com');
-const careBranchCookie = await login('care.branch.p8@bliss.com');
-const careNationalCookie = await login('care.national.p8@bliss.com');
+const mdCookie = await login('md.p8@elpisproperty.test');
+const bm1Cookie = await login('bm.ikeja.p8@elpisproperty.test');
+const bm2Cookie = await login('bm.ajah.p8@elpisproperty.test');
+const tlCookie = await login('tl.ikeja.p8@elpisproperty.test');
+const mkt1Cookie = await login('mkt1.p8@elpisproperty.test');
+const mkt2Cookie = await login('mkt2.p8@elpisproperty.test');
+const mkt3Cookie = await login('mkt3.p8@elpisproperty.test');
+const finCookie = await login('fin.p8@elpisproperty.test');
+const saCookie = await login('sa.p8@elpisproperty.test');
+const pmCookie = await login('pm.ikeja.p8@elpisproperty.test');
+const haCookie = await login('ha.p8@elpisproperty.test');
+const mktNoTeamCookie = await login('mkt.noteam.p8@elpisproperty.test');
+const careBranchCookie = await login('care.branch.p8@elpisproperty.test');
+const careNationalCookie = await login('care.national.p8@elpisproperty.test');
 const clientCookie = await login('client.p8@example.com');
 
 console.log('--- 1. Authentication, sessions and CSRF ---');
 await test('login cookies are HttpOnly/Secure/SameSite and session fixation is prevented', async () => {
-  const first = await request('/api/login', { method: 'POST', body: { email: 'md.p8@bliss.com', password: 'password123' } });
+  const first = await request('/api/login', { method: 'POST', body: { email: 'md.p8@elpisproperty.test', password: 'password123' } });
   const setCookie = first.headers.get('set-cookie') || '';
   assert(first.status === 200, 'login expected 200');
   assert(/HttpOnly/i.test(setCookie) && /Secure/i.test(setCookie) && /SameSite=Lax/i.test(setCookie), 'cookie flags incorrect');
   const oldCookie = setCookie.split(';')[0];
-  const second = await request('/api/login', { method: 'POST', headers: { Cookie: oldCookie }, body: { email: 'md.p8@bliss.com', password: 'password123' } });
+  const second = await request('/api/login', { method: 'POST', headers: { Cookie: oldCookie }, body: { email: 'md.p8@elpisproperty.test', password: 'password123' } });
   assert(second.status === 200, 'second login expected 200');
   const oldMe = await request('/api/me', { headers: { Cookie: oldCookie } });
   assert(oldMe.status === 401, 'pre-login session must be invalidated');
@@ -759,13 +759,13 @@ await test('single global logo intro supports hype/classic, full/short replay an
   const motionJs = readFileSync('assets/js/motion.js', 'utf8');
   const motionCss = readFileSync('assets/css/motion.css', 'utf8');
   const config = readFileSync('assets/js/intro-config.js', 'utf8');
-  assert(!motionJs.includes('bliss_intro_played'), 'once-per-session intro logic must be removed');
+  assert(!motionJs.includes('elpis_intro_played'), 'once-per-session intro logic must be removed');
   assert(config.includes('INTRO_STYLE: "hype"'), 'default intro style must be hype');
   assert(config.includes('"classic"') && motionJs.includes('INTRO_STYLE === "classic"'), 'classic switch missing');
   assert(config.includes('total: 3000') && config.includes('total: 1000'), 'full/short hype durations missing');
   assert(config.includes('fadeIn: 600') && config.includes('hold: 1500') && config.includes('fadeOut: 600'), 'classic full timings missing');
   assert(config.includes('failsafe: 3800') && config.includes('failsafe: 1800'), 'hype failsafe timings missing');
-  assert(config.includes('LOGO_SRC: "assets/images/bliss-legacy-logo.png"'), 'actual site logo path missing');
+  assert(config.includes('LOGO_SRC: "assets/images/elpis-legacy-logo.png"'), 'actual site logo path missing');
   assert(motionJs.includes("addEventListener(\"pageshow\""), 'Back/Forward pageshow replay missing');
   assert(motionJs.includes("addEventListener(\"popstate\""), 'Back/Forward popstate replay missing');
   assert(motionJs.includes("event.key !== \"Escape\"") && motionJs.includes("event.key !== \"Enter\""), 'Escape/Enter skip missing');
@@ -773,9 +773,9 @@ await test('single global logo intro supports hype/classic, full/short replay an
   assert(motionJs.includes('markInternalNavigation') && motionJs.includes('consumeInternalMarker'), 'internal-navigation short/full distinction missing');
   assert(motionJs.includes('.pagination [data-page]') && !motionJs.includes('button, [data-page]'), 'generic data-page selectors would trigger the intro on every click');
   assert(motionJs.includes('has-logo-error'), 'logo failure fallback missing');
-  assert(motionJs.includes('lowPower') && motionCss.includes('.bliss-intro.low-power'), 'low-power handling missing');
-  assert(!motionCss.includes('bliss-view-enter'), 'separate page-transition system must be removed');
-  assert(motionCss.includes('.bliss-intro') && motionCss.includes('has-logo-error'), 'intro visual/fallback styles missing');
+  assert(motionJs.includes('lowPower') && motionCss.includes('.elpis-intro.low-power'), 'low-power handling missing');
+  assert(!motionCss.includes('elpis-view-enter'), 'separate page-transition system must be removed');
+  assert(motionCss.includes('.elpis-intro') && motionCss.includes('has-logo-error'), 'intro visual/fallback styles missing');
   assert(motionCss.includes('.style-hype') && motionCss.includes('.style-classic'), 'both visual styles missing');
   assert(motionCss.includes('@media (prefers-reduced-motion: reduce)'), 'CSS reduced-motion fallback missing');
   for (const file of readdirSync('.').filter(name => name.endsWith('.html'))) {
@@ -789,7 +789,7 @@ await test('single global logo intro supports hype/classic, full/short replay an
 
 await test('PWA manifest, service worker and install flow are wired for iOS and Android', async () => {
   const manifest = JSON.parse(readFileSync('manifest.json', 'utf8'));
-  assert(manifest.name === 'Bliss Legacy Limited' && manifest.short_name === 'Bliss Legacy', 'PWA manifest branding incorrect');
+  assert(manifest.name === 'elpis Legacy Limited' && manifest.short_name === 'elpis Legacy', 'PWA manifest branding incorrect');
   assert(manifest.start_url === '/' && manifest.scope === '/' && manifest.display === 'standalone', 'PWA start/scope/display incorrect');
   assert(manifest.icons.some(icon => icon.sizes === '192x192'), '192px PWA icon missing');
   assert(manifest.icons.some(icon => icon.sizes === '512x512'), '512px PWA icon missing');
@@ -1290,7 +1290,7 @@ await test('branch and national customer care scopes are enforced server-side', 
 await test('SMS is sent once per confirmed payment, normalises phones, respects opt-out and skips unconfirmed payments', async () => {
   const configure = await request('/api/sms/settings', {
     method: 'PUT', headers: { Cookie: mdCookie }, body: {
-      sms_enabled: true, sms_provider: 'mock', sms_sender_id: 'Bliss', sms_low_credit_threshold: 10
+      sms_enabled: true, sms_provider: 'mock', sms_sender_id: 'elpis', sms_low_credit_threshold: 10
     }
   });
   assert(configure.status === 200, 'SMS settings expected 200');
@@ -1427,7 +1427,7 @@ await test('ALATPay static wallet creation, signature validation, status verific
   globalThis.fetch = async (input, init = {}) => {
     const url = String(input);
     if (url.includes('/alatpay-wallet/api/v1/staticaccount/validateAndCreate')) {
-      return mockJson({ status: true, data: { accountNumber: '0412345678', accountName: 'BLISS LEGACY - TEST CLIENT', bankName: 'Wema Bank', id: 'sw-account-1' } });
+      return mockJson({ status: true, data: { accountNumber: '0412345678', accountName: 'elpis LEGACY - TEST CLIENT', bankName: 'Wema Bank', id: 'sw-account-1' } });
     }
     if (url.includes('/alatpay-wallet/api/v1/staticaccount') && String(init.method || 'GET').toUpperCase() === 'POST') {
       return mockJson({ status: true, data: { id: 'sw-init-1', otpTrackingID: 'otp-track-1', message: 'An OTP has been sent to 08*******86' } });
@@ -1459,13 +1459,13 @@ await test('ALATPay static wallet creation, signature validation, status verific
       method: 'POST', headers: { Cookie: mdCookie }, body: { otp: '123456' }, env: alatEnv
     });
     assert(validate.status === 200 && validate.data.status === 'active' && validate.data.account_number === '0412345678', 'static wallet validate expected active account');
-    assert(validate.data.account_name === 'Phase 8 Client / Bliss Legacy Limited', `unexpected static wallet account name: ${validate.data.account_name}`);
+    assert(validate.data.account_name === 'Phase 8 Client / elpis Legacy Limited', `unexpected static wallet account name: ${validate.data.account_name}`);
     const staffWallet = await request(`/api/finance/clients/${adaId}/static-wallet`, { headers: { Cookie: mdCookie }, env: alatEnv });
     assert(staffWallet.data.wallet && staffWallet.data.wallet.status === 'active', 'staff static wallet view missing');
-    assert(staffWallet.data.wallet.account_name === 'Phase 8 Client / Bliss Legacy Limited', 'staff static wallet account name was not normalized');
+    assert(staffWallet.data.wallet.account_name === 'Phase 8 Client / elpis Legacy Limited', 'staff static wallet account name was not normalized');
     const clientWallet = await request('/api/client/virtual-account', { headers: { Cookie: clientCookie }, env: alatEnv });
     assert(clientWallet.data.is_active === true && clientWallet.data.is_static === true && clientWallet.data.account_number === '0412345678', 'client static wallet view missing');
-    assert(clientWallet.data.account_name === 'Phase 8 Client / Bliss Legacy Limited', 'client static wallet account name was not normalized');
+    assert(clientWallet.data.account_name === 'Phase 8 Client / elpis Legacy Limited', 'client static wallet account name was not normalized');
 
     const payload = {
       Value: { Data: {
@@ -1602,16 +1602,16 @@ await test('verified webhook creates commission once, duplicate creates none, fa
 
 console.log('\n--- 11. Test-account expiry and monthly marketer reactivation ---');
 await test('expired test accounts cannot log in and are deactivated', async () => {
-  const expiredId = upsertUser('expired.test.p8@bliss.com', 'Expired Test', 'Marketer', ikeja);
+  const expiredId = upsertUser('expired.test.p8@elpisproperty.test', 'Expired Test', 'Marketer', ikeja);
   db.prepare("UPDATE users SET is_test=1, test_expires_at='2020-01-01', is_active=1 WHERE id=?").run(expiredId);
   const clock = makeEnv({ TEST_NOW: '2026-02-15' });
-  const res = await request('/api/login', { method: 'POST', body: { email: 'expired.test.p8@bliss.com', password: 'password123' }, env: clock });
+  const res = await request('/api/login', { method: 'POST', body: { email: 'expired.test.p8@elpisproperty.test', password: 'password123' }, env: clock });
   assert(res.status === 403, `expired test login expected 403, got ${res.status}`);
   assert(/expired after 14 days/i.test(res.data.error || ''), 'expiry message is unclear');
   assert(db.prepare('SELECT is_active FROM users WHERE id=?').get(expiredId).is_active === 0, 'expired test account stayed active');
   assert(db.prepare("SELECT COUNT(*) AS c FROM audit_logs WHERE action='test_account.expired' AND target_id=?").get(String(expiredId)).c > 0, 'expiry was not audited');
 
-  const scheduledExpiredId = upsertUser('scheduled.expired.p8@bliss.com', 'Scheduled Expired', 'Marketer', ikeja);
+  const scheduledExpiredId = upsertUser('scheduled.expired.p8@elpisproperty.test', 'Scheduled Expired', 'Marketer', ikeja);
   db.prepare("UPDATE users SET is_test=1, test_expires_at='2020-01-01', is_active=1 WHERE id=?").run(scheduledExpiredId);
   await worker.scheduled({}, clock, { waitUntil() {} });
   assert(db.prepare('SELECT is_active FROM users WHERE id=?').get(scheduledExpiredId).is_active === 0, 'scheduled job did not deactivate an expired test account');
@@ -1619,10 +1619,10 @@ await test('expired test accounts cannot log in and are deactivated', async () =
 });
 
 await test('lapsed marketer sees a clear message, BM sees pending list, reactivation is audited', async () => {
-  const lapsedId = upsertUser('lapsed.marketer.p8@bliss.com', 'Lapsed Marketer', 'Marketer', ikeja);
+  const lapsedId = upsertUser('lapsed.marketer.p8@elpisproperty.test', 'Lapsed Marketer', 'Marketer', ikeja);
   db.prepare("UPDATE users SET access_valid_until='2026-01-31', is_active=1, is_test=0 WHERE id=?").run(lapsedId);
   const clock = makeEnv({ TEST_NOW: '2026-02-15' });
-  const blocked = await request('/api/login', { method: 'POST', body: { email: 'lapsed.marketer.p8@bliss.com', password: 'password123' }, env: clock });
+  const blocked = await request('/api/login', { method: 'POST', body: { email: 'lapsed.marketer.p8@elpisproperty.test', password: 'password123' }, env: clock });
   assert(blocked.status === 403, `lapsed marketer login expected 403, got ${blocked.status}`);
   assert(/monthly access has lapsed/i.test(blocked.data.error || '') && /contact your branch manager/i.test(blocked.data.error || ''), 'lapse message does not tell the marketer what to do');
   assert(db.prepare('SELECT access_lapsed_at FROM users WHERE id=?').get(lapsedId).access_lapsed_at, 'lapse was not recorded');
@@ -1633,7 +1633,7 @@ await test('lapsed marketer sees a clear message, BM sees pending list, reactiva
   const row = db.prepare('SELECT is_active, access_valid_until, reactivated_at, reactivated_by FROM users WHERE id=?').get(lapsedId);
   assert(row.is_active === 1 && row.reactivated_at && row.reactivated_by === bm1Id, 'reactivation record incomplete');
   assert(db.prepare("SELECT COUNT(*) AS c FROM audit_logs WHERE action='marketer.reactivated' AND actor_user_id=? AND target_id=?").get(bm1Id, String(lapsedId)).c > 0, 'reactivation not audited with actor');
-  const allowed = await request('/api/login', { method: 'POST', body: { email: 'lapsed.marketer.p8@bliss.com', password: 'password123' }, env: clock });
+  const allowed = await request('/api/login', { method: 'POST', body: { email: 'lapsed.marketer.p8@elpisproperty.test', password: 'password123' }, env: clock });
   assert(allowed.status === 200, 'reactivated marketer cannot log in');
 });
 
@@ -1641,13 +1641,13 @@ await test('per-role access setting off allows month-end login and scheduled job
   const clock = makeEnv({ TEST_NOW: '2026-02-15' });
   const setting = await request('/api/staff/access-settings', { method: 'PUT', headers: { Cookie: mdCookie }, body: { role_name: 'Marketer', enabled: false }, env: clock });
   assert(setting.status === 200 && setting.data.enabled === 0, 'could not disable monthly reactivation');
-  const openId = upsertUser('open.marketer.p8@bliss.com', 'Open Marketer', 'Marketer', ikeja);
+  const openId = upsertUser('open.marketer.p8@elpisproperty.test', 'Open Marketer', 'Marketer', ikeja);
   db.prepare("UPDATE users SET access_valid_until='2026-01-31', is_active=1, is_test=0 WHERE id=?").run(openId);
-  const allowed = await request('/api/login', { method: 'POST', body: { email: 'open.marketer.p8@bliss.com', password: 'password123' }, env: clock });
+  const allowed = await request('/api/login', { method: 'POST', body: { email: 'open.marketer.p8@elpisproperty.test', password: 'password123' }, env: clock });
   assert(allowed.status === 200, 'setting off still blocked a lapsed marketer');
   await request('/api/staff/access-settings', { method: 'PUT', headers: { Cookie: mdCookie }, body: { role_name: 'Marketer', enabled: true }, env: clock });
 
-  const scheduledId = upsertUser('scheduled.lapse.p8@bliss.com', 'Scheduled Lapse', 'Marketer', ikeja);
+  const scheduledId = upsertUser('scheduled.lapse.p8@elpisproperty.test', 'Scheduled Lapse', 'Marketer', ikeja);
   db.prepare("UPDATE users SET access_valid_until='2026-02-01', is_active=1, is_test=0 WHERE id=?").run(scheduledId);
   await worker.scheduled({}, clock, { waitUntil() {} });
   assert(db.prepare('SELECT is_active FROM users WHERE id=?').get(scheduledId).is_active === 0, 'scheduled job did not deactivate lapsed marketer');

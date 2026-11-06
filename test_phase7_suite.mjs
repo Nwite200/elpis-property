@@ -74,21 +74,21 @@ function upsertClient(ref, data) {
   ).lastInsertRowid);
 }
 
-const mdId = upsertUser('md@bliss.com', 'Managing Director', 1, null);
-const bm1Id = upsertUser('bm.ikeja@bliss.com', 'Ikeja Branch Manager', 2, 1);
-const bm2Id = upsertUser('bm.ajah@bliss.com', 'Ajah Branch Manager', 2, 2);
-const tl1Id = upsertUser('tl.ikeja@bliss.com', 'Ikeja Team Lead', 3, 1);
-const tl2Id = upsertUser('tl.ajah@bliss.com', 'Ajah Team Lead', 3, 2);
-const mkt1Id = upsertUser('mkt.ikeja@bliss.com', 'Ikeja Marketer One', 4, 1);
-const mkt2Id = upsertUser('mkt.ikeja2@bliss.com', 'Ikeja Marketer Two', 4, 1);
-const mkt3Id = upsertUser('mkt.ajah@bliss.com', 'Ajah Marketer', 4, 2);
-const finId = upsertUser('finance@bliss.com', 'Head Finance Officer', 5, 1);
+const mdId = upsertUser('md@elpisproperty.test', 'Managing Director', 1, null);
+const bm1Id = upsertUser('bm.ikeja@elpisproperty.test', 'Ikeja Branch Manager', 2, 1);
+const bm2Id = upsertUser('bm.ajah@elpisproperty.test', 'Ajah Branch Manager', 2, 2);
+const tl1Id = upsertUser('tl.ikeja@elpisproperty.test', 'Ikeja Team Lead', 3, 1);
+const tl2Id = upsertUser('tl.ajah@elpisproperty.test', 'Ajah Team Lead', 3, 2);
+const mkt1Id = upsertUser('mkt.ikeja@elpisproperty.test', 'Ikeja Marketer One', 4, 1);
+const mkt2Id = upsertUser('mkt.ikeja2@elpisproperty.test', 'Ikeja Marketer Two', 4, 1);
+const mkt3Id = upsertUser('mkt.ajah@elpisproperty.test', 'Ajah Marketer', 4, 2);
+const finId = upsertUser('finance@elpisproperty.test', 'Head Finance Officer', 5, 1);
 // Phase 12: commission access must be granted explicitly. This test grants it
 // to the finance user while verifying that staff/team leads remain excluded.
 db.prepare('UPDATE users SET commission_access=1 WHERE id=?').run(finId);
 const adaUserId = upsertUser('ada@example.com', 'Ada Nwosu', 6, 1);
 const musaUserId = upsertUser('musa@example.com', 'Musa Dike', 6, 1);
-const demoUserId = upsertUser('demo@bliss.com', 'Demo Investor', 6, 1);
+const demoUserId = upsertUser('demo@elpisproperty.test', 'Demo Investor', 6, 1);
 
 // Isolated deterministic Phase 7 fixtures.
 db.exec(`
@@ -138,7 +138,7 @@ const prop2 = Number(db.prepare(`INSERT INTO properties (reference,title,descrip
 const adaId = upsertClient('BLC-P7-ADA', { full_name: 'Ada Nwosu', phone_number: '08071000001', email: 'ada@example.com', status: 'Active Buyer', saleType: 'New Sale', branchId: 1, createdBy: mkt1Id, marketerId: mkt1Id, teamLeadId: tl1Id, agreedPrice: 10000000, propertyId: prop1, userId: adaUserId });
 const musaId = upsertClient('BLC-P7-MUSA', { full_name: 'Musa Dike', phone_number: '08071000002', email: 'musa@example.com', status: 'Interested', saleType: 'Resale', branchId: 1, createdBy: mkt2Id, marketerId: mkt2Id, teamLeadId: tl1Id, agreedPrice: 8000000, propertyId: prop1, userId: musaUserId });
 const crossId = upsertClient('BLC-P7-CROSS', { full_name: 'Cross Branch Client', phone_number: '08071000003', email: 'cross@example.com', status: 'Active Buyer', saleType: 'New Sale', branchId: 2, createdBy: mkt3Id, marketerId: mkt3Id, teamLeadId: tl2Id, agreedPrice: 8000000, propertyId: prop2 });
-const demoId = upsertClient('DEMO-CLIENT-001', { full_name: 'Demo Investor', phone_number: '08071000004', email: 'demo@bliss.com', status: 'Active Buyer', saleType: 'New Sale', branchId: 1, createdBy: mkt1Id, marketerId: mkt1Id, teamLeadId: tl1Id, agreedPrice: 15000000, propertyId: prop1, userId: demoUserId });
+const demoId = upsertClient('DEMO-CLIENT-001', { full_name: 'Demo Investor', phone_number: '08071000004', email: 'demo@elpisproperty.test', status: 'Active Buyer', saleType: 'New Sale', branchId: 1, createdBy: mkt1Id, marketerId: mkt1Id, teamLeadId: tl1Id, agreedPrice: 15000000, propertyId: prop1, userId: demoUserId });
 
 // Phase 7.1 multi-property allocations. Ada owns two properties.
 for (const [clientId, propertyId, price] of [
@@ -208,7 +208,7 @@ function makeEnv(overrides = {}) {
     ASSETS: {
       async fetch(input) {
         const url = typeof input === 'string' ? input : (input.url || String(input));
-        if (url.includes('bliss-legacy-logo')) return new Response(new Uint8Array([0xff, 0xd8, 0xff, 0xd9]), { status: 200, headers: { 'Content-Type': 'image/jpeg' } });
+        if (url.includes('elpis-legacy-logo')) return new Response(new Uint8Array([0xff, 0xd8, 0xff, 0xd9]), { status: 200, headers: { 'Content-Type': 'image/jpeg' } });
         return new Response('Not found', { status: 404 });
       }
     },
@@ -246,18 +246,18 @@ function assert(condition, message) { if (!condition) throw new Error(message); 
 function pdfText(bytes) { return Buffer.from(bytes).toString('latin1'); }
 
 console.log('\n========================================================');
-console.log('   BLISS LEGACY — PHASE 7 COMMISSION & REPORT SUITE');
+console.log('   elpis LEGACY — PHASE 7 COMMISSION & REPORT SUITE');
 console.log('========================================================\n');
 
-const mdCookie = await login('md@bliss.com');
-const bm1Cookie = await login('bm.ikeja@bliss.com');
-const bm2Cookie = await login('bm.ajah@bliss.com');
-const tl1Cookie = await login('tl.ikeja@bliss.com');
-const tl2Cookie = await login('tl.ajah@bliss.com');
-const mkt1Cookie = await login('mkt.ikeja@bliss.com');
-const mkt2Cookie = await login('mkt.ikeja2@bliss.com');
-const mkt3Cookie = await login('mkt.ajah@bliss.com');
-const finCookie = await login('finance@bliss.com');
+const mdCookie = await login('md@elpisproperty.test');
+const bm1Cookie = await login('bm.ikeja@elpisproperty.test');
+const bm2Cookie = await login('bm.ajah@elpisproperty.test');
+const tl1Cookie = await login('tl.ikeja@elpisproperty.test');
+const tl2Cookie = await login('tl.ajah@elpisproperty.test');
+const mkt1Cookie = await login('mkt.ikeja@elpisproperty.test');
+const mkt2Cookie = await login('mkt.ikeja2@elpisproperty.test');
+const mkt3Cookie = await login('mkt.ajah@elpisproperty.test');
+const finCookie = await login('finance@elpisproperty.test');
 const adaCookie = await login('ada@example.com');
 
 console.log('--- 1. Commission plan configuration ---');
@@ -648,8 +648,8 @@ await test('staff see only their own commission amounts while permitted users se
   const branches = [...new Set(fin.data.entries.map(e => e.branch_id))];
   assert(branches.length >= 1, 'full-access user should see all branch entries');
   const careRoleId = db.prepare("SELECT id FROM roles WHERE name='Customer Care'").get().id;
-  const careId = upsertUser('care.commission.p7@bliss.com', 'Care P7', careRoleId, 1);
-  const careCookie = await login('care.commission.p7@bliss.com');
+  const careId = upsertUser('care.commission.p7@elpisproperty.test', 'Care P7', careRoleId, 1);
+  const careCookie = await login('care.commission.p7@elpisproperty.test');
   const careCommission = await request('/api/commissions', { headers: { Cookie: careCookie } });
   assert(careCommission.status === 403, 'customer care must see no commission data');
   const client = await request('/api/commissions', { headers: { Cookie: adaCookie } });
@@ -967,24 +967,24 @@ await test('client sign-up session cookie, login, logout and expiry are enforced
 });
 
 await test('official logo is used across pages, login screens and receipt assets', async () => {
-  const rootLogo = readFileSync('bliss-legacy-logo.png');
-  const assetLogo = readFileSync('assets/images/bliss-legacy-logo.png');
+  const rootLogo = readFileSync('elpis-legacy-logo.png');
+  const assetLogo = readFileSync('assets/images/elpis-legacy-logo.png');
   assert(rootLogo.equals(assetLogo), 'assets logo must match the official root logo');
-  const jpg = readFileSync('assets/images/bliss-legacy-logo.jpg');
+  const jpg = readFileSync('assets/images/elpis-legacy-logo.jpg');
   assert(jpg.length > 10000 && jpg[0] === 0xff && jpg[1] === 0xd8, 'official JPEG logo for PDFs is missing/invalid');
   const pages = readdirSync('.').filter(f => f.endsWith('.html'));
   for (const page of pages) {
     const text = readFileSync(page, 'utf8');
-    const injectsLogo = text.includes('bliss-legacy-logo') || text.includes('assets/js/staff-shell.js') || text.includes('assets/js/components.js');
+    const injectsLogo = text.includes('elpis-legacy-logo') || text.includes('assets/js/staff-shell.js') || text.includes('assets/js/components.js');
     assert(injectsLogo, `${page} does not include the official logo or shared logo shell`);
   }
   const ignore = readFileSync('.assetsignore', 'utf8');
-  assert(ignore.includes('/bliss-legacy-logo.png'), '.assetsignore must exclude only the root logo, not assets/images/logo');
-  assert(!/^bliss-legacy-logo\.png$/m.test(ignore), '.assetsignore must not exclude the served assets logo');
+  assert(ignore.includes('/elpis-legacy-logo.png'), '.assetsignore must exclude only the root logo, not assets/images/logo');
+  assert(!/^elpis-legacy-logo\.png$/m.test(ignore), '.assetsignore must not exclude the served assets logo');
   assert(readFileSync('client-login.html', 'utf8').includes('signup.html'), 'client login missing sign-up link');
   assert(readFileSync('login.html', 'utf8').includes('signup.html'), 'staff portal login missing sign-up link');
-  assert(readFileSync('signup.html', 'utf8').includes('assets/images/bliss-legacy-logo.png'), 'sign-up page missing official logo');
-  assert(readFileSync('src/index.js', 'utf8').includes('assets/images/bliss-legacy-logo.jpg'), 'receipt/report PDFs must use official logo asset');
+  assert(readFileSync('signup.html', 'utf8').includes('assets/images/elpis-legacy-logo.png'), 'sign-up page missing official logo');
+  assert(readFileSync('src/index.js', 'utf8').includes('assets/images/elpis-legacy-logo.jpg'), 'receipt/report PDFs must use official logo asset');
 });
 
 console.log('\n========================================================');
