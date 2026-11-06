@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Curated demo listings are only used when no live property is available.
   // Once a real listing exists, demonstration content is never merged into the
   // public catalogue.
-  const showDemo = !window.BLIS_CONFIG || window.BLIS_CONFIG.showDemoProperties === true;
+  const showDemo = !window.ELPIS_CONFIG || window.ELPIS_CONFIG.showDemoProperties === true;
   const staticProperties = allProperties.length === 0 && showDemo
     ? Elpis.properties().map(p => ({ ...p, isDemo: true }))
     : [];

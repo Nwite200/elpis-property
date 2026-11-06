@@ -7,7 +7,7 @@ Elpis.money = function(n) {
 };
 
 Elpis.config = function() {
-  return window.BLIS_CONFIG || {};
+  return window.ELPIS_CONFIG || {};
 };
 
 Elpis.properties = function() {
