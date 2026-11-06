@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#00B522" />
-  <title>My Virtual Account | Bliss Legacy Limited</title>
+  <meta name="theme-color" content="#C6A45C" />
+  <title>My Virtual Account | Elpis Property Limited</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -104,7 +104,7 @@
   <link rel="manifest" href="manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Bliss Legacy">
+  <meta name="apple-mobile-web-app-title" content="Elpis Property">
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
@@ -114,7 +114,7 @@
   <div class="portal-layout">
     <aside class="portal-sidebar">
       <a href="index.html">
-        <img src="assets/images/bliss-legacy-logo.png" alt="Bliss Legacy" class="brand-logo" onerror="this.src='bliss-legacy-logo.png'">
+        <img src="assets/images/Elpis-legacy-logo.png" alt="Elpis Property" class="brand-logo" onerror="this.src='Elpis-legacy-logo.png'">
       </a>
       <span class="nav-section-title">Client Workspace</span>
       <a href="client-dashboard.html">📊 Overview</a>
@@ -185,7 +185,7 @@
                 </div>
                 <div>
                   <span style="font-size:11px;color:var(--muted);text-transform:uppercase">Amount</span>
-                  <div style="font-size:16px;font-weight:700;color:var(--ink);margin-top:4px">${data.is_static ? 'Any amount' : Bliss.money((data.amount_kobo || 0) / 100)}</div>
+                  <div style="font-size:16px;font-weight:700;color:var(--ink);margin-top:4px">${data.is_static ? 'Any amount' : Elpis.money((data.amount_kobo || 0) / 100)}</div>
                 </div>
                 <div>
                   <span style="font-size:11px;color:var(--muted);text-transform:uppercase">Expires</span>
@@ -251,7 +251,7 @@
                 <button class="btn btn-green" id="activateWalletBtn">Create my dedicated account</button>
               </div>
               <div id="walletMsg" style="font-size:12px;margin-top:10px"></div>
-              <p style="font-size:11px;color:var(--muted);margin-top:12px">Your BVN is sent directly to ALATPay to create the account and is never stored by Bliss Legacy.${data.bvn_last4 ? ` BVN on file ends ${esc(data.bvn_last4)}.` : ''}</p>
+              <p style="font-size:11px;color:var(--muted);margin-top:12px">Your BVN is sent directly to ALATPay to create the account and is never stored by Elpis Property.${data.bvn_last4 ? ` BVN on file ends ${esc(data.bvn_last4)}.` : ''}</p>
             </div>
             ${Number(data.outstanding_ngn || 0) > 0 ? `
             <div style="background:var(--soft);border:1px solid var(--line);border-radius:var(--radius-sm);padding:24px;margin-top:16px">
@@ -264,7 +264,7 @@
                 <button class="btn btn-outline" id="generateVaBtn">Generate one-off account</button>
               </div>
               <div id="vaMsg" style="font-size:12px;margin-top:10px"></div>
-              <p style="font-size:11px;color:var(--muted);margin-top:12px">Outstanding balance: <strong>${Bliss.money(data.outstanding_ngn || 0)}</strong>.</p>
+              <p style="font-size:11px;color:var(--muted);margin-top:12px">Outstanding balance: <strong>${Elpis.money(data.outstanding_ngn || 0)}</strong>.</p>
             </div>` : ''}
           `;
           document.getElementById('activateWalletBtn').addEventListener('click', async () => {
@@ -346,7 +346,7 @@
           const waBtn = document.getElementById('waFinanceBtn');
           if (waBtn) {
             waBtn.addEventListener('click', () => {
-              Bliss.enquireWhatsApp("Hello Bliss Legacy Finance Team, I would like payment assistance for my property account.");
+              Elpis.enquireWhatsApp("Hello Elpis Property Finance Team, I would like payment assistance for my property account.");
             });
           }
         }
