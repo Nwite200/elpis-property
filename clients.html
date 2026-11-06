@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clients | Bliss Legacy Limited</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/motion.css">
+  <script src="assets/js/intro-config.js"></script>
+  <script src="assets/js/motion.js"></script>
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Bliss Legacy">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
+  <meta name="theme-color" content="#00B522" />
+</head>
+<body>
+  <div class="dash">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand"><img src="assets/images/bliss-legacy-logo.png" alt="Bliss Legacy"></div>
+      <div class="section-label">Management</div>
+      <a href="dashboard.html">📊 Overview</a>
+      <a href="properties.html">🏡 Properties</a>
+      <a href="clients.html" class="active">👥 Clients</a>
+      <a href="finance-dashboard.html">💳 Finance & Ledger</a>
+      <div class="section-label">Clients</div>
+      <a href="clients.html" style="font-weight:700">• All Clients</a>
+      <a href="client-register.html">+ Register Client</a>
+      <div class="section-label">Account</div>
+      <a href="index.html">🌐 Public Website</a>
+      <a href="#" id="logoutBtn" style="color:#E74C3C">Logout</a>
+    </aside>
+    <main class="dash-main">
+      <div class="dash-top">
+        <div><h1>Manage Clients</h1><p>Track and manage client relationships.</p></div>
+        <a class="btn btn-green" href="client-register.html">Register Client</a>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="label">Total</div><div class="value" id="kpiTotal">-</div></div>
+        <div class="kpi"><div class="label">Active</div><div class="value" id="kpiActive">-</div></div>
+        <div class="kpi"><div class="label">Prospect</div><div class="value" id="kpiProspect">-</div></div>
+        <div class="kpi"><div class="label">Purchased</div><div class="value" id="kpiPurchased">-</div></div>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+          <div class="filters" style="gap:8px">
+            <input id="searchInput" type="search" placeholder="Search clients...">
+            <select id="statusFilter"><option value="">All Statuses</option><option>Prospect</option><option>Interested</option><option>Negotiation</option><option>Reserved</option><option>Active Buyer</option><option>Completed</option><option>Cancelled</option><option>Inactive</option></select>
+            <select id="branchFilter"><option value="">All Branches</option></select>
+            <select id="marketerFilter"><option value="">All Marketers</option></select>
+          </div>
+        </div>
+        <div class="table-responsive"><table class="table">
+          <thead>
+            <tr>
+              <th>Reference</th><th>Client</th><th>Phone</th><th>Status</th><th>Branch</th><th>Marketer</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="clientTableBody"></tbody>
+        </table></div>
+      </div>
+    </main>
+  </div>
+  <script src="assets/js/clients.js"></script>
+  <script src="assets/js/mobile-nav.js"></script>
+  <script src="assets/js/pwa.js"></script>
+</body>
+</html>
