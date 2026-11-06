@@ -1,7 +1,7 @@
 /* ==========================================================================
-   BLISS LEGACY LIMITED — OFFICIAL DESIGN SYSTEM & STYLESHEET
+   ELPIS PROPERTY LIMITED — OFFICIAL DESIGN SYSTEM & STYLESHEET
    Brand Palette:
-   - Primary Green: #00B522
+   - Primary Gold: #C6A45C
    - Primary Dark Green: #008F1B
    - Charcoal / Ink: #414141
    - Dark Charcoal: #2A2A2A
@@ -11,20 +11,20 @@
    ========================================================================== */
 
 :root {
-  --green: #00B522;
-  --green-dark: #008F1B;
-  --green-light: #E8F9EB;
-  --green-glow: rgba(0, 181, 34, 0.16);
-  --charcoal: #414141;
-  --charcoal-dark: #222B24;
-  --ink: #303A32;
+  --green: #C6A45C;
+  --green-dark: #A9853F;
+  --green-light: #F4EBD7;
+  --green-glow: rgba(198, 164, 92, 0.18);
+  --charcoal: #17243A;
+  --charcoal-dark: #0B1424;
+  --ink: #17243A;
   --muted: #6B7280;
   --muted-light: #9CA3AF;
   --paper: #FFFFFF;
-  --soft: #F5F7F5;
-  --sidebar: #17231A;
-  --soft-alt: #EDF3EE;
-  --line: #E2E8E2;
+  --soft: #F5F3EE;
+  --sidebar: #0B1424;
+  --soft-alt: #F1EBDD;
+  --line: #E7DFCF;
   --line-dark: #37473B;
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -126,7 +126,7 @@ button, input, select, textarea {
 .btn-green:hover {
   background-color: var(--green-dark);
   color: #FFFFFF;
-  box-shadow: 0 6px 20px rgba(0, 181, 34, 0.28);
+  box-shadow: 0 6px 20px rgba(198, 164, 92, 0.28);
   transform: translateY(-1px);
 }
 
@@ -227,7 +227,7 @@ button, input, select, textarea {
    TOPLINE BANNER
    ========================================================================== */
 .topline {
-  background-color: #1A251C;
+  background-color: #0B1424;
   color: #E2EBE4;
   font-size: 12px;
   padding: 8px 0;
