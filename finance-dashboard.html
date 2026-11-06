@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Finance & Ledger Management | Bliss Legacy Limited</title>
+  <title>Finance & Ledger Management | Elpis Property Limited</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Manrope:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -134,12 +134,12 @@
   <link rel="manifest" href="manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Bliss Legacy">
+  <meta name="apple-mobile-web-app-title" content="Elpis Property">
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
-  <meta name="theme-color" content="#00B522" />
+  <meta name="theme-color" content="#C6A45C" />
 </head>
 <body>
   <div id="demoBanner" class="demo-banner-top">
@@ -151,7 +151,7 @@
     <aside class="sidebar" id="sidebar">
       <div class="brand">
         <a href="index.html">
-          <img src="assets/images/bliss-legacy-logo.png" alt="Bliss Legacy" onerror="this.src='bliss-legacy-logo.png'">
+          <img src="assets/images/Elpis-legacy-logo.png" alt="Elpis Property" onerror="this.src='Elpis-legacy-logo.png'">
         </a>
       </div>
       <div class="section-label">Management</div>
@@ -206,7 +206,7 @@
 
       <!-- Financial KPI Cards -->
       <div class="finance-kpis">
-        <div class="fin-kpi-card" style="border-left:4px solid #00B522">
+        <div class="fin-kpi-card" style="border-left:4px solid #C6A45C">
           <span class="label">Total Verified Collections</span>
           <div class="amount" id="kpiTotalVerified">₦0.00</div>
           <span class="meta" id="kpiVerifiedCount">0 verified payments</span>
@@ -391,7 +391,7 @@
         </div>
         <div style="display:flex;justify-content:space-between;font-size:14px;border-top:1px dashed var(--line);padding-top:8px">
           <span style="color:var(--muted)">Verified Amount:</span>
-          <strong id="verifyModalAmount" style="color:#008F1B;font-size:16px">₦0.00</strong>
+          <strong id="verifyModalAmount" style="color:#A9853F;font-size:16px">₦0.00</strong>
         </div>
       </div>
       <div style="display:flex;justify-content:flex-end;gap:10px">
@@ -703,7 +703,7 @@
         wBadge.textContent = w.status;
         if (w.status === "Active") {
           wBadge.style.background = "#E8F9EB";
-          wBadge.style.color = "#008F1B";
+          wBadge.style.color = "#A9853F";
         } else {
           wBadge.style.background = "#FEF3C7";
           wBadge.style.color = "#92400E";
@@ -772,14 +772,14 @@
             <div style="font-size:11px;color:var(--muted);font-family:'Space Mono', monospace">${esc(t.client_reference)}</div>
           </td>
           <td style="font-size:12px">${esc(t.branch_name || "Head Office")}</td>
-          <td style="font-family:var(--font-display);font-weight:700;font-size:14px;color:${t.status === 'verified' ? '#008F1B' : 'var(--charcoal)'}">
+          <td style="font-family:var(--font-display);font-weight:700;font-size:14px;color:${t.status === 'verified' ? '#A9853F' : 'var(--charcoal)'}">
             ${formatNGN(t.amount)}
           </td>
           <td style="font-size:12px">${t.method || "Transfer"}</td>
           <td><span class="status-badge ${statusClass}">${t.status}</span></td>
           <td style="font-size:12px">${t.created_at ? new Date(t.created_at).toLocaleDateString("en-NG", { dateStyle: "short" }) : "--"}</td>
           <td style="font-size:12px">
-            ${t.receipt_ref ? `<span style="font-family:'Space Mono', monospace;color:#008F1B;font-size:11px;font-weight:700">${t.receipt_ref}</span>` : '<span style="color:#9CA3AF">-</span>'}
+            ${t.receipt_ref ? `<span style="font-family:'Space Mono', monospace;color:#A9853F;font-size:11px;font-weight:700">${t.receipt_ref}</span>` : '<span style="color:#9CA3AF">-</span>'}
           </td>
           <td style="text-align:right">
             <div style="display:inline-flex;gap:6px">
@@ -1009,7 +1009,7 @@
       const encodedUri = encodeURI(csvContent);
       const link = document.createElement("a");
       link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `bliss_transactions_${isDemoMode ? 'demo' : 'live'}_${Date.now()}.csv`);
+      link.setAttribute("download", `Elpis_transactions_${isDemoMode ? 'demo' : 'live'}_${Date.now()}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -1052,7 +1052,7 @@
             <td><strong>${s.client_name}</strong><div style="font-size:11px;color:var(--muted);font-family:'Space Mono', monospace">${s.client_reference}</div></td>
             <td style="font-size:12px">${s.property_title || "-"}</td>
             <td style="font-weight:700">${formatNGN(s.total_agreed_price)}</td>
-            <td style="font-weight:700;color:#008F1B">${formatNGN(s.installment_amount)}</td>
+            <td style="font-weight:700;color:#A9853F">${formatNGN(s.installment_amount)}</td>
             <td style="font-size:12px">${planTypeLabel(s.plan_type)}<div>${planBadge}</div></td>
             <td style="font-size:12px">${formatNGN((s.expected_to_date_kobo || 0) / 100)}<div style="color:#DC2626">Behind ${formatNGN((s.amount_behind_kobo || 0) / 100)}</div></td>
             <td style="font-size:12px">${(s.next_due_date || "").slice(0, 10)}</td>
