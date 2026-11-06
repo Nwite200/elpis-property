@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Properties | Bliss Legacy Limited</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/motion.css">
+  <script src="assets/js/intro-config.js"></script>
+  <script src="assets/js/motion.js"></script>
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Bliss Legacy">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
+  <meta name="theme-color" content="#00B522" />
+</head>
+<body>
+  <div class="dash">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand"><img src="assets/images/bliss-legacy-logo.png" alt="Bliss Legacy"></div>
+      <div class="section-label">Management</div>
+      <a href="dashboard.html">📊 Overview</a>
+      <a href="properties.html" class="active">🏡 Properties</a>
+      <a href="clients.html">👥 Clients</a>
+      <a href="finance-dashboard.html">💳 Finance & Ledger</a>
+      <div class="section-label">Properties</div>
+      <a href="properties.html" style="font-weight:700">• Listings</a>
+      <a href="property-create.html">+ Add Property</a>
+      <div class="section-label">Account</div>
+      <a href="index.html">🌐 Public Website</a>
+      <a href="#" id="logoutBtn" style="color:#E74C3C">Logout</a>
+    </aside>
+    <main class="dash-main">
+      <div class="dash-top">
+        <div>
+          <h1>Property Listings</h1>
+          <p style="color:var(--muted);font-size:13px">Manage property inventory, plans, publishing and approvals.</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-outline" type="button" id="pendingApprovalBtn">Pending approval</button>
+          <a class="btn btn-green" href="property-create.html" id="addPropertyBtn">Add Property</a>
+        </div>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="label">Total Properties</div><div class="value" id="kpiTotal">-</div></div>
+        <div class="kpi"><div class="label">Published</div><div class="value" id="kpiPublished">-</div></div>
+        <div class="kpi"><div class="label">Pending approval</div><div class="value" id="kpiPending">-</div></div>
+        <div class="kpi"><div class="label">Test / demo</div><div class="value" id="kpiTestDemo">-</div></div>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+          <div class="filters" style="gap:8px">
+            <input id="searchInput" type="search" placeholder="Search title, city, state...">
+            <select id="categoryFilter"><option value="">All Categories</option></select>
+            <select id="statusFilter"><option value="">All Sales Statuses</option><option>Available</option><option>Reserved</option><option>Sold</option><option>Unavailable</option></select>
+            <select id="workflowFilter">
+              <option value="">All workflow statuses</option>
+              <option value="draft">Draft</option>
+              <option value="pending_approval">Pending approval</option>
+              <option value="published">Published</option>
+              <option value="unpublished">Unpublished</option>
+              <option value="sold_out">Sold out</option>
+              <option value="archived">Archived</option>
+            </select>
+            <select id="branchFilter"><option value="">All Branches</option></select>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px"><input type="checkbox" id="flagsFilter"> Test / demo only</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px"><input type="checkbox" id="archivedFilter"> Include archived</label>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Reference</th><th>Property</th><th>Price</th><th>Branch</th><th>Workflow</th><th>Sales</th><th>Flags</th><th>Plans</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="propertyTableBody"></tbody>
+          </table>
+        </div>
+        <div id="pagination" style="display:flex;justify-content:center;gap:6px;margin-top:12px"></div>
+      </div>
+    </main>
+  </div>
+  <script src="assets/js/properties.js"></script>
+  <script src="assets/js/mobile-nav.js"></script>
+  <script src="assets/js/pwa.js"></script>
+</body>
+</html>
