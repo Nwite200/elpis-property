@@ -1,5 +1,5 @@
 (function () {
-  const S = window.BlissStaff;
+  const S = window.ElpisStaff;
   let me = null;
   let dashboard = null;
 
@@ -398,7 +398,7 @@
       };
     }
     const share = el("shareReferralBtn");
-    share.href = "https://wa.me/?text=" + encodeURIComponent(`Buy property with Bliss Legacy through my referral link: ${me.referral_link}`);
+    share.href = "https://wa.me/?text=" + encodeURIComponent(`Buy property with Elpis Property through my referral link: ${me.referral_link}`);
   }
 
   function renderProfile() {
