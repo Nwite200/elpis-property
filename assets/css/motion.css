@@ -1,7 +1,7 @@
-/* Bliss Legacy Limited — single global logo intro.
+/* elpis Legacy Limited — single global logo intro.
    Hype and classic variants share one component. Front-end only. */
 
-.bliss-intro {
+.elpis-intro {
   position: fixed;
   inset: 0;
   z-index: 2147483000;
@@ -13,34 +13,34 @@
   isolation: isolate;
 }
 
-.bliss-intro.style-hype {
+.elpis-intro.style-hype {
   background:
-    radial-gradient(circle at 50% 44%, #102218 0%, #08110b 55%, #040806 100%);
+    radial-gradient(circle at 50% 44%, #17243A 0%, #0B1424 55%, #070D18 100%);
 }
 
-.bliss-intro.style-classic,
-.bliss-intro.style-reduced {
+.elpis-intro.style-classic,
+.elpis-intro.style-reduced {
   background:
-    radial-gradient(circle at 50% 42%, #ffffff 0%, #f5f7f5 56%, #edf3ee 100%);
+    radial-gradient(circle at 50% 42%, #ffffff 0%, #F5F3EE 56%, #F1EBDD 100%);
 }
 
-.bliss-intro__halo {
+.elpis-intro__halo {
   position: absolute;
   width: min(82vw, 660px);
   aspect-ratio: 1;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,255,255,0.98) 0%, rgba(245,247,245,0.92) 34%, rgba(0,181,34,0.14) 62%, transparent 73%);
+  background: radial-gradient(circle, rgba(255,255,255,0.98) 0%, rgba(245,247,245,0.92) 34%, rgba(198,164,92,0.14) 62%, transparent 73%);
   filter: blur(22px);
   opacity: 0.96;
   z-index: 0;
 }
 
-.style-classic .bliss-intro__halo,
-.style-reduced .bliss-intro__halo {
+.style-classic .elpis-intro__halo,
+.style-reduced .elpis-intro__halo {
   display: none;
 }
 
-.bliss-intro__streak {
+.elpis-intro__streak {
   position: absolute;
   top: -12%;
   left: 50%;
@@ -48,12 +48,12 @@
   height: 124%;
   z-index: 1;
   opacity: 0;
-  background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.9) 28%, rgba(92,255,120,0.95) 50%, rgba(255,255,255,0.8) 72%, transparent 100%);
-  box-shadow: 0 0 16px rgba(92,255,120,0.7);
+  background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.9) 28%, rgba(226,201,139,0.95) 50%, rgba(255,255,255,0.8) 72%, transparent 100%);
+  box-shadow: 0 0 16px rgba(226,201,139,0.7);
   transform: translate3d(-42vw, 0, 0) rotate(8deg);
 }
 
-.bliss-intro__sweep {
+.elpis-intro__sweep {
   position: absolute;
   inset: 0;
   z-index: 2;
@@ -63,14 +63,14 @@
   transform: translate3d(-120%, 0, 0);
 }
 
-.bliss-intro__lines {
+.elpis-intro__lines {
   position: absolute;
   inset: 0;
   z-index: 0;
   opacity: 0;
 }
 
-.bliss-intro__lines span {
+.elpis-intro__lines span {
   position: absolute;
   display: block;
   height: 1px;
@@ -79,11 +79,11 @@
   filter: blur(0.2px);
 }
 
-.bliss-intro__lines span:nth-child(1) { left: 8%; top: 32%; }
-.bliss-intro__lines span:nth-child(2) { right: 6%; top: 48%; width: clamp(90px, 20vw, 270px); }
-.bliss-intro__lines span:nth-child(3) { left: 14%; bottom: 28%; width: clamp(100px, 24vw, 300px); }
+.elpis-intro__lines span:nth-child(1) { left: 8%; top: 32%; }
+.elpis-intro__lines span:nth-child(2) { right: 6%; top: 48%; width: clamp(90px, 20vw, 270px); }
+.elpis-intro__lines span:nth-child(3) { left: 14%; bottom: 28%; width: clamp(100px, 24vw, 300px); }
 
-.bliss-intro__ring {
+.elpis-intro__ring {
   position: absolute;
   z-index: 4;
   width: 190px;
@@ -94,7 +94,7 @@
   box-shadow: 0 0 34px rgba(0,181,34,0.24);
 }
 
-.bliss-intro__flash {
+.elpis-intro__flash {
   position: absolute;
   inset: 0;
   z-index: 5;
@@ -102,7 +102,7 @@
   opacity: 0;
 }
 
-.bliss-intro__stage {
+.elpis-intro__stage {
   position: relative;
   z-index: 3;
   display: grid;
@@ -110,20 +110,20 @@
   padding: 24px;
 }
 
-.bliss-intro__camera {
+.elpis-intro__camera {
   display: grid;
   place-items: center;
   transform-origin: center;
 }
 
-.bliss-intro__logo-wrap {
+.elpis-intro__logo-wrap {
   display: grid;
   place-items: center;
   transform-origin: center;
   opacity: 0;
 }
 
-.bliss-intro__logo {
+.elpis-intro__logo {
   display: block;
   width: clamp(280px, 42vw, 520px);
   height: auto;
@@ -133,7 +133,7 @@
   transform-origin: center;
 }
 
-.bliss-intro__fallback {
+.elpis-intro__fallback {
   display: none;
   font-family: var(--font-display, "Manrope", sans-serif);
   font-size: clamp(20px, 4.4vw, 38px);
@@ -143,15 +143,15 @@
   text-align: center;
 }
 
-.bliss-intro.has-logo-error .bliss-intro__logo {
+.elpis-intro.has-logo-error .elpis-intro__logo {
   display: none;
 }
 
-.bliss-intro.has-logo-error .bliss-intro__fallback {
+.elpis-intro.has-logo-error .elpis-intro__fallback {
   display: block;
 }
 
-.bliss-intro__tagline {
+.elpis-intro__tagline {
   margin-top: 24px;
   max-width: min(86vw, 560px);
   text-align: center;
@@ -163,86 +163,86 @@
   opacity: 0;
 }
 
-.style-hype .bliss-intro__tagline {
+.style-hype .elpis-intro__tagline {
   color: rgba(65, 65, 65, 0.86);
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
-.style-classic .bliss-intro__tagline,
-.style-reduced .bliss-intro__tagline,
-.style-classic .bliss-intro__streak,
-.style-classic .bliss-intro__sweep,
-.style-classic .bliss-intro__lines,
-.style-classic .bliss-intro__ring,
-.style-classic .bliss-intro__flash,
-.style-reduced .bliss-intro__streak,
-.style-reduced .bliss-intro__sweep,
-.style-reduced .bliss-intro__lines,
-.style-reduced .bliss-intro__ring,
-.style-reduced .bliss-intro__flash {
+.style-classic .elpis-intro__tagline,
+.style-reduced .elpis-intro__tagline,
+.style-classic .elpis-intro__streak,
+.style-classic .elpis-intro__sweep,
+.style-classic .elpis-intro__lines,
+.style-classic .elpis-intro__ring,
+.style-classic .elpis-intro__flash,
+.style-reduced .elpis-intro__streak,
+.style-reduced .elpis-intro__sweep,
+.style-reduced .elpis-intro__lines,
+.style-reduced .elpis-intro__ring,
+.style-reduced .elpis-intro__flash {
   display: none;
 }
 
-.style-classic .bliss-intro__logo,
-.style-reduced .bliss-intro__logo {
+.style-classic .elpis-intro__logo,
+.style-reduced .elpis-intro__logo {
   filter: drop-shadow(0 18px 38px rgba(34,43,36,0.10));
 }
 
 /* Glitch uses filter only for a few frames; transform remains owned by WAAPI. */
-.bliss-intro__logo.is-glitching {
-  animation: bliss-glitch 110ms steps(2, end) both;
+.elpis-intro__logo.is-glitching {
+  animation: elpis-glitch 110ms steps(2, end) both;
 }
 
-@keyframes bliss-glitch {
+@keyframes elpis-glitch {
   0% { filter: drop-shadow(3px 0 rgba(255,45,90,0.55)) drop-shadow(-3px 0 rgba(0,220,255,0.45)); }
   50% { filter: drop-shadow(-2px 0 rgba(255,45,90,0.45)) drop-shadow(2px 0 rgba(0,220,255,0.4)); }
   100% { filter: drop-shadow(0 18px 38px rgba(34,43,36,0.10)); }
 }
 
 @media (max-width: 640px) {
-  .bliss-intro__logo {
+  .elpis-intro__logo {
     width: min(80vw, 360px);
     max-height: 32vh;
   }
-  .bliss-intro__ring { width: 140px; height: 140px; }
-  .bliss-intro__tagline { margin-top: 18px; font-size: 12px; }
+  .elpis-intro__ring { width: 140px; height: 140px; }
+  .elpis-intro__tagline { margin-top: 18px; font-size: 12px; }
 }
 
 /* will-change only while the component is active. */
-.bliss-intro.is-running,
-.bliss-intro.is-running .bliss-intro__camera,
-.bliss-intro.is-running .bliss-intro__logo-wrap,
-.bliss-intro.is-running .bliss-intro__logo,
-.bliss-intro.is-running .bliss-intro__ring,
-.bliss-intro.is-running .bliss-intro__streak,
-.bliss-intro.is-running .bliss-intro__sweep {
+.elpis-intro.is-running,
+.elpis-intro.is-running .elpis-intro__camera,
+.elpis-intro.is-running .elpis-intro__logo-wrap,
+.elpis-intro.is-running .elpis-intro__logo,
+.elpis-intro.is-running .elpis-intro__ring,
+.elpis-intro.is-running .elpis-intro__streak,
+.elpis-intro.is-running .elpis-intro__sweep {
   will-change: transform, opacity;
 }
 
 /* Low-power heuristic disables the most expensive filter/glow work. */
-.bliss-intro.low-power .bliss-intro__logo {
+.elpis-intro.low-power .elpis-intro__logo {
   filter: none !important;
 }
-.bliss-intro.low-power .bliss-intro__halo {
+.elpis-intro.low-power .elpis-intro__halo {
   filter: none;
 }
-.bliss-intro.low-power .bliss-intro__streak,
-.bliss-intro.low-power .bliss-intro__sweep {
+.elpis-intro.low-power .elpis-intro__streak,
+.elpis-intro.low-power .elpis-intro__sweep {
   box-shadow: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bliss-intro__streak,
-  .bliss-intro__sweep,
-  .bliss-intro__lines,
-  .bliss-intro__ring,
-  .bliss-intro__flash,
-  .bliss-intro__tagline {
+  .elpis-intro__streak,
+  .elpis-intro__sweep,
+  .elpis-intro__lines,
+  .elpis-intro__ring,
+  .elpis-intro__flash,
+  .elpis-intro__tagline {
     display: none !important;
   }
-  .bliss-intro__logo,
-  .bliss-intro__logo-wrap,
-  .bliss-intro__camera {
+  .elpis-intro__logo,
+  .elpis-intro__logo-wrap,
+  .elpis-intro__camera {
     transform: none !important;
     filter: none !important;
   }
