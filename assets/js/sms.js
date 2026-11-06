@@ -1,5 +1,5 @@
 (function () {
-  const S = window.BlissStaff;
+  const S = window.elpisStaff;
   let me = null;
   let page = 1;
   let total = 0;
