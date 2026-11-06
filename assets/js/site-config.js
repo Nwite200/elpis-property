@@ -1,6 +1,6 @@
 // Elpis Property Limited public-site configuration.
 // Replace branch addresses and phone numbers when Elpis supplies verified details.
-window.BLIS_CONFIG = {
+window.ELPIS_CONFIG = {
   companyName: "Elpis Property Limited",
   tagline: "Your Trusted Real Estate Partner",
   whatsappNumber: "",
@@ -23,15 +23,15 @@ window.ELPIS_CONFIG_READY = fetch("/api/site-config", { credentials: "same-origi
   .then(function (payload) {
     if (payload && payload.config) {
       var c = payload.config;
-      window.BLIS_CONFIG.companyName = c.companyName || window.BLIS_CONFIG.companyName;
-      window.BLIS_CONFIG.tagline = c.tagline || window.BLIS_CONFIG.tagline;
-      window.BLIS_CONFIG.whatsappNumber = c.whatsappNumber || window.BLIS_CONFIG.whatsappNumber;
-      window.BLIS_CONFIG.phone = c.phone || window.BLIS_CONFIG.phone;
-      window.BLIS_CONFIG.email = c.email || window.BLIS_CONFIG.email;
-      window.BLIS_CONFIG.address = c.address || window.BLIS_CONFIG.address;
-      window.BLIS_CONFIG.social = c.social || window.BLIS_CONFIG.social;
-      if (Array.isArray(c.branches) && c.branches.length) window.BLIS_CONFIG.branches = c.branches;
+      window.ELPIS_CONFIG.companyName = c.companyName || window.ELPIS_CONFIG.companyName;
+      window.ELPIS_CONFIG.tagline = c.tagline || window.ELPIS_CONFIG.tagline;
+      window.ELPIS_CONFIG.whatsappNumber = c.whatsappNumber || window.ELPIS_CONFIG.whatsappNumber;
+      window.ELPIS_CONFIG.phone = c.phone || window.ELPIS_CONFIG.phone;
+      window.ELPIS_CONFIG.email = c.email || window.ELPIS_CONFIG.email;
+      window.ELPIS_CONFIG.address = c.address || window.ELPIS_CONFIG.address;
+      window.ELPIS_CONFIG.social = c.social || window.ELPIS_CONFIG.social;
+      if (Array.isArray(c.branches) && c.branches.length) window.ELPIS_CONFIG.branches = c.branches;
     }
-    return window.BLIS_CONFIG;
+    return window.ELPIS_CONFIG;
   })
-  .catch(function () { return window.BLIS_CONFIG; });
+  .catch(function () { return window.ELPIS_CONFIG; });

@@ -118,33 +118,33 @@
   }
 
   function buildOverlay(mode) {
-    var overlay = make("div", "bliss-intro style-" + STYLE + " mode-" + mode + (lowPower ? " low-power" : ""));
+    var overlay = make("div", "ELPIS-intro style-" + STYLE + " mode-" + mode + (lowPower ? " low-power" : ""));
     overlay.setAttribute("aria-hidden", "true");
     overlay.setAttribute("role", "presentation");
 
-    var halo = make("div", "bliss-intro__halo");
-    var streak = make("div", "bliss-intro__streak");
-    var sweep = make("div", "bliss-intro__sweep");
-    var lines = make("div", "bliss-intro__lines");
+    var halo = make("div", "ELPIS-intro__halo");
+    var streak = make("div", "ELPIS-intro__streak");
+    var sweep = make("div", "ELPIS-intro__sweep");
+    var lines = make("div", "ELPIS-intro__lines");
     lines.appendChild(make("span"));
     lines.appendChild(make("span"));
     lines.appendChild(make("span"));
-    var ring = make("div", "bliss-intro__ring");
-    var flash = make("div", "bliss-intro__flash");
+    var ring = make("div", "ELPIS-intro__ring");
+    var flash = make("div", "ELPIS-intro__flash");
 
-    var stage = make("div", "bliss-intro__stage");
-    var camera = make("div", "bliss-intro__camera");
-    var logoWrap = make("div", "bliss-intro__logo-wrap");
-    var logo = make("img", "bliss-intro__logo");
+    var stage = make("div", "ELPIS-intro__stage");
+    var camera = make("div", "ELPIS-intro__camera");
+    var logoWrap = make("div", "ELPIS-intro__logo-wrap");
+    var logo = make("img", "ELPIS-intro__logo");
     logo.src = LOGO_SRC;
     logo.alt = "";
     logo.width = 1536;
     logo.height = 1024;
     logo.decoding = "async";
     logo.onerror = function () { overlay.classList.add("has-logo-error"); };
-    var fallback = make("div", "bliss-intro__fallback");
+    var fallback = make("div", "ELPIS-intro__fallback");
     fallback.textContent = BRAND_NAME;
-    var tagline = make("div", "bliss-intro__tagline");
+    var tagline = make("div", "ELPIS-intro__tagline");
     tagline.textContent = TAGLINE;
 
     logoWrap.appendChild(logo);
@@ -456,7 +456,7 @@
 
   runIntro(initialMode());
 
-  window.BlissMotion = {
+  window.ELPISMotion = {
     replay: function (mode) { runIntro(mode === "short" ? "short" : "full"); },
     timings: CFG,
     style: STYLE

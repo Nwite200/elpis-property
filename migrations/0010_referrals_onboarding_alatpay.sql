@@ -3,7 +3,7 @@ PRAGMA foreign_keys = ON;
 
 -- Staff referral identity. Every staff member receives one stable code.
 ALTER TABLE users ADD COLUMN referral_code TEXT;
-UPDATE users SET referral_code = 'BL-' || printf('%06d', id) WHERE referral_code IS NULL;
+UPDATE users SET referral_code = 'ELP-' || printf('%06d', id) WHERE referral_code IS NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS idx_users_referral_code ON users(referral_code);
 
 -- Enhanced client onboarding and referral attribution.
