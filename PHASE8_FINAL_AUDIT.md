@@ -1,6 +1,6 @@
 # elpis Legacy Limited — Phase 8 Final Integration Audit
 
-**Status:** local audit and hardening complete. The later explicit owner instruction authorized a live demo deployment; the demo is deployed at `https://elpis-legacy-limited.easterntechexpo.workers.dev` with temporary demo accounts. The Phase 8 code changes remain uncommitted at the time of writing.
+**Status:** local audit and hardening complete. The later explicit owner instruction authorized a live demo deployment; the demo is deployed at `https://ELPIS_STAGING_WORKER_HOST` with temporary demo accounts. The Phase 8 code changes remain uncommitted at the time of writing.
 
 **Audit date:** 04 November 2026
 
@@ -165,7 +165,7 @@ Syntax checks passed for `src/index.js`, every `assets/js/*.js` file, every test
 
 ## 8. Remaining production dependencies
 
-The application is deployed to a **live Cloudflare demo** at `https://elpis-legacy-limited.easterntechexpo.workers.dev`. It is not yet a fully signed-off production service. Remaining external and infrastructure dependencies are listed in `KNOWN_LIMITATIONS.md` and `PRODUCTION_READINESS_CHECKLIST.md`, including:
+The application is deployed to a **live Cloudflare demo** at `https://ELPIS_STAGING_WORKER_HOST`. It is not yet a fully signed-off production service. Remaining external and infrastructure dependencies are listed in `KNOWN_LIMITATIONS.md` and `PRODUCTION_READINESS_CHECKLIST.md`, including:
 
 - Real Cloudflare D1/R2/KV/Queue resource IDs.
 - Production secrets and custom domain/DNS.

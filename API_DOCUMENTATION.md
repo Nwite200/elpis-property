@@ -2,7 +2,7 @@
 
 **Base URL (local):** `http://localhost:8787`
 
-**Base URL (deployed demo):** `https://elpis-legacy-limited.easterntechexpo.workers.dev`
+**Base URL (deployed demo):** `https://ELPIS_STAGING_WORKER_HOST`
 
 All APIs are served by the Cloudflare Worker in `src/index.js`. JSON responses use `Content-Type: application/json`. Authentication is a session cookie named `elpis_session`.
 
