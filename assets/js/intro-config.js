@@ -1,18 +1,18 @@
-// Bliss Legacy Limited — single source of truth for the logo intro.
+// Elpis Property Limited — single source of truth for the logo intro.
 // Change INTRO_STYLE to "classic" for the plain elegant variant.
 // No other code change is required to switch styles.
 window.BLISS_INTRO_CONFIG = {
   INTRO_STYLE: "hype", // "hype" | "classic"
-  LOGO_SRC: "assets/images/bliss-legacy-logo.png",
+  LOGO_SRC: "assets/images/elpis-property-logo-original.png",
   BRAND_NAME: "BLISS LEGACY LIMITED",
   TAGLINE: "Your Future Begins With the Right Property.",
 
   COLORS: {
-    accent: "#00B522",
-    accentBright: "#5CFF78",
-    charcoal: "#414141",
-    dark: "#08110B",
-    soft: "#F5F7F5",
+    accent: "#C6A45C",
+    accentBright: "#E2C98B",
+    charcoal: "#17243A",
+    dark: "#0B1424",
+    soft: "#F5F3EE",
     white: "#FFFFFF"
   },
 
