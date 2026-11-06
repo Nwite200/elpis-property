@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#00B522" />
-  <title>Client Portal Dashboard | Bliss Legacy Limited</title>
+  <meta name="theme-color" content="#C6A45C" />
+  <title>Client Portal Dashboard | Elpis Property Limited</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -193,7 +193,7 @@
     }
     .progress-bar-fill {
       height: 100%;
-      background: linear-gradient(90deg, #00B522 0%, #7FE58D 100%);
+      background: linear-gradient(90deg, #C6A45C 0%, #7FE58D 100%);
       border-radius: 100px;
       transition: width 0.8s ease;
     }
@@ -339,7 +339,7 @@
   <link rel="manifest" href="manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Bliss Legacy">
+  <meta name="apple-mobile-web-app-title" content="Elpis Property">
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
@@ -350,7 +350,7 @@
     <!-- Sidebar Navigation -->
     <aside class="portal-sidebar">
       <a href="index.html">
-        <img src="assets/images/bliss-legacy-logo.png" alt="Bliss Legacy" class="brand-logo" onerror="this.src='bliss-legacy-logo.png'">
+        <img src="assets/images/Elpis-legacy-logo.png" alt="Elpis Property" class="brand-logo" onerror="this.src='Elpis-legacy-logo.png'">
       </a>
       <span class="nav-section-title">Client Workspace</span>
       <a href="client-dashboard.html" class="active">📊 Overview</a>
@@ -392,7 +392,7 @@
         <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
           <div>
             <strong>Verify your account</strong>
-            <div class="small muted" style="margin-top:3px">Confirm your phone or email with a 6-digit code so Bliss Legacy knows this account is real.</div>
+            <div class="small muted" style="margin-top:3px">Confirm your phone or email with a 6-digit code so Elpis Property knows this account is real.</div>
           </div>
           <a class="btn btn-green btn-sm" href="client-verify.html">Verify now</a>
         </div>
@@ -557,7 +557,7 @@
           if (copyBtn) copyBtn.addEventListener('click', async () => {
             try { await navigator.clipboard.writeText(data.account_number); }
             catch { /* clipboard may be unavailable */ }
-            if (window.Bliss && Bliss.toast) Bliss.toast('Account number copied.'); else copyBtn.textContent = 'Copied';
+            if (window.Elpis && Elpis.toast) Elpis.toast('Account number copied.'); else copyBtn.textContent = 'Copied';
           });
         } else if (data.static_wallet && data.static_wallet.status === 'otp_pending') {
           box.innerHTML = `
@@ -612,16 +612,16 @@
         document.getElementById('profileNok').textContent = client.next_of_kin || '—';
 
         // Fill Financial KPIs (derived strictly from integer kobo)
-        document.getElementById('agreedPrice').textContent = Bliss.money(financials.agreed_price_ngn);
-        document.getElementById('totalVerified').textContent = Bliss.money(financials.total_verified_ngn);
-        document.getElementById('outstandingBalance').textContent = Bliss.money(financials.outstanding_balance_ngn);
+        document.getElementById('agreedPrice').textContent = Elpis.money(financials.agreed_price_ngn);
+        document.getElementById('totalVerified').textContent = Elpis.money(financials.total_verified_ngn);
+        document.getElementById('outstandingBalance').textContent = Elpis.money(financials.outstanding_balance_ngn);
         document.getElementById('verifiedCount').textContent = `${financials.verified_payments_count || 0} verified payment(s)`;
 
         const pct = financials.payment_percentage || 0;
         document.getElementById('paymentPctText').textContent = `${pct}%`;
         document.getElementById('progressPctLabel').textContent = `${pct}% Completed`;
         document.getElementById('progressBarFill').style.width = `${pct}%`;
-        document.getElementById('progressTarget').textContent = `Agreed Price: ${Bliss.money(financials.agreed_price_ngn)}`;
+        document.getElementById('progressTarget').textContent = `Agreed Price: ${Elpis.money(financials.agreed_price_ngn)}`;
 
         // Render Property Section
         const propBox = document.getElementById('propertyContainer');
@@ -636,13 +636,13 @@
                   <h3>${esc(item.title)}</h3>
                   <p>📍 Location: ${esc(item.location || 'Prime Estate')}${item.category_name ? ` · ${esc(item.category_name)}` : ''}</p>
                   <p>Ref: <strong>${esc(item.reference || 'N/A')}</strong></p>
-                  <div class="mini-prop-price">${Bliss.money(item.agreed_purchase_price)}</div>
+                  <div class="mini-prop-price">${Elpis.money(item.agreed_purchase_price)}</div>
                 </div>
               </div>
               <div style="margin-top:10px;padding:0 2px">
                 <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px">
-                  <span>Paid: <strong style="color:var(--green)">${Bliss.money(item.verified_ngn)}</strong></span>
-                  <span>Remaining: <strong>${Bliss.money(item.outstanding_ngn)}</strong></span>
+                  <span>Paid: <strong style="color:var(--green)">${Elpis.money(item.verified_ngn)}</strong></span>
+                  <span>Remaining: <strong>${Elpis.money(item.outstanding_ngn)}</strong></span>
                 </div>
                 <div class="progress-bar-track" style="height:8px">
                   <div class="progress-bar-fill" style="width:${progressValue}%"></div>
@@ -668,7 +668,7 @@
           nextBox.innerHTML = `
             <div class="next-payment-banner">
               <span class="kpi-lbl">Scheduled Installment</span>
-              <div class="next-pay-amount">${Bliss.money(nextPay.installment_amount)}</div>
+              <div class="next-pay-amount">${Elpis.money(nextPay.installment_amount)}</div>
               <p class="next-pay-meta">
                 Due Date: <strong>${nextPay.next_due_date.slice(0, 10)}</strong> (${nextPay.status})
               </p>
@@ -705,7 +705,7 @@
 
         // WhatsApp Action
         document.getElementById('waSupportBtn').addEventListener('click', () => {
-          Bliss.enquireWhatsApp(`Hello Bliss Legacy, my name is ${client.full_name} (Ref: ${client.client_reference}). I need assistance with my account.`);
+          Elpis.enquireWhatsApp(`Hello Elpis Property, my name is ${client.full_name} (Ref: ${client.client_reference}). I need assistance with my account.`);
         });
 
         document.getElementById('notifToggleBtn').addEventListener('click', () => {
