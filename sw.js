@@ -1,6 +1,6 @@
-/* Bliss Legacy Limited — PWA service worker.
+/* elpis Legacy Limited — PWA service worker.
    Static assets only. API and authenticated financial data are never cached. */
-const CACHE_VERSION = "bliss-pwa-v5";
+const CACHE_VERSION = "elpis-pwa-v5";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const CORE_ASSETS = [
   "/",
@@ -14,7 +14,7 @@ const CORE_ASSETS = [
   "/assets/js/mobile-nav.js",
   "/assets/js/components.js",
   "/assets/js/data/properties.js",
-  "/assets/images/bliss-legacy-logo.png",
+  "/assets/images/elpis-legacy-logo.png",
   "/assets/icons/icon-192.png",
   "/assets/icons/icon-512.png",
   "/assets/icons/icon-maskable-512.png",

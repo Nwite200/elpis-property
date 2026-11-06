@@ -1,5 +1,5 @@
 (function () {
-  const S = window.BlissStaff;
+  const S = window.elpisStaff;
   let me = null;
   let roles = [];
   let allPermissions = [];
@@ -115,7 +115,7 @@
     const data = await S.fetchJson("/api/admin/app-settings");
     const settings = data.settings || {};
     const c = settings.site_config || {};
-    el("siteCompanyName").value = c.company_name || "Bliss Legacy Limited";
+    el("siteCompanyName").value = c.company_name || "elpis Legacy Limited";
     el("siteTagline").value = c.tagline || "";
     el("sitePhone").value = c.phone || "";
     el("siteWhatsapp").value = c.whatsapp_number || "";
