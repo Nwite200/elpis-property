@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#00B522" />
-  <title>Verify Your Account | Bliss Legacy Limited</title>
+  <meta name="theme-color" content="#C6A45C" />
+  <title>Verify Your Account | Elpis Property Limited</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -26,7 +26,7 @@
   <link rel="manifest" href="manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Bliss Legacy">
+  <meta name="apple-mobile-web-app-title" content="Elpis Property">
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
@@ -34,7 +34,7 @@
 </head>
 <body>
   <div class="verify-card">
-    <img class="verify-logo" src="assets/images/bliss-legacy-logo.png" alt="Bliss Legacy" onerror="this.src='bliss-legacy-logo.png'">
+    <img class="verify-logo" src="assets/images/Elpis-legacy-logo.png" alt="Elpis Property" onerror="this.src='Elpis-legacy-logo.png'">
     <div class="verify-title">Verify your account</div>
     <p class="verify-sub" id="verifySub">We will send a 6-digit code to confirm this client account is real.</p>
 
@@ -95,7 +95,7 @@
       emailOption.disabled = !(state.has_email && state.email_ready);
       smsOption.disabled = !(state.has_phone && state.sms_ready);
       if (emailOption.disabled && smsOption.disabled) {
-        otpStatus.textContent = 'No delivery channel is configured yet. Please contact Bliss Legacy.';
+        otpStatus.textContent = 'No delivery channel is configured yet. Please contact Elpis Property.';
         document.getElementById('sendOtpBtn').disabled = true;
       } else if (!smsOption.disabled) {
         channel.value = 'sms';
