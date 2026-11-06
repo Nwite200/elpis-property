@@ -1,4 +1,4 @@
-// Bliss Legacy Limited — Main Landing Page Logic
+// Elpis Property Limited — Main Landing Page Logic
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.BLISS_CONFIG_READY) await window.BLISS_CONFIG_READY;
   // Render persistent site header and footer
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (waBtn) {
     waBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      Bliss.enquireWhatsApp('Hello Bliss Legacy Limited, I would like to speak with a property consultant regarding available opportunities.');
+      Bliss.enquireWhatsApp('Hello Elpis Property Limited, I would like to speak with a property consultant regarding available opportunities.');
     });
   }
 
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <p class="branch-location">${b.city}, ${b.state}</p>
         <p class="branch-address">${b.address}</p>
         <div class="branch-footer">
-          <a class="branch-action wa-link" href="#" data-message="Hello Bliss Legacy, I would like to visit or speak with an agent at the ${b.name} office.">Contact Office →</a>
+          <a class="branch-action wa-link" href="#" data-message="Hello Elpis Property, I would like to visit or speak with an agent at the ${b.name} office.">Contact Office →</a>
         </div>
       </div>
     `).join('');
@@ -239,7 +239,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             <div class="prop-actions-row">
               <a href="property.html?id=${p.id}" class="btn btn-card-details">View Details</a>
-              <a href="#" class="btn btn-card-enquire wa-link" data-message="Hello Bliss Legacy Limited, I am interested in ${p.name} located at ${p.location}, listed at ${Bliss.money(p.price)}. Please provide more details.">
+              <a href="#" class="btn btn-card-enquire wa-link" data-message="Hello Elpis Property Limited, I am interested in ${p.name} located at ${p.location}, listed at ${Bliss.money(p.price)}. Please provide more details.">
                 Enquire Now
               </a>
             </div>
@@ -252,7 +252,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     grid.querySelectorAll('.wa-link').forEach(a => {
       a.addEventListener('click', (e) => {
         e.preventDefault();
-        const msg = a.getAttribute('data-message') || 'Hello Bliss Legacy Limited, I would like to make an enquiry.';
+        const msg = a.getAttribute('data-message') || 'Hello Elpis Property Limited, I would like to make an enquiry.';
         Bliss.enquireWhatsApp(msg);
       });
     });
