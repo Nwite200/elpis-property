@@ -1,4 +1,4 @@
-// Bliss Legacy Limited — Sample Property Data (DEMONSTRATION CONTENT).
+// Elpis Property Limited — Sample Property Data (DEMONSTRATION CONTENT).
 // Structured for seamless future API and administrative backend integration.
 
 window.BLIS_BRANCHES = [
