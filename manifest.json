@@ -8,30 +8,25 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
   "orientation": "any",
   "background_color": "#F5F3EE",
   "theme_color": "#C6A45C",
-  "categories": ["business", "finance", "lifestyle"],
+  "categories": [
+    "business",
+    "finance",
+    "lifestyle"
+  ],
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "assets/icons/icon-192.png",
-      "sizes": "192x192",
+      "src": "assets/images/elpis-property-logo-original.png",
+      "sizes": "any",
       "type": "image/png",
       "purpose": "any"
-    },
-    {
-      "src": "assets/icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "assets/icons/icon-maskable-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
     }
   ],
   "shortcuts": [
@@ -39,19 +34,34 @@
       "name": "Staff Dashboard",
       "short_name": "Dashboard",
       "url": "/dashboard",
-      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "assets/images/elpis-property-logo-original.png",
+          "sizes": "any"
+        }
+      ]
     },
     {
       "name": "Client Portal",
       "short_name": "Client Portal",
       "url": "/client-login",
-      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "assets/images/elpis-property-logo-original.png",
+          "sizes": "any"
+        }
+      ]
     },
     {
       "name": "Properties",
       "short_name": "Properties",
       "url": "/#properties",
-      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "assets/images/elpis-property-logo-original.png",
+          "sizes": "any"
+        }
+      ]
     }
   ]
 }
