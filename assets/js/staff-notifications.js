@@ -1,5 +1,5 @@
 (function () {
-  const S = window.BlissStaff;
+  const S = window.elpisStaff;
   let notifications = [];
   const el = id => document.getElementById(id);
 
