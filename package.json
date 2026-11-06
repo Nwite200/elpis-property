@@ -5,15 +5,16 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "db:migrate:local": "wrangler d1 migrations apply bliss-legacy-staging-db --local",
-    "db:migrate:remote": "wrangler d1 migrations apply bliss-legacy-staging-db --remote",
+    "db:migrate:local": "wrangler d1 migrations apply elpis-property-db --local",
+    "db:migrate:remote": "wrangler d1 migrations apply elpis-property-db --remote",
     "test:phase5": "node --experimental-sqlite test_phase5_suite.mjs",
     "test:phase6": "node --experimental-sqlite test_phase6_suite.mjs",
     "test:phase7": "node --experimental-sqlite test_phase7_suite.mjs",
     "test:phase8": "node --experimental-sqlite test_phase8_suite.mjs",
     "test": "npm run test:phase5 && npm run test:phase6 && npm run test:phase7 && npm run test:phase8 && npm run test:seed && npm run test:browser",
     "test:seed": "node --experimental-sqlite test_seed_security.mjs",
-    "test:browser": "node test_browser.mjs"
+    "test:browser": "node test_browser.mjs",
+    "deploy:production": "wrangler deploy --config wrangler.production.toml"
   },
   "devDependencies": {
     "playwright-core": "^1.64.1",
