@@ -1,5 +1,5 @@
 (function () {
-  const S = window.BlissStaff;
+  const S = window.ElpisStaff;
   let me = null;
   let page = 1;
   let total = 0;
@@ -184,7 +184,7 @@
       catch { /* clipboard may be unavailable */ }
       S.toast("Referral code copied.");
     });
-    el("shareReferralBtn").href = "https://wa.me/?text=" + encodeURIComponent(`Buy property with Bliss Legacy through my referral link: ${me.referral_link}`);
+    el("shareReferralBtn").href = "https://wa.me/?text=" + encodeURIComponent(`Buy property with Elpis Property through my referral link: ${me.referral_link}`);
   }
 
   document.addEventListener("DOMContentLoaded", async () => {
