@@ -1,4 +1,4 @@
-# Bliss Legacy Limited — Known Limitations and Outstanding Work
+# elpis Legacy Limited — Known Limitations and Outstanding Work
 
 This is an honest list of what the current implementation does **not** provide. It is not a promise that an earlier plan item is complete.
 

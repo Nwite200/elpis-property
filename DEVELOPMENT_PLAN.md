@@ -1,4 +1,4 @@
-# Bliss Legacy Limited — Development Plan
+# elpis Legacy Limited — Development Plan
 
 ## Current state (Phase 7 completed — local verification)
 
@@ -194,7 +194,7 @@ credentials, account numbers, or claims of live integration).
 - `migrations/0006_phase5_completion.sql` — schedule lifecycle/history, kobo totals, webhook_events, notification_deliveries, notification_dedupe
 - `client-login.html`, `client-dashboard.html`, `client-property.html`, `client-payments.html`, `client-virtual-account.html`, `client-receipts.html`, `client-notifications.html`, `client-profile.html`
 - `finance-dashboard.html`, `provider-config.html`
-- `assets/images/bliss-legacy-logo.jpg` (official logo re-encoded for PDF embedding)
+- `assets/images/elpis-legacy-logo.jpg` (official logo re-encoded for PDF embedding)
 - `seed_phase5.py` (idempotent local demo seed), `test_phase5_suite.mjs` (62-test verification and acceptance suite)
 
 ### Modified
