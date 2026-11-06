@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Staff Dashboard | Bliss Legacy Limited</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Manrope:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/motion.css">
+  <script src="assets/js/intro-config.js"></script>
+  <script src="assets/js/motion.js"></script>
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Bliss Legacy">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
+  <meta name="theme-color" content="#00B522" />
+</head>
+<body data-page="dashboard">
+  <div class="dash">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="dash-main">
+      <section class="role-hero">
+        <h1 id="roleTitle">Loading dashboard…</h1>
+        <p id="roleSubtitle">Preparing your authorised view.</p>
+        <div class="role-hero-meta" id="heroMeta"></div>
+        <div class="hero-actions" id="heroActions"></div>
+      </section>
+
+      <div class="card" id="referralCard" style="margin-bottom:16px;display:none">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+          <div style="flex:1;min-width:240px">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700">Your client referral link</div>
+            <p style="font-size:12px;color:var(--muted);margin:5px 0 10px">Share this link with prospective clients. Anyone who signs up through it is attributed to you and your branch.</p>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <input class="field-input" id="referralLinkInput" readonly style="flex:1;min-width:240px;font-size:12px">
+              <button class="btn btn-green btn-sm" type="button" id="copyReferralBtn">Copy link</button>
+              <button class="btn btn-outline btn-sm" type="button" id="copyReferralCodeBtn">Copy code</button>
+              <a class="btn btn-outline btn-sm" id="shareReferralBtn" target="_blank" rel="noopener">Share on WhatsApp</a>
+            </div>
+            <div class="small muted" id="referralCodeText" style="margin-top:7px"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="revenueTodayCard" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700">Total paid today</div>
+          <div id="revenueTodayTotal" style="font-family:var(--font-display);font-size:30px;font-weight:800;color:var(--green-dark);margin-top:4px">₦0</div>
+          <div id="revenueTodayMeta" style="font-size:11px;color:var(--muted)">Verified payments in your scope</div>
+        </div>
+        <a class="btn btn-green" href="revenue.html">Open revenue drill-down →</a>
+      </div>
+
+      <div class="card" id="smsBalanceCard" style="margin-bottom:16px;display:none;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700">SMS provider credit</div>
+          <div id="smsBalanceTotal" style="font-family:var(--font-display);font-size:30px;font-weight:800;color:var(--green-dark);margin-top:4px">—</div>
+          <div id="smsBalanceMeta" style="font-size:11px;color:var(--muted)">Provider balance and low-credit threshold</div>
+        </div>
+        <a class="btn btn-outline" href="sms-center.html">Open SMS centre →</a>
+      </div>
+
+      <div class="card" id="defaultingCard" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700">Defaulting clients</div>
+          <div id="defaultingTotal" style="font-family:var(--font-display);font-size:30px;font-weight:800;color:#B45309;margin-top:4px">0</div>
+          <div id="defaultingMeta" style="font-size:11px;color:var(--muted)">Clients behind their own payment plan</div>
+        </div>
+        <a class="btn btn-outline" href="defaulting.html">Open defaulting clients →</a>
+      </div>
+
+      <div class="filter-panel">
+        <div class="field-group">
+          <label class="field-label" for="fromDate">From</label>
+          <input class="field-input" type="date" id="fromDate">
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="toDate">To</label>
+          <input class="field-input" type="date" id="toDate">
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="granularity">Trend</label>
+          <select class="field-input" id="granularity">
+            <option value="day">Daily</option>
+            <option value="week">Weekly</option>
+            <option value="month">Monthly</option>
+            <option value="year">Yearly</option>
+          </select>
+        </div>
+        <div class="field-group" id="branchFilterGroup" style="display:none">
+          <label class="field-label" for="branchFilter">Branch</label>
+          <select class="field-input" id="branchFilter"><option value="">All branches</option></select>
+        </div>
+        <button class="btn btn-green btn-sm" id="applyFilters" type="button">Apply filters</button>
+        <button class="btn btn-ghost btn-sm" id="resetFilters" type="button">Reset</button>
+      </div>
+
+      <div class="kpi-grid" id="summaryKpis"></div>
+      <div class="kpi-grid kpi-grid-5" id="periodKpis"></div>
+
+      <div class="card section-gap" id="commissionCard">
+        <div class="card-head"><h3 id="commissionCardTitle">Commission overview</h3><span><a class="small muted" href="referral-commissions.html">Referral commissions →</a> · <a class="small muted" href="commissions.html">Commission management →</a></span></div>
+        <div class="kpi-grid kpi-grid-5" id="commissionKpis"></div>
+        <div class="table-responsive mt-16"><table class="table">
+          <thead><tr><th>Commission</th><th>Client</th><th>Plan</th><th>Earned</th><th>Paid</th><th>Outstanding</th><th>Status</th></tr></thead>
+          <tbody id="commissionTableBody"></tbody>
+        </table></div>
+      </div>
+
+      <div class="split-grid wide-left">
+        <div class="card chart-card">
+          <div class="card-head">
+            <h3>Sales & lead trend</h3>
+            <span class="small muted" id="trendRangeLabel"></span>
+          </div>
+          <div class="bar-chart" id="trendChart"><div class="empty-state">Loading trend…</div></div>
+          <div class="chart-legend">
+            <span><span class="legend-dot verified"></span>Verified collections</span>
+            <span><span class="legend-dot contract"></span>Contract value</span>
+            <span><span class="legend-dot leads"></span>Leads</span>
+            <span><span class="legend-dot conversions"></span>Conversions</span>
+          </div>
+        </div>
+        <div class="card" id="pipelineCard">
+          <div class="card-head"><h3>Lead pipeline</h3><a class="small muted" href="leads.html">Open pipeline →</a></div>
+          <div class="pipeline-board" id="leadPipeline"><div class="empty-state">Loading pipeline…</div></div>
+        </div>
+      </div>
+
+      <div class="split-grid" id="rankingGrid">
+        <div class="card" id="branchComparisonCard">
+          <div class="card-head"><h3>Branch performance</h3><span class="small muted">Contract vs verified</span></div>
+          <div class="table-responsive"><table class="table">
+            <thead><tr><th>Branch</th><th>Properties</th><th>Clients</th><th>Contract</th><th>Verified</th><th>Outstanding</th></tr></thead>
+            <tbody id="branchTableBody"></tbody>
+          </table></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Marketer rankings</h3><span class="small muted">Verified collections</span></div>
+          <div class="rank-list" id="marketerRankings"><div class="empty-state">Loading rankings…</div></div>
+        </div>
+      </div>
+
+      <div class="split-grid" id="teamAndFollowups">
+        <div class="card" id="teamRankingCard">
+          <div class="card-head"><h3>Team rankings</h3><span class="small muted">Team verified collections</span></div>
+          <div class="table-responsive"><table class="table">
+            <thead><tr><th>Team</th><th>Lead</th><th>Members</th><th>Clients</th><th>Contract</th><th>Verified</th><th>Conversion</th></tr></thead>
+            <tbody id="teamTableBody"></tbody>
+          </table></div>
+        </div>
+        <div class="card" id="followUpsCard">
+          <div class="card-head"><h3>Follow-ups due</h3><a class="small muted" href="leads.html?follow_up_due=1">View all →</a></div>
+          <div class="mini-list" id="dueFollowUps"><div class="empty-state">No follow-ups due.</div></div>
+        </div>
+      </div>
+
+      <div class="split-grid" id="portfolioGrid">
+        <div class="card">
+          <div class="card-head"><h3 id="clientsCardTitle">Recent clients</h3><a class="small muted" href="clients.html">All clients →</a></div>
+          <div class="table-responsive"><table class="table">
+            <thead><tr><th>Client</th><th>Status</th><th>Contract</th><th>Branch</th></tr></thead>
+            <tbody id="clientsTableBody"></tbody>
+          </table></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3 id="propertiesCardTitle">Property assignments</h3><a class="small muted" href="properties.html">Properties →</a></div>
+          <div class="mini-list" id="propertiesList"><div class="empty-state">No property assignments.</div></div>
+        </div>
+      </div>
+
+      <div class="split-grid" id="teamMembersAndProfile">
+        <div class="card" id="teamMembersCard">
+          <div class="card-head"><h3>Team members</h3><a class="small muted" href="staff-management.html">Manage teams →</a></div>
+          <div class="table-responsive"><table class="table">
+            <thead><tr><th>Staff</th><th>Role</th><th>Branch</th><th>Status</th></tr></thead>
+            <tbody id="teamMembersBody"></tbody>
+          </table></div>
+        </div>
+        <div class="card" id="profileCard">
+          <div class="card-head"><h3>My profile</h3><a class="small muted" href="staff-management.html">Staff directory →</a></div>
+          <div id="profileBody"><div class="empty-state">Loading profile…</div></div>
+        </div>
+      </div>
+
+      <div class="card section-gap">
+        <div class="card-head"><h3>Recent activity</h3><a class="small muted" href="activity-centre.html">Activity centre →</a></div>
+        <div class="activity-feed" id="recentActivity"><div class="empty-state">Loading activity…</div></div>
+      </div>
+    </main>
+  </div>
+  <script src="assets/js/staff-shell.js"></script>
+  <script src="assets/js/dashboard.js"></script>
+  <script src="assets/js/mobile-nav.js"></script>
+  <script src="assets/js/pwa.js"></script>
+</body>
+</html>
