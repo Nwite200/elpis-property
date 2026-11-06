@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "Bliss Legacy Limited",
-  "short_name": "Bliss Legacy",
-  "description": "Bliss Legacy Limited property, client, payment and staff portal.",
+  "name": "Elpis Property Limited",
+  "short_name": "Elpis Property",
+  "description": "Elpis Property Limited property, client, payment and staff portal.",
   "lang": "en-NG",
   "dir": "ltr",
   "start_url": "/",
@@ -10,8 +10,8 @@
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
   "orientation": "any",
-  "background_color": "#F5F7F5",
-  "theme_color": "#00B522",
+  "background_color": "#F5F3EE",
+  "theme_color": "#C6A45C",
   "categories": ["business", "finance", "lifestyle"],
   "prefer_related_applications": false,
   "icons": [
