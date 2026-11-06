@@ -26,7 +26,7 @@ EMAIL_PROVIDER=resend
 ```
 
 `EMAIL_FROM` must be a verified Resend sender, for example
-`Bliss Legacy <no-reply@blisslegacylimited.com>`.
+`elpis Legacy <no-reply@elpisproperty.org>`.
 
 For automated tests only, `EMAIL_PROVIDER=mock` is accepted outside production.
 

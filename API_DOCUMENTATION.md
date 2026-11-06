@@ -1,10 +1,10 @@
-# Bliss Legacy Limited — API Documentation
+# elpis Legacy Limited — API Documentation
 
 **Base URL (local):** `http://localhost:8787`
 
-**Base URL (deployed demo):** `https://bliss-legacy-limited.easterntechexpo.workers.dev`
+**Base URL (deployed demo):** `https://elpis-legacy-limited.easterntechexpo.workers.dev`
 
-All APIs are served by the Cloudflare Worker in `src/index.js`. JSON responses use `Content-Type: application/json`. Authentication is a session cookie named `bliss_session`.
+All APIs are served by the Cloudflare Worker in `src/index.js`. JSON responses use `Content-Type: application/json`. Authentication is a session cookie named `elpis_session`.
 
 ---
 
@@ -178,7 +178,7 @@ Client endpoints are always scoped to the authenticated client. Cross-client acc
 
 The webhook re-queries ALATPay with the secret key before crediting any payment. It does not trust an unverified callback payload.
 
-Dedicated/static payment accounts are displayed everywhere as **“Client Name / Bliss Legacy Limited”**, including the client dashboard, client virtual-account page and staff client detail view. Clients without a BVN can still create their account and add the BVN later from My Virtual Account.
+Dedicated/static payment accounts are displayed everywhere as **“Client Name / elpis Legacy Limited”**, including the client dashboard, client virtual-account page and staff client detail view. Clients without a BVN can still create their account and add the BVN later from My Virtual Account.
 
 ### Referral fields
 
