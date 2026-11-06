@@ -1,0 +1,53 @@
+name = "elpis-property-production"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+workers_dev = true
+preview_urls = false
+
+[assets]
+directory = "./"
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "elpis-property-db"
+database_id = "REPLACE_WITH_ELPIS_D1_DATABASE_ID"
+migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "FILES"
+bucket_name = "elpis-property-files"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "REPLACE_WITH_ELPIS_KV_NAMESPACE_ID"
+
+[[queues.producers]]
+binding = "TASKS"
+queue = "elpis-property-tasks"
+
+[[queues.consumers]]
+queue = "elpis-property-tasks"
+max_batch_size = 10
+max_batch_timeout = 5
+max_retries = 5
+
+[[durable_objects.bindings]]
+name = "CHAT_ROOM"
+class_name = "ChatRoom"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["ChatRoom"]
+
+[triggers]
+crons = ["0 6 * * *"]
+
+[vars]
+ENVIRONMENT = "production"
+DEMO_MODE_ENABLED = "0"
+DEFAULT_GRACE_DAYS = "0"
+PAYMENT_MODE = "test"
+
+[observability]
+enabled = true
