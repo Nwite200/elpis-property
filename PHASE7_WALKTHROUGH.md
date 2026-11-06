@@ -1,4 +1,4 @@
-# Bliss Legacy Limited — Phase 7 Local Walkthrough
+# elpis Legacy Limited — Phase 7 Local Walkthrough
 
 Phase 7 adds commission plans, commission calculation and attribution, approval/payment workflow, commission payment receipts, financial reports and management analytics.
 
@@ -7,7 +7,7 @@ No company commission percentages or rates are hard-coded. All rates in this wal
 ## 1. Local setup
 
 ```bash
-cd "/Users/a/bliss estate project "
+cd "/Users/a/elpis estate project "
 npm install
 npm run db:migrate:local
 SEED_ENV=local python3 seed_phase5.py
@@ -28,8 +28,8 @@ run unless `SEED_ENV` is `local` or `staging` and the database ID matches.
 - Successful sign-up creates a Client user, a Prospect client record in Head Office, an auto-login session and redirects to the client dashboard.
 - Clients cannot choose or change their branch, marketer or team. Authorised staff assign these after registration.
 - Public sign-up never sets a contract price and does not assign a marketer commission.
-- The official `assets/images/bliss-legacy-logo.png` is used across all pages and portal login screens.
-- `assets/images/bliss-legacy-logo.jpg` is used in receipt, commission payment and PDF report generation.
+- The official `assets/images/elpis-legacy-logo.png` is used across all pages and portal login screens.
+- `assets/images/elpis-legacy-logo.jpg` is used in receipt, commission payment and PDF report generation.
 
 ### Property portfolio visibility
 
@@ -40,7 +40,7 @@ run unless `SEED_ENV` is `local` or `staging` and the database ID matches.
 
 ## 2. Create a commission plan
 
-Sign in as `md@bliss.com` or `finance@bliss.com`.
+Sign in as `md@elpisproperty.test` or `finance@elpisproperty.test`.
 
 1. Open `commissions.html`.
 2. Select **Commission plans**.

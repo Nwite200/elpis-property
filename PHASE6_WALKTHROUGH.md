@@ -1,4 +1,4 @@
-# Bliss Legacy Limited — Phase 6 Local Testing Walkthrough
+# elpis Legacy Limited — Phase 6 Local Testing Walkthrough
 
 This document is the local walkthrough for every Phase 6 staff dashboard. It replaces the need for attached screenshots because the project can be run locally and verified role by role.
 
@@ -7,7 +7,7 @@ This document is the local walkthrough for every Phase 6 staff dashboard. It rep
 ## 1. Start locally
 
 ```bash
-cd "/Users/a/bliss estate project "
+cd "/Users/a/elpis estate project "
 npm install
 npm run db:migrate:local
 SEED_ENV=local python3 seed_phase5.py
@@ -28,20 +28,20 @@ identifier matches.
 
 | Role | Email | Branch | Main screen |
 |---|---|---|---|
-| Managing Director | `md@bliss.com` | Company-wide | `dashboard.html` |
-| Branch Manager | `bm.ikeja@bliss.com` | Ikeja | `dashboard.html` |
-| Branch Manager | `bm.ajah@bliss.com` | Ajah | `dashboard.html` |
-| Team Lead | `tl.ikeja@bliss.com` | Ikeja | `dashboard.html` |
-| Team Lead | `tl.ajah@bliss.com` | Ajah | `dashboard.html` |
-| Marketer | `mkt.ikeja@bliss.com` | Ikeja | `dashboard.html` |
-| Marketer | `mkt.ikeja2@bliss.com` | Ikeja | `dashboard.html` |
-| Marketer | `mkt.ajah@bliss.com` | Ajah | `dashboard.html` |
-| Finance Officer | `finance@bliss.com` | Ikeja / company financial view | `dashboard.html`, `finance-dashboard.html` |
+| Managing Director | `md@elpisproperty.test` | Company-wide | `dashboard.html` |
+| Branch Manager | `bm.ikeja@elpisproperty.test` | Ikeja | `dashboard.html` |
+| Branch Manager | `bm.ajah@elpisproperty.test` | Ajah | `dashboard.html` |
+| Team Lead | `tl.ikeja@elpisproperty.test` | Ikeja | `dashboard.html` |
+| Team Lead | `tl.ajah@elpisproperty.test` | Ajah | `dashboard.html` |
+| Marketer | `mkt.ikeja@elpisproperty.test` | Ikeja | `dashboard.html` |
+| Marketer | `mkt.ikeja2@elpisproperty.test` | Ikeja | `dashboard.html` |
+| Marketer | `mkt.ajah@elpisproperty.test` | Ajah | `dashboard.html` |
+| Finance Officer | `finance@elpisproperty.test` | Ikeja / company financial view | `dashboard.html`, `finance-dashboard.html` |
 | Client | `ada@example.com` | Ikeja | `client-dashboard.html` |
 
 ## 3. Managing Director walkthrough
 
-1. Sign in as `md@bliss.com`.
+1. Sign in as `md@elpisproperty.test`.
 2. Open `dashboard.html`.
 3. Confirm the company-wide KPI cards:
    - Total properties, published, reserved, sold and unavailable.
@@ -66,7 +66,7 @@ identifier matches.
 
 ## 4. Branch Manager walkthrough
 
-1. Sign in as `bm.ikeja@bliss.com` or `bm.ajah@bliss.com`.
+1. Sign in as `bm.ikeja@elpisproperty.test` or `bm.ajah@elpisproperty.test`.
 2. Open `dashboard.html`.
 3. Confirm only the signed-in branch is represented:
    - Branch property inventory.
@@ -84,7 +84,7 @@ identifier matches.
 
 ## 5. Team Lead walkthrough
 
-1. Sign in as `tl.ikeja@bliss.com`.
+1. Sign in as `tl.ikeja@elpisproperty.test`.
 2. Open `dashboard.html`.
 3. Confirm:
    - Team members card lists the Team Lead and team marketers.
@@ -99,7 +99,7 @@ identifier matches.
 
 ## 6. Marketer walkthrough
 
-1. Sign in as `mkt.ikeja@bliss.com`.
+1. Sign in as `mkt.ikeja@elpisproperty.test`.
 2. Open `dashboard.html`.
 3. Confirm:
    - Personal profile and team.
@@ -122,7 +122,7 @@ identifier matches.
 
 ## 7. Finance Officer walkthrough
 
-1. Sign in as `finance@bliss.com`.
+1. Sign in as `finance@elpisproperty.test`.
 2. Open `dashboard.html` and confirm company-wide contract value, verified collections and outstanding balances.
 3. Open `performance.html` and confirm contract value is distinct from verified cash.
 4. Open `finance-dashboard.html` and confirm:
