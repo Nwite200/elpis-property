@@ -1,5 +1,5 @@
 (function () {
-  const S = window.BlissStaff;
+  const S = window.ElpisStaff;
   let me = null;
   let options = { categories: [], branches: [], teams: [], roles: [], sale_types: [], bases: [], statuses: [] };
   let plans = [];
