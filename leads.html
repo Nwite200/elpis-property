@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lead Pipeline | Bliss Legacy Limited</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Manrope:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/motion.css">
+  <script src="assets/js/intro-config.js"></script>
+  <script src="assets/js/motion.js"></script>
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Bliss Legacy">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
+  <meta name="theme-color" content="#00B522" />
+</head>
+<body data-page="leads">
+  <div class="dash">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="dash-main">
+      <section class="role-hero">
+        <h1>Lead Pipeline</h1>
+        <p>New Lead → Contacted → Interested → Inspection Scheduled → Negotiation → Converted / Lost. Follow-ups and conversions are recorded in D1 and the activity centre.</p>
+        <div class="role-hero-meta" id="heroMeta"></div>
+        <div class="hero-actions">
+          <button class="btn btn-green" type="button" id="newLeadBtn">+ Add lead</button>
+          <button class="btn btn-outline-white" type="button" id="bulkImportBtn">Bulk import CSV</button>
+          <a class="btn btn-outline-white" href="performance.html">Performance analytics</a>
+        </div>
+      </section>
+
+      <div class="card">
+        <div class="card-head"><h3>Pipeline snapshot</h3><span class="small muted">Live leads only</span></div>
+        <div class="pipeline-board" id="pipelineBoard"><div class="empty-state">Loading pipeline…</div></div>
+        <div class="toolbar mt-16" id="temperatureCounts"></div>
+      </div>
+
+      <div class="card section-gap">
+        <div class="card-head"><h3>Inspections</h3><span class="small muted" id="inspectionCount"></span></div>
+        <div class="kpi-grid kpi-grid-5" id="inspectionKpis"></div>
+        <div class="table-responsive mt-16"><table class="table">
+          <thead><tr><th>Lead</th><th>Date</th><th>Time</th><th>Property</th><th>Marketer</th><th>Branch</th></tr></thead>
+          <tbody id="inspectionBody"><tr><td colspan="6">Loading inspections…</td></tr></tbody>
+        </table></div>
+      </div>
+
+      <div class="card section-gap">
+        <div class="card-head"><h3>Lead register</h3><span class="small muted" id="leadCount"></span></div>
+        <div class="filters mb-16">
+          <input type="search" id="leadSearch" placeholder="Search name, phone, email or reference…">
+          <select id="leadStatusFilter"><option value="">All statuses</option><option>New Lead</option><option>Contacted</option><option>Interested</option><option>Inspection Scheduled</option><option>Negotiation</option><option>Converted</option><option>Lost</option></select>
+          <select id="leadTemperatureFilter"><option value="">All temperatures</option><option>Hot</option><option>Warm</option><option>Cold</option></select>
+          <select id="leadMarketerFilter"><option value="">All marketers</option></select>
+          <select id="leadBranchFilter"><option value="">All branches</option></select>
+          <label class="tag" style="display:inline-flex;align-items:center;gap:6px;padding:9px 10px"><input type="checkbox" id="followUpDueFilter"> Follow-ups due</label>
+          <button class="btn btn-green btn-sm" type="button" id="applyLeadFilters">Filter</button>
+          <button class="btn btn-ghost btn-sm" type="button" id="resetLeadFilters">Reset</button>
+        </div>
+        <div class="table-responsive"><table class="table">
+          <thead><tr><th>Lead</th><th>Status</th><th>Temperature</th><th>Marketer</th><th>Branch</th><th>Property</th><th>Inspection</th><th>Contacts</th><th>Next follow-up</th><th>Estimated value</th><th>Actions</th></tr></thead>
+          <tbody id="leadBody"></tbody>
+        </table></div>
+        <div class="toolbar mt-16" style="justify-content:space-between">
+          <span class="small muted" id="leadPageLabel"></span>
+          <div class="toolbar">
+            <button class="btn btn-ghost btn-sm" type="button" id="leadPrev">← Previous</button>
+            <button class="btn btn-ghost btn-sm" type="button" id="leadNext">Next →</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="leadModal">
+    <div class="modal-box modal-wide">
+      <div class="modal-header"><h3 id="leadModalTitle">Add lead</h3><button class="icon-btn" type="button" data-close-modal="leadModal">✕</button></div>
+      <form id="leadForm">
+        <input type="hidden" id="leadId">
+        <div class="form-grid">
+          <div class="field-group"><label class="field-label" for="leadFullName">Full name</label><input class="field-input" id="leadFullName" required></div>
+          <div class="field-group"><label class="field-label" for="leadPhone">Phone</label><input class="field-input" id="leadPhone" required></div>
+          <div class="field-group"><label class="field-label" for="leadEmail">Email</label><input class="field-input" type="email" id="leadEmail"></div>
+          <div class="field-group"><label class="field-label" for="leadSource">Source</label><input class="field-input" id="leadSource" placeholder="Website, referral, walk-in…"></div>
+          <div class="field-group"><label class="field-label" for="leadReferrer">Referrer</label><input class="field-input" id="leadReferrer" placeholder="Person or campaign that referred the lead"></div>
+          <div class="field-group"><label class="field-label" for="leadTemperature">Temperature</label><select class="field-input" id="leadTemperature"><option value="">Not set</option><option>Hot</option><option>Warm</option><option>Cold</option></select></div>
+          <div class="field-group"><label class="field-label" for="leadStatus">Status</label><select class="field-input" id="leadStatus"></select></div>
+          <div class="field-group" id="leadBranchGroup"><label class="field-label" for="leadBranch">Branch</label><select class="field-input" id="leadBranch"><option value="">Select branch</option></select></div>
+          <div class="field-group" id="leadMarketerGroup"><label class="field-label" for="leadMarketer">Assigned marketer</label><select class="field-input" id="leadMarketer"><option value="">Unassigned</option></select></div>
+          <div class="field-group"><label class="field-label" for="leadProperty">Interested property</label><select class="field-input" id="leadProperty"><option value="">No property selected</option></select></div>
+          <div class="field-group"><label class="field-label" for="leadInspectionDate">Inspection date</label><input class="field-input" type="date" id="leadInspectionDate"></div>
+          <div class="field-group"><label class="field-label" for="leadInspectionTime">Inspection time</label><input class="field-input" type="time" id="leadInspectionTime"></div>
+          <div class="field-group"><label class="field-label" for="leadEstimated">Estimated value (₦)</label><input class="field-input" type="number" min="0" step="0.01" id="leadEstimated"></div>
+          <div class="field-group"><label class="field-label" for="leadFollowUp">Next follow-up date</label><input class="field-input" type="date" id="leadFollowUp"></div>
+          <div class="field-group full"><label class="field-label" for="leadNotes">Notes</label><textarea class="field-input" id="leadNotes" rows="2"></textarea></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
+          <button class="btn btn-ghost" type="button" data-close-modal="leadModal">Cancel</button>
+          <button class="btn btn-green" type="submit">Save lead</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="leadDetailModal">
+    <div class="modal-box modal-wide">
+      <div class="modal-header"><h3 id="leadDetailTitle">Lead detail</h3><button class="icon-btn" type="button" data-close-modal="leadDetailModal">✕</button></div>
+      <div id="leadDetailBody"><div class="empty-state">Loading…</div></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="bulkLeadModal">
+    <div class="modal-box modal-wide">
+      <div class="modal-header"><h3>Bulk import leads</h3><button class="icon-btn" type="button" data-close-modal="bulkLeadModal">✕</button></div>
+      <p class="small muted">Paste CSV or choose a file. Recognised headers: full_name/name, phone/phone_number, email, source, status, property_id, assigned_marketer_id/marketer_id, branch_id, estimated_value, notes. Without a header row the order must be name, phone, email, source, status, marketer id, branch id, estimated value, notes.</p>
+      <div class="field-group"><label class="field-label" for="bulkLeadFile">CSV file</label><input class="field-input" type="file" id="bulkLeadFile" accept=".csv,text/csv"></div>
+      <div class="field-group"><label class="field-label" for="bulkLeadSource">Default campaign / source</label><input class="field-input" id="bulkLeadSource" placeholder="e.g. November Facebook campaign"></div>
+      <div class="field-group"><label class="field-label" for="bulkLeadText">Or paste CSV</label><textarea class="field-input" id="bulkLeadText" rows="8" placeholder="full_name,phone_number,email_address,source,status&#10;Ada Nwosu,08030000001,ada@example.com,Facebook campaign,New Lead"></textarea></div>
+      <div id="bulkLeadResult" class="small muted"></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+        <button class="btn btn-ghost" type="button" data-close-modal="bulkLeadModal">Cancel</button>
+        <button class="btn btn-green" type="button" id="bulkLeadSubmit">Import leads</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="inspectionModal">
+    <div class="modal-box">
+      <div class="modal-header"><h3 id="inspectionTitle">Schedule inspection</h3><button class="icon-btn" type="button" data-close-modal="inspectionModal">✕</button></div>
+      <form id="inspectionForm">
+        <input type="hidden" id="inspectionLeadId">
+        <div class="form-grid">
+          <div class="field-group"><label class="field-label" for="inspectionDate">Date</label><input class="field-input" type="date" id="inspectionDate" required></div>
+          <div class="field-group"><label class="field-label" for="inspectionTime">Time</label><input class="field-input" type="time" id="inspectionTime" required></div>
+          <div class="field-group full"><label class="field-label" for="inspectionProperty">Property</label><select class="field-input" id="inspectionProperty"><option value="">Use lead property / no property</option></select></div>
+          <div class="field-group full"><label class="field-label" for="inspectionNotes">Inspection notes</label><textarea class="field-input" id="inspectionNotes" rows="2"></textarea></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+          <button class="btn btn-ghost" type="button" data-close-modal="inspectionModal">Cancel</button>
+          <button class="btn btn-green" type="submit">Save inspection</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="assets/js/staff-shell.js"></script>
+  <script src="assets/js/leads.js"></script>
+  <script src="assets/js/mobile-nav.js"></script>
+  <script src="assets/js/pwa.js"></script>
+</body>
+</html>
