@@ -15,7 +15,7 @@ run_worker_first = true
 binding = "DB"
 database_name = "elpis-property-staging-db"
 # LOCAL-ONLY PLACEHOLDER. Replace with the D1 UUID created in Elpis Cloudflare before any remote deploy.
-database_id = "00000000-0000-4000-8000-000000000001"
+database_id = "0cec58fd-dd43-462a-b974-9b6b9231a950"
 migrations_dir = "migrations"
 
 [[r2_buckets]]
