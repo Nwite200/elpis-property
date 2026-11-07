@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&display=swap");
 /* ==========================================================================
    ELPIS PROPERTY LIMITED — OFFICIAL DESIGN SYSTEM & STYLESHEET
    Brand Palette:
@@ -2853,3 +2854,135 @@ a.contact-val:hover {
   min-width: 0;
 }
 .pipeline-board, .bar-chart, .role-hero { max-width: 100%; }
+
+
+/* ==========================================================================
+   ELPIS SIGNATURE EXPERIENCE — PREMIUM BRAND & DASHBOARD LAYER
+   Shared by the public website, staff workspace and client portal.
+   ========================================================================== */
+:root {
+  --green: #142C27;
+  --green-dark: #0D211D;
+  --green-light: #E8EFEA;
+  --green-glow: rgba(197, 161, 107, .20);
+  --charcoal: #242927;
+  --charcoal-dark: #101B18;
+  --ink: #202925;
+  --muted: #68736D;
+  --muted-light: #98A19B;
+  --paper: #FFFFFF;
+  --soft: #F5F2EC;
+  --sidebar: #142C27;
+  --soft-alt: #EEE9DF;
+  --line: #E6E0D5;
+  --line-dark: #33483F;
+  --gold: #C5A16B;
+  --gold-light: #E9D8B9;
+  --radius-sm: 9px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --shadow-sm: 0 5px 16px rgba(20,44,39,.045);
+  --shadow-md: 0 14px 36px rgba(20,44,39,.085);
+  --shadow-lg: 0 24px 64px rgba(13,33,29,.16);
+  --font-body: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: "Playfair Display", Georgia, serif;
+}
+h1,h2,h3,h4,h5,h6,.hero-title,.section-heading,.role-hero h1 {
+  font-family: var(--font-display);
+  letter-spacing: -.025em;
+}
+body { background: var(--paper); color: var(--ink); }
+.btn { border-radius: 9px; font-weight: 700; letter-spacing: .005em; }
+.btn-green { background: var(--green); color:#fff; box-shadow: 0 8px 22px rgba(20,44,39,.16); }
+.btn-green:hover { background:#203E35; color:#fff; box-shadow:0 10px 26px rgba(20,44,39,.22); }
+.btn-outline:hover,.btn-login:hover { border-color:var(--gold); color:var(--green); background:#F8F4EC; }
+.btn-login { border-radius:9px; }
+.topline { background:#10231F; color:#E9E3D8; }
+.topline-contact { color:#E1C493; }
+.site-header { background:rgba(250,249,246,.94); border-bottom-color:rgba(20,44,39,.10); }
+.nav-links a { color:#293831; }
+.nav-links a:hover,.nav-links a.active { color:var(--green); }
+.nav-links a::after { background:var(--gold); }
+.brand-img { width:168px; }
+.hero-section {
+  min-height:690px;
+  background-color:#142C27;
+  background-image:url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=2400&q=90');
+  background-position:center 52%;
+  padding:94px 0 84px;
+}
+.hero-overlay {
+  background:linear-gradient(90deg,rgba(9,27,23,.91) 0%,rgba(14,35,29,.78) 48%,rgba(14,35,29,.24) 100%);
+}
+.hero-content { max-width:760px; }
+.hero-badge { background:rgba(197,161,107,.15); border-color:rgba(225,196,147,.42); color:#F0D9B3; border-radius:99px; }
+.badge-pulsing-dot { background:var(--gold); box-shadow:0 0 0 3px rgba(197,161,107,.22); }
+.hero-title { font-size:clamp(44px,6vw,76px); font-weight:600; letter-spacing:-1.7px; line-height:1.04; max-width:760px; }
+.highlight-green { color:#E1C493; }
+.hero-subtitle { max-width:620px; font-size:17px; color:rgba(255,255,255,.82); }
+.hero-trust-indicators { color:rgba(255,255,255,.8); }
+.ind-icon { color:#E1C493; }
+.hero-stats-panel { background:rgba(15,34,29,.78); border:1px solid rgba(225,196,147,.3); border-radius:16px; backdrop-filter:blur(16px); box-shadow:0 20px 50px rgba(0,0,0,.18); }
+.hero-stats-panel .stat-number { color:#E5C99B; }
+.trustbar-section { background:#F5F2EC; border-block:1px solid #E9E2D7; }
+.trustbar-card { border-color:rgba(20,44,39,.08); }
+.trustbar-icon { color:var(--gold); }
+.kicker-tag { color:#9A7442; letter-spacing:2px; }
+.section-heading { font-weight:600; letter-spacing:-.7px; }
+.filter-controls-panel { border:1px solid var(--line); border-radius:15px; box-shadow:var(--shadow-sm); background:#fff; }
+.filter-input-wrap input,.filter-select-wrap select { border-radius:9px; }
+.property-card,.branch-card,.trustbar-card { border-radius:16px; box-shadow:var(--shadow-sm); }
+.property-card:hover,.branch-card:hover { transform:translateY(-5px); box-shadow:var(--shadow-md); }
+.about-stamp-card { background:var(--green); border:1px solid rgba(225,196,147,.4); }
+.site-footer { background:#10231F; }
+.footer-trust-badge,.footer-links-list a:hover,.footer-social-strip a:hover { color:#E1C493; }
+.footer-social-strip a:hover { background:var(--gold); color:#142C27; }
+
+/* Staff dashboard: calm executive workspace */
+.dash { background:#F5F2EC; grid-template-columns:252px minmax(0,1fr); }
+.sidebar { background:linear-gradient(180deg,#142C27 0%,#10231F 100%); border-right:1px solid rgba(225,196,147,.12); padding:26px 18px; }
+.sidebar .brand img { filter:none; max-width:174px; max-height:56px; object-fit:contain; background:#fff; padding:5px 9px; border-radius:8px; }
+.sidebar a { color:#C3CEC7; border-radius:9px; padding:11px 13px; }
+.sidebar a:hover,.sidebar a.active { background:rgba(197,161,107,.16); color:#F0D9B3; box-shadow:inset 3px 0 0 var(--gold); }
+.sidebar .section-label { color:#C4A777; letter-spacing:1.7px; }
+.sidebar .sidebar-note { border-color:rgba(225,196,147,.18); color:#B8C5BD; }
+.dash-main { padding:30px clamp(20px,3vw,44px); }
+.role-hero { background:linear-gradient(115deg,#142C27 0%,#1D4036 70%,#2A5144 100%); border:1px solid rgba(197,161,107,.28); border-radius:18px; padding:32px 34px; box-shadow:0 16px 36px rgba(20,44,39,.12); }
+.role-hero::after { border-color:rgba(197,161,107,.16); width:340px; height:340px; right:-70px; top:-120px; }
+.role-hero h1 { font-size:clamp(28px,3vw,38px); font-weight:600; }
+.role-hero p { color:#D5DED8; }
+.scope-badge { color:#F0D9B3; background:rgba(197,161,107,.14); border-color:rgba(225,196,147,.25); }
+.kpi { border-radius:15px; border-color:#E8E1D6; padding:21px; box-shadow:0 8px 24px rgba(20,44,39,.045); transition:transform .2s ease,box-shadow .2s ease; }
+.kpi:hover { transform:translateY(-3px); box-shadow:var(--shadow-md); }
+.kpi .value { color:var(--green); font-size:26px; }
+.kpi .delta { color:#967345; }
+.card,.filter-panel,.fin-kpi-card,.finance-kpi-card,.wema-widget { border-radius:15px; border-color:#E8E1D6; box-shadow:0 7px 22px rgba(20,44,39,.045); }
+.card { padding:21px; }
+.card h3,.card-head h3 { color:#24342D; font-size:17px; }
+.table th { color:#7A827C; letter-spacing:1.2px; }
+.table th,.table td { border-bottom-color:#EEE9E0; }
+.table tbody tr:hover { background:#FAF8F3; }
+.filter-panel { background:#fff; }
+.field-input,.filters input,.filters select { border-radius:9px; border-color:#E3DED4; }
+.field-input:focus,.filters input:focus,.filters select:focus { outline:2px solid rgba(197,161,107,.25); border-color:var(--gold); }
+.badge-green { background:#E8EFEA; color:#1B4B3C; }
+.chart-placeholder { background:linear-gradient(180deg,#F5F2EC,#fff); border-color:#E4DCCF; }
+.portal-layout { background:#F5F2EC; }
+.portal-sidebar { background:linear-gradient(180deg,#142C27,#10231F); }
+.portal-sidebar a:hover,.portal-sidebar a.active { background:rgba(197,161,107,.16); color:#EBD2A8; }
+.portal-sidebar .brand-logo { border-radius:9px; }
+.portal-main { padding:34px clamp(18px,3vw,44px); }
+.login-box { border-radius:18px !important; box-shadow:var(--shadow-lg) !important; border-color:#E8E1D6 !important; }
+.login-title { font-family:var(--font-display); font-weight:600 !important; }
+@media (max-width: 900px) {
+  .dash { grid-template-columns:1fr; }
+  .sidebar { min-height:auto; position:relative; }
+  .dash-main { padding:20px 16px; }
+  .role-hero { padding:25px 22px; }
+}
+@media (max-width: 640px) {
+  .hero-section { min-height:650px; padding:72px 0 65px; background-position:60% center; }
+  .hero-title { font-size:clamp(40px,11vw,54px); }
+  .hero-stats-panel { gap:12px; padding:16px; }
+  .portal-main { padding:22px 15px; }
+}
