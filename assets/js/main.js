@@ -68,6 +68,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // Properties
+  const normaliseCategory = (value) => {
+    const label = String(value || "");
+    if (/land/i.test(label)) return "Land";
+    if (/commercial|office/i.test(label)) return "Commercial";
+    if (/residential|apartment|house|estate/i.test(label)) return "Residential";
+    return label || "Residential";
+  };
   let allProperties = [];
   try {
     const res = await fetch("/api/properties?limit=50");
@@ -80,7 +87,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           name: p.title || p.name,
           location: p.city ? `${p.city}, ${p.state || "Nigeria"}` : (p.state || "Nigeria"),
           branch: p.branch_name || "Head Office",
-          category: p.category_name || "Residential",
+          category: normaliseCategory(p.category_name),
           price: Number(p.sale_price || p.price || 0),
           units: p.available_units || 1,
           totalUnits: p.total_units || 10,

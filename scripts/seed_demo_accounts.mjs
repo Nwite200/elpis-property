@@ -95,8 +95,8 @@ WHERE t.name='Elpis Demo Team'
 
 // Demo properties.
 const properties = [
-  { reference: 'ELP-DEMO-RES-001', title: 'Elpis Garden Residences', category: 'Residential', type: 'Terrace', city: 'Lekki', state: 'Lagos', address: 'Demonstration address, Lekki', price: 25000000, bedrooms: 4, bathrooms: 4, land: '450 sqm' },
-  { reference: 'ELP-DEMO-LAND-001', title: 'Elpis Prime Land Estate', category: 'Land', type: 'Residential Land', city: 'Ibeju-Lekki', state: 'Lagos', address: 'Demonstration address, Ibeju-Lekki', price: 12000000, bedrooms: 0, bathrooms: 0, land: '600 sqm' }
+  { reference: 'ELP-DEMO-RES-001', title: 'Elpis Garden Residences', category: 'Residential Properties', type: 'Terrace', city: 'Lekki', state: 'Lagos', address: 'Demonstration address, Lekki', price: 25000000, bedrooms: 4, bathrooms: 4, land: '450 sqm' },
+  { reference: 'ELP-DEMO-LAND-001', title: 'Elpis Prime Land Estate', category: 'Land and Plots', type: 'Residential Land', city: 'Ibeju-Lekki', state: 'Lagos', address: 'Demonstration address, Ibeju-Lekki', price: 12000000, bedrooms: 0, bathrooms: 0, land: '600 sqm' }
 ];
 for (const property of properties) {
   statements.push(`
