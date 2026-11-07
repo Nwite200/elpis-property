@@ -183,7 +183,7 @@ def seed():
             "email_address": "ada@example.com",
             "residential_address": "14 Victoria Island, Lagos",
             "state": "Lagos",
-            "city": "Ikeja",
+            "city": "Branch 1",
             "next_of_kin": "Emeka Nwosu (Brother, 08012345678)",
             "assigned_branch_id": 1,
             "created_by": 3,

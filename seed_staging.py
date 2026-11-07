@@ -100,8 +100,8 @@ def build_statements():
 
     # ---- staff -----------------------------------------------------------
     users = [
-        ("staging.bm.ajah@elpisproperty.test", "Staging Ajah Branch Manager", 2, 2, 0, "NULL"),
-        ("staging.marketer.ajah@elpisproperty.test", "Staging Ajah Marketer (no Team Lead)", 4, 2, 0,
+        ("staging.bm.ajah@elpisproperty.test", "Staging Branch 2 Branch Manager", 2, 2, 0, "NULL"),
+        ("staging.marketer.ajah@elpisproperty.test", "Staging Branch 2 Marketer (no Team Lead)", 4, 2, 0,
          "(SELECT id FROM users WHERE email='staging.bm.ajah@elpisproperty.test')"),
         ("staging.commission@elpisproperty.test", "Staging Commission Access Only", 5, 6, 1, "NULL"),
     ]
@@ -121,13 +121,13 @@ def build_statements():
 
     statements.append(
         """INSERT INTO teams (name, branch_id, team_lead_user_id, is_active)
-           SELECT 'Staging Ikeja Team', 1, (SELECT id FROM users WHERE email='staging.tl@elpisproperty.test'), 1
-           WHERE NOT EXISTS (SELECT 1 FROM teams WHERE name='Staging Ikeja Team' AND branch_id=1)"""
+           SELECT 'Staging Branch 1 Team', 1, (SELECT id FROM users WHERE email='staging.tl@elpisproperty.test'), 1
+           WHERE NOT EXISTS (SELECT 1 FROM teams WHERE name='Staging Branch 1 Team' AND branch_id=1)"""
     )
     statements.append(
         """INSERT OR IGNORE INTO team_members (team_id, user_id)
            SELECT t.id, u.id FROM teams t, users u
-           WHERE t.name='Staging Ikeja Team' AND t.branch_id=1
+           WHERE t.name='Staging Branch 1 Team' AND t.branch_id=1
              AND u.email IN ('staging.tl@elpisproperty.test','staging.marketer@elpisproperty.test')"""
     )
 

@@ -95,7 +95,7 @@ CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_logs(created_at);
 
 -- Seed branches
 INSERT OR IGNORE INTO branches (name) VALUES
-  ('Ikeja'),('Ajah'),('Asaba'),('Ihama'),('Obakhavba'),('Head Office');
+  ('Branch 1'),('Branch 2'),('Branch 3'),('Branch 4'),('Branch 5'),('Head Office');
 
 -- Seed roles
 INSERT OR IGNORE INTO roles (name) VALUES
