@@ -194,7 +194,7 @@ db.prepare(`INSERT INTO receipts (payment_id, client_id, receipt_ref, amount, am
 // ---------------------------------------------------------------------------
 const r2 = new Map();
 const queuedMessages = [];
-const logoBytes = new Uint8Array(readFileSync('assets/images/elpis-legacy-logo.jpg'));
+const logoBytes = new Uint8Array(readFileSync('assets/images/elpis-property-logo-original.png'));
 
 function makeEnv(overrides = {}) {
   return {
@@ -253,8 +253,8 @@ function makeEnv(overrides = {}) {
     ASSETS: {
       async fetch(input) {
         const url = typeof input === 'string' ? input : (input.url || String(input));
-        if (url.includes('elpis-legacy-logo')) {
-          return new Response(logoBytes, { status: 200, headers: { 'Content-Type': 'image/jpeg' } });
+        if (url.includes('elpis-property-logo-original')) {
+          return new Response(logoBytes, { status: 200, headers: { 'Content-Type': 'image/png' } });
         }
         return new Response('Not found', { status: 404 });
       }
@@ -1040,7 +1040,7 @@ await test('own-branch property updates, status history, image upload and public
   assert(history.data.history.some(h => h.new_status === 'Reserved'), 'status history records the change');
 
   const form = new FormData();
-  form.append('file', new Blob([new Uint8Array([0xff, 0xd8, 0xff, 0xd9])], { type: 'image/jpeg' }), 'audit.jpg');
+  form.append('file', new Blob([new Uint8Array([0xff, 0xd8, 0xff, 0xd9])], { type: 'image/png' }), 'audit.jpg');
   form.append('is_main', '1');
   const upload = await request(`/api/properties/${auditPropId}/images`, {
     method: 'POST', headers: { Cookie: bmCookie }, body: form
@@ -1050,7 +1050,7 @@ await test('own-branch property updates, status history, image upload and public
   auditImageKey = upload.data.key;
   const image = await request(`/api/files/${encodeURIComponent(auditImageKey)}`);
   assert(image.status === 200, `public property image expected 200, got ${image.status}`);
-  assert((image.headers.get('content-type') || '').includes('image/jpeg'), 'image content type preserved');
+  assert((image.headers.get('content-type') || '').includes('image/png'), 'image content type preserved');
 
   const badForm = new FormData();
   badForm.append('file', new Blob(['not an image'], { type: 'text/plain' }), 'bad.txt');
