@@ -39,7 +39,7 @@ INSERT OR IGNORE INTO terms_versions
 VALUES (
   1,
   'Terms and Conditions',
-  'These Terms and Conditions govern the use of the Bliss Legacy Limited client portal and the creation of a client account.
+  'These Terms and Conditions govern the use of the Elpis Property Limited client portal and the creation of a client account.
 
 1. Account information
 You confirm that the information you provide during registration is accurate, current and complete. You must promptly update your contact details if they change.
@@ -48,7 +48,7 @@ You confirm that the information you provide during registration is accurate, cu
 You consent to identity and KYC checks, including verification of the identity details and BVN you provide. Identity numbers and BVNs are handled securely and are never displayed in full.
 
 3. Property enquiries and payments
-Submitting an enquiry or creating an account does not by itself create a property allocation, guarantee a price, or reserve a property. Property terms, payment plans and allocations are only confirmed in the formal documents issued by Bliss Legacy Limited.
+Submitting an enquiry or creating an account does not by itself create a property allocation, guarantee a price, or reserve a property. Property terms, payment plans and allocations are only confirmed in the formal documents issued by Elpis Property Limited.
 
 4. Payments and virtual accounts
 Payments must be made through the verified channels shown in your client portal. A dedicated virtual account may be created with our banking partner. You are responsible for confirming the account details before sending money.
