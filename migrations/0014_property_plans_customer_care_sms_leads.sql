@@ -136,7 +136,7 @@ CREATE TABLE IF NOT EXISTS sms_settings (
 INSERT OR IGNORE INTO sms_settings (setting_key, setting_value) VALUES
   ('sms_enabled', '0'),
   ('sms_provider', 'termii'),
-  ('sms_sender_id', 'BlissLegacy'),
+  ('sms_sender_id', 'ELPISPROP'),
   ('sms_low_credit_threshold', '1000'),
   ('sms_reminders_enabled', '0'),
   ('sms_defaulting_reminders_enabled', '0'),
@@ -153,15 +153,15 @@ INSERT OR IGNORE INTO sms_templates_seed_marker (id) VALUES (1);
 
 INSERT OR IGNORE INTO sms_templates (template_key, name, body, language) VALUES
   ('payment_received', 'Payment received',
-   'Payment received: NGN {amount} for {property}. New balance: NGN {balance}. Date: {date}. Ref: {reference}. Thank you, Bliss Legacy.', 'en'),
+   'Payment received: NGN {amount} for {property}. New balance: NGN {balance}. Date: {date}. Ref: {reference}. Thank you, Elpis Property.', 'en'),
   ('monthly_statement', 'Monthly balance statement',
-   'Balance statement: paid NGN {paid} of NGN {total}; outstanding NGN {balance}. Next due: {next_due}. Bliss Legacy.', 'en'),
+   'Balance statement: paid NGN {paid} of NGN {total}; outstanding NGN {balance}. Next due: {next_due}. Elpis Property.', 'en'),
   ('payment_reminder', 'Payment reminder',
-   'Reminder: NGN {amount} is due on {due_date} for {property}. Ref {reference}. Bliss Legacy.', 'en'),
+   'Reminder: NGN {amount} is due on {due_date} for {property}. Ref {reference}. Elpis Property.', 'en'),
   ('defaulting_reminder', 'Defaulting reminder',
-   '{days} day(s) overdue: NGN {amount} behind on {property}. Please pay or contact Bliss Legacy.', 'en'),
+   '{days} day(s) overdue: NGN {amount} behind on {property}. Please pay or contact Elpis Property.', 'en'),
   ('account_created', 'Account created',
-   'Welcome {name}. Your Bliss Legacy client reference is {reference}. We will keep you updated by SMS.', 'en');
+   'Welcome {name}. Your Elpis Property client reference is {reference}. We will keep you updated by SMS.', 'en');
 
 CREATE TABLE IF NOT EXISTS sms_messages (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

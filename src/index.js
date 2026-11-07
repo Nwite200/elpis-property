@@ -585,9 +585,9 @@ async function createAlatpayVirtualAccount(env, client, amountKobo, actorId) {
     amount,
     currency: "NGN",
     orderId,
-    description: "Elpis Property property payment",
+    description: "Elpis Property Limited property payment",
     customer: {
-      email: client.email_address || env.ALATPAY_DEFAULT_EMAIL || "hrElpisProperty@gmail.com",
+      email: client.email_address || env.ALATPAY_DEFAULT_EMAIL || "hr@elpisproperty.org",
       phone: client.phone_number || "",
       firstName,
       lastName,

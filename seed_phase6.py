@@ -102,13 +102,13 @@ def seed():
 
     staff = [
         ("md@elpisproperty.test", "Managing Director", 1, None, "08060000000", "Managing Director"),
-        ("bm.ikeja@elpisproperty.test", "Ikeja Branch Manager", 2, 1, "08060000001", "Branch Manager"),
-        ("bm.ajah@elpisproperty.test", "Ajah Branch Manager", 2, 2, "08060000002", "Branch Manager"),
-        ("tl.ikeja@elpisproperty.test", "Ikeja Team Lead", 3, 1, "08060000003", "Team Lead"),
-        ("tl.ajah@elpisproperty.test", "Ajah Team Lead", 3, 2, "08060000004", "Team Lead"),
-        ("mkt.ikeja@elpisproperty.test", "Ikeja Marketer", 4, 1, "08060000005", "Marketer"),
-        ("mkt.ikeja2@elpisproperty.test", "Ikeja Marketer Two", 4, 1, "08060000006", "Marketer"),
-        ("mkt.ajah@elpisproperty.test", "Ajah Marketer", 4, 2, "08060000007", "Marketer"),
+        ("bm.ikeja@elpisproperty.test", "Branch 1 Branch Manager", 2, 1, "08060000001", "Branch Manager"),
+        ("bm.ajah@elpisproperty.test", "Branch 2 Branch Manager", 2, 2, "08060000002", "Branch Manager"),
+        ("tl.ikeja@elpisproperty.test", "Branch 1 Team Lead", 3, 1, "08060000003", "Team Lead"),
+        ("tl.ajah@elpisproperty.test", "Branch 2 Team Lead", 3, 2, "08060000004", "Team Lead"),
+        ("mkt.ikeja@elpisproperty.test", "Branch 1 Marketer", 4, 1, "08060000005", "Marketer"),
+        ("mkt.ikeja2@elpisproperty.test", "Branch 1 Marketer Two", 4, 1, "08060000006", "Marketer"),
+        ("mkt.ajah@elpisproperty.test", "Branch 2 Marketer", 4, 2, "08060000007", "Marketer"),
         ("finance@elpisproperty.test", "Head Finance Officer", 5, 1, "08060000008", "Finance Officer"),
     ]
     ids = {}
@@ -117,11 +117,11 @@ def seed():
         ensure_profile(cur, ids[email], phone, title)
 
     t1 = ensure_team(
-        cur, "Ikeja Team Alpha", 1, ids["tl.ikeja@elpisproperty.test"],
+        cur, "Branch 1 Team Alpha", 1, ids["tl.ikeja@elpisproperty.test"],
         [ids["tl.ikeja@elpisproperty.test"], ids["mkt.ikeja@elpisproperty.test"], ids["mkt.ikeja2@elpisproperty.test"]],
     )
     t2 = ensure_team(
-        cur, "Ajah Team", 2, ids["tl.ajah@elpisproperty.test"],
+        cur, "Branch 2 Team", 2, ids["tl.ajah@elpisproperty.test"],
         [ids["tl.ajah@elpisproperty.test"], ids["mkt.ajah@elpisproperty.test"]],
     )
 
@@ -138,7 +138,7 @@ def seed():
 
     conn.commit()
     print("Phase 6 demo seed complete.")
-    print(f"Teams: Ikeja Team Alpha (id={t1}), Ajah Team (id={t2})")
+    print(f"Teams: Branch 1 Team Alpha (id={t1}), Branch 2 Team (id={t2})")
     print("Test credentials generated for this run (shown once):")
     for email, _, role_id, branch_id, _, _ in staff:
         print(f"  {email} / {TEST_PASSWORDS.get(email, '(unchanged existing account)')} · role_id={role_id} · branch_id={branch_id}")

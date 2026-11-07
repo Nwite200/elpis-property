@@ -115,7 +115,7 @@
     const data = await S.fetchJson("/api/admin/app-settings");
     const settings = data.settings || {};
     const c = settings.site_config || {};
-    el("siteCompanyName").value = c.company_name || "elpis Legacy Limited";
+    el("siteCompanyName").value = c.company_name || "Elpis Property Limited";
     el("siteTagline").value = c.tagline || "";
     el("sitePhone").value = c.phone || "";
     el("siteWhatsapp").value = c.whatsapp_number || "";

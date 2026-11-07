@@ -1,4 +1,4 @@
-// elpis Legacy Limited — Dedicated Public Property Details Logic
+// Elpis Property Limited — Dedicated Public Property Details Logic
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.elpis_CONFIG_READY) await window.elpis_CONFIG_READY;
   // Render persistent site header and footer
@@ -58,13 +58,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Set document title
-  document.title = `${p.name} | elpis Legacy Limited`;
+  document.title = `${p.name} | Elpis Property Limited`;
 
   const coverImage = (p.images && p.images[0]) || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80';
   const allImages = (p.images && p.images.length) ? p.images : [coverImage];
 
   // Pre-formatted WhatsApp message
-  const waMessage = `Hello elpis Legacy Limited, I am interested in ${p.name} located at ${p.location} (${p.branch} Branch), listed at ${elpis.money(p.price)}. Please provide more details.`;
+  const waMessage = `Hello Elpis Property Limited, I am interested in ${p.name} located at ${p.location} (${p.branch} Branch), listed at ${elpis.money(p.price)}. Please provide more details.`;
 
   container.innerHTML = `
     <!-- Breadcrumb & Back Link -->
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     <!-- Demo Content Alert -->
     <div class="demo-alert-bar">
       <span class="demo-pill">Demonstration Listing</span>
-      <span class="demo-msg">This listing is demonstration content for elpis Legacy Limited. Titles and pricing are verified sample parameters.</span>
+      <span class="demo-msg">This listing is demonstration content for Elpis Property Limited. Titles and pricing are verified sample parameters.</span>
     </div>
 
     <!-- Property Header Info -->
@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <h2 class="section-subtitle">Property Overview & Description</h2>
           <div class="prop-text-body">
             <p>${p.description}</p>
-            <p>Every development under elpis Legacy Limited undergoes rigorous title verification, architectural quality auditing, and clear legal boundary mapping. Clients enjoy transparent purchasing procedures without hidden agency commissions or dispute burdens.</p>
+            <p>Every development under Elpis Property Limited undergoes rigorous title verification, architectural quality auditing, and clear legal boundary mapping. Clients enjoy transparent purchasing procedures without hidden agency commissions or dispute burdens.</p>
           </div>
         </section>
 
@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div>
               <h3 class="trust-box-title">Verified Title & Buyer Protection</h3>
               <p class="trust-box-desc">
-                elpis Legacy Limited guarantees complete documentation transparency on this property. Title verification documents, survey plans, and allocation protocols are provided upon inspection and formal inquiry.
+                Elpis Property Limited guarantees complete documentation transparency on this property. Title verification documents, survey plans, and allocation protocols are provided upon inspection and formal inquiry.
               </p>
             </div>
           </div>
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="enquiry-success" id="detailFormSuccess" style="display:none">
             <div class="success-icon">✓</div>
             <h4>Enquiry Received!</h4>
-            <p>Thank you for your interest in <strong>${p.name}</strong>. A dedicated elpis Legacy consultant from the <strong>${p.branch} Branch</strong> will contact you promptly.</p>
+            <p>Thank you for your interest in <strong>${p.name}</strong>. A dedicated Elpis Property consultant from the <strong>${p.branch} Branch</strong> will contact you promptly.</p>
             <button class="btn btn-outline btn-sm" id="resetEnqFormBtn" style="margin-top:12px">Send Another Inquiry</button>
           </div>
         </div>
@@ -381,7 +381,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
             <div class="prop-actions-row">
               <a href="property.html?id=${item.id}" class="btn btn-card-details">View Details</a>
-              <a href="#" class="btn btn-card-enquire wa-link" data-message="Hello elpis Legacy, I am interested in ${item.name}.">Enquire</a>
+              <a href="#" class="btn btn-card-enquire wa-link" data-message="Hello Elpis Property, I am interested in ${item.name}.">Enquire</a>
             </div>
           </div>
         </article>
@@ -391,7 +391,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     relatedGrid.querySelectorAll('.wa-link').forEach(a => {
       a.addEventListener('click', (e) => {
         e.preventDefault();
-        const msg = a.getAttribute('data-message') || 'Hello elpis Legacy.';
+        const msg = a.getAttribute('data-message') || 'Hello Elpis Property.';
         elpis.enquireWhatsApp(msg);
       });
     });

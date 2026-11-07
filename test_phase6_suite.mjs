@@ -89,13 +89,13 @@ function upsertClient(ref, data) {
 }
 
 const mdId = upsertUser('md@elpisproperty.test', 'Managing Director', 1, null);
-const bm1Id = upsertUser('bm.ikeja@elpisproperty.test', 'Ikeja Branch Manager', 2, 1);
-const bm2Id = upsertUser('bm.ajah@elpisproperty.test', 'Ajah Branch Manager', 2, 2);
-const tl1Id = upsertUser('tl.ikeja@elpisproperty.test', 'Ikeja Team Lead', 3, 1);
-const tl2Id = upsertUser('tl.ajah@elpisproperty.test', 'Ajah Team Lead', 3, 2);
-const mkt1Id = upsertUser('mkt.ikeja@elpisproperty.test', 'Ikeja Marketer One', 4, 1);
-const mkt2Id = upsertUser('mkt.ikeja2@elpisproperty.test', 'Ikeja Marketer Two', 4, 1);
-const mkt3Id = upsertUser('mkt.ajah@elpisproperty.test', 'Ajah Marketer', 4, 2);
+const bm1Id = upsertUser('bm.ikeja@elpisproperty.test', 'Branch 1 Branch Manager', 2, 1);
+const bm2Id = upsertUser('bm.ajah@elpisproperty.test', 'Branch 2 Branch Manager', 2, 2);
+const tl1Id = upsertUser('tl.ikeja@elpisproperty.test', 'Branch 1 Team Lead', 3, 1);
+const tl2Id = upsertUser('tl.ajah@elpisproperty.test', 'Branch 2 Team Lead', 3, 2);
+const mkt1Id = upsertUser('mkt.ikeja@elpisproperty.test', 'Branch 1 Marketer One', 4, 1);
+const mkt2Id = upsertUser('mkt.ikeja2@elpisproperty.test', 'Branch 1 Marketer Two', 4, 1);
+const mkt3Id = upsertUser('mkt.ajah@elpisproperty.test', 'Branch 2 Marketer', 4, 2);
 const finId = upsertUser('finance@elpisproperty.test', 'Head Finance Officer', 5, 1);
 const adaUserId = upsertUser('ada@example.com', 'Ada Nwosu', 6, 1);
 const musaUserId = upsertUser('musa@example.com', 'Musa Dike', 6, 1);
@@ -136,10 +136,10 @@ db.exec(`
 
 const prop1 = db.prepare("SELECT id FROM properties WHERE reference='BLP-P6-IKEJA'").get()
   || { id: Number(db.prepare(`INSERT INTO properties (reference,title,description,sale_price,state,city,address,branch_id,status,is_published,created_by)
-      VALUES ('BLP-P6-IKEJA','Phase 6 Ikeja Property','Test inventory',10000000,'Lagos','Ikeja','1 Phase 6 Close',1,'Available',1,?)`).run(mdId).lastInsertRowid) };
+      VALUES ('BLP-P6-IKEJA','Phase 6 Branch 1 Property','Test inventory',10000000,'Lagos','Branch 1','1 Phase 6 Close',1,'Available',1,?)`).run(mdId).lastInsertRowid) };
 const prop2 = db.prepare("SELECT id FROM properties WHERE reference='BLP-P6-AJAH'").get()
   || { id: Number(db.prepare(`INSERT INTO properties (reference,title,description,sale_price,state,city,address,branch_id,status,is_published,created_by)
-      VALUES ('BLP-P6-AJAH','Phase 6 Ajah Property','Test inventory',8000000,'Lagos','Ajah','2 Phase 6 Close',2,'Reserved',1,?)`).run(mdId).lastInsertRowid) };
+      VALUES ('BLP-P6-AJAH','Phase 6 Branch 2 Property','Test inventory',8000000,'Lagos','Branch 2','2 Phase 6 Close',2,'Reserved',1,?)`).run(mdId).lastInsertRowid) };
 db.prepare("UPDATE properties SET sale_price=10000000, status='Available', is_published=1, branch_id=1 WHERE id=?").run(prop1.id);
 db.prepare("UPDATE properties SET sale_price=8000000, status='Reserved', is_published=1, branch_id=2 WHERE id=?").run(prop2.id);
 
@@ -192,9 +192,9 @@ insertPayment(demoId, 'TX-P6-DEMO-01', 300000000, 'verified', { isDemo: true });
 
 const teamAlphaId = Number(db.prepare('INSERT INTO teams (name, branch_id, team_lead_user_id, is_active) VALUES (?, ?, ?, 1)')
   .run('Team Alpha', 1, tl1Id).lastInsertRowid);
-const teamAjahId = Number(db.prepare('INSERT INTO teams (name, branch_id, team_lead_user_id, is_active) VALUES (?, ?, ?, 1)')
-  .run('Team Ajah', 2, tl2Id).lastInsertRowid);
-for (const [team, user] of [[teamAlphaId, tl1Id], [teamAlphaId, mkt1Id], [teamAlphaId, mkt2Id], [teamAjahId, tl2Id], [teamAjahId, mkt3Id]]) {
+const teamBranch2Id = Number(db.prepare('INSERT INTO teams (name, branch_id, team_lead_user_id, is_active) VALUES (?, ?, ?, 1)')
+  .run('Team Branch 2', 2, tl2Id).lastInsertRowid);
+for (const [team, user] of [[teamAlphaId, tl1Id], [teamAlphaId, mkt1Id], [teamAlphaId, mkt2Id], [teamBranch2Id, tl2Id], [teamBranch2Id, mkt3Id]]) {
   db.prepare('INSERT OR IGNORE INTO team_members (team_id, user_id) VALUES (?, ?)').run(team, user);
 }
 for (const [uid, phone, title] of [
@@ -362,10 +362,10 @@ await test('MD dashboard computes company-wide property, client, staff, lead and
   assert(res.data.range.granularity === 'day', '30-day range should default to day granularity');
   assert(res.data.trends.length >= 20, 'daily trend buckets missing');
   assert(res.data.branch_comparison.length >= 6, 'branch comparison missing');
-  const ikeja = res.data.branch_comparison.find(b => b.branch_name === 'Ikeja');
-  assert(ikeja && ikeja.clients === 2 && ikeja.contract_value_kobo === 1800000000 && ikeja.verified_kobo === 400000000, 'Ikeja branch metrics incorrect');
-  const ajah = res.data.branch_comparison.find(b => b.branch_name === 'Ajah');
-  assert(ajah && ajah.clients === 1 && ajah.contract_value_kobo === 800000000 && ajah.verified_kobo === 200000000, 'Ajah branch metrics incorrect');
+  const ikeja = res.data.branch_comparison.find(b => b.branch_name === 'Branch 1');
+  assert(ikeja && ikeja.clients === 2 && ikeja.contract_value_kobo === 1800000000 && ikeja.verified_kobo === 400000000, 'Branch 1 branch metrics incorrect');
+  const ajah = res.data.branch_comparison.find(b => b.branch_name === 'Branch 2');
+  assert(ajah && ajah.clients === 1 && ajah.contract_value_kobo === 800000000 && ajah.verified_kobo === 200000000, 'Branch 2 branch metrics incorrect');
   assert(res.data.marketer_rankings.length === 3, 'marketer rankings expected 3');
   assert(res.data.marketer_rankings[0].verified_kobo === 400000000, 'top marketer should have 4,000,000 verified');
   assert(res.data.team_rankings.length === 2, 'team rankings expected 2');
@@ -377,19 +377,19 @@ await test('MD dashboard computes company-wide property, client, staff, lead and
 await test('Branch Managers see only their own branch and cannot widen scope with query parameters', async () => {
   const ikeja = await request('/api/dashboard?branch_id=2', { headers: { Cookie: bm1Cookie } });
   assert(ikeja.status === 200, 'BM dashboard expected 200');
-  assert(ikeja.data.summary.clients.total === 2, `BM Ikeja clients expected 2, got ${ikeja.data.summary.clients.total}`);
-  assert(ikeja.data.summary.financials.contract_sales_value_kobo === 1800000000, 'BM Ikeja contract value incorrect');
-  assert(ikeja.data.summary.financials.verified_payments_kobo === 400000000, 'BM Ikeja verified incorrect');
-  assert(ikeja.data.branch_comparison.length === 1 && ikeja.data.branch_comparison[0].branch_id === 1, 'BM must only see Ikeja branch comparison');
-  assert(ikeja.data.marketer_rankings.every(m => m.branch_name === 'Ikeja'), 'BM must only see Ikeja marketers');
-  assert(ikeja.data.team_rankings.every(t => t.branch_id === 1), 'BM must only see Ikeja teams');
-  assert(ikeja.data.summary.leads.total === 2, 'BM Ikeja leads expected 2');
+  assert(ikeja.data.summary.clients.total === 2, `BM Branch 1 clients expected 2, got ${ikeja.data.summary.clients.total}`);
+  assert(ikeja.data.summary.financials.contract_sales_value_kobo === 1800000000, 'BM Branch 1 contract value incorrect');
+  assert(ikeja.data.summary.financials.verified_payments_kobo === 400000000, 'BM Branch 1 verified incorrect');
+  assert(ikeja.data.branch_comparison.length === 1 && ikeja.data.branch_comparison[0].branch_id === 1, 'BM must only see Branch 1 branch comparison');
+  assert(ikeja.data.marketer_rankings.every(m => m.branch_name === 'Branch 1'), 'BM must only see Branch 1 marketers');
+  assert(ikeja.data.team_rankings.every(t => t.branch_id === 1), 'BM must only see Branch 1 teams');
+  assert(ikeja.data.summary.leads.total === 2, 'BM Branch 1 leads expected 2');
 
   const ajah = await request('/api/dashboard', { headers: { Cookie: bm2Cookie } });
-  assert(ajah.data.summary.clients.total === 1, 'BM Ajah clients expected 1');
-  assert(ajah.data.summary.financials.contract_sales_value_kobo === 800000000, 'BM Ajah contract value incorrect');
-  assert(ajah.data.summary.financials.verified_payments_kobo === 200000000, 'BM Ajah verified incorrect');
-  assert(ajah.data.branch_comparison[0].branch_id === 2, 'BM Ajah branch comparison incorrect');
+  assert(ajah.data.summary.clients.total === 1, 'BM Branch 2 clients expected 1');
+  assert(ajah.data.summary.financials.contract_sales_value_kobo === 800000000, 'BM Branch 2 contract value incorrect');
+  assert(ajah.data.summary.financials.verified_payments_kobo === 200000000, 'BM Branch 2 verified incorrect');
+  assert(ajah.data.branch_comparison[0].branch_id === 2, 'BM Branch 2 branch comparison incorrect');
 });
 
 await test('Team Leads see only their team portfolio and team members', async () => {
@@ -406,8 +406,8 @@ await test('Team Leads see only their team portfolio and team members', async ()
   assert(forbiddenLead.status === 404, 'TL must not access another team lead lead');
 
   const ajah = await request('/api/dashboard', { headers: { Cookie: tl2Cookie } });
-  assert(ajah.data.summary.clients.total === 1, 'TL Ajah clients expected 1');
-  assert(ajah.data.summary.leads.total === 1, 'TL Ajah leads expected 1');
+  assert(ajah.data.summary.clients.total === 1, 'TL Branch 2 clients expected 1');
+  assert(ajah.data.summary.leads.total === 1, 'TL Branch 2 leads expected 1');
 });
 
 await test('Marketers see only personal assigned clients, properties and leads', async () => {
@@ -489,10 +489,10 @@ await test('date filters and granularity produce correct empty and populated tre
 await test('branch, marketer and team rankings respect hierarchy and conversion percentages', async () => {
   const md = await request('/api/analytics/performance', { headers: { Cookie: mdCookie } });
   const topMarketer = md.data.marketer_rankings[0];
-  assert(topMarketer.full_name === 'Ikeja Marketer One', `top marketer expected Ikeja Marketer One, got ${topMarketer.full_name}`);
+  assert(topMarketer.full_name === 'Branch 1 Marketer One', `top marketer expected Branch 1 Marketer One, got ${topMarketer.full_name}`);
   assert(topMarketer.converted_count === 0, 'marketer one has no converted lead in baseline');
   const bm = await request('/api/analytics/performance', { headers: { Cookie: bm1Cookie } });
-  assert(bm.data.branch_comparison.length === 1 && bm.data.branch_comparison[0].branch_name === 'Ikeja', 'BM analytics branch scope incorrect');
+  assert(bm.data.branch_comparison.length === 1 && bm.data.branch_comparison[0].branch_name === 'Branch 1', 'BM analytics branch scope incorrect');
   assert(bm.data.marketer_rankings.length === 2, 'BM analytics marketer scope incorrect');
   const tl = await request('/api/analytics/performance', { headers: { Cookie: tl1Cookie } });
   assert(tl.data.team_rankings.length === 1 && tl.data.team_rankings[0].team_name === 'Team Alpha', 'TL analytics team scope incorrect');
@@ -506,7 +506,7 @@ await test('staff list and creation enforce branch and role restrictions', async
   assert(mdList.data.pagination.total === 9, `MD staff total expected 9, got ${mdList.data.pagination.total}`);
   const bmList = await request('/api/staff?limit=100', { headers: { Cookie: bm1Cookie } });
   assert(bmList.data.pagination.total === 5, `BM staff total expected 5, got ${bmList.data.pagination.total}`);
-  assert(bmList.data.staff.every(s => s.branch_name === 'Ikeja'), 'BM staff list leaked another branch');
+  assert(bmList.data.staff.every(s => s.branch_name === 'Branch 1'), 'BM staff list leaked another branch');
 
   const created = await request('/api/staff', {
     method: 'POST', headers: { Cookie: mdCookie }, body: {
@@ -588,11 +588,11 @@ await test('team management is branch-scoped and member assignment is validated'
   assert(updated.status === 200, `team update expected 200, got ${updated.status}: ${JSON.stringify(updated.data)}`);
   const detail = await request(`/api/teams/${teamId}`, { headers: { Cookie: bm1Cookie } });
   assert(detail.status === 200 && detail.data.members.length === 3, 'team members not persisted');
-  const cross = await request(`/api/teams/${teamAjahId}`, { method: 'PUT', headers: { Cookie: bm1Cookie }, body: { name: 'Hijack' } });
+  const cross = await request(`/api/teams/${teamBranch2Id}`, { method: 'PUT', headers: { Cookie: bm1Cookie }, body: { name: 'Hijack' } });
   assert(cross.status === 403, 'BM cross-branch team update expected 403');
   const tlDetail = await request(`/api/teams/${teamAlphaId}`, { headers: { Cookie: tl1Cookie } });
   assert(tlDetail.status === 200, 'TL own team detail expected 200');
-  const tlCross = await request(`/api/teams/${teamAjahId}`, { headers: { Cookie: tl1Cookie } });
+  const tlCross = await request(`/api/teams/${teamBranch2Id}`, { headers: { Cookie: tl1Cookie } });
   assert(tlCross.status === 403, 'TL cross-team detail expected 403');
   const assignStaff = await request(`/api/staff/${mkt2Id}/teams`, {
     method: 'PUT', headers: { Cookie: bm1Cookie }, body: { team_ids: [teamAlphaId, teamId] }
@@ -632,7 +632,7 @@ await test('lead creation enforces branch, marketer and estimated-value rules', 
   assert(bmLead.status === 200, 'BM lead create expected 200');
   const mdLead = await request('/api/leads', {
     method: 'POST', headers: { Cookie: mdCookie }, body: {
-      full_name: 'Ajah Lead', phone_number: '08064000004', branch_id: 2, assigned_marketer_id: mkt3Id
+      full_name: 'Branch 2 Lead', phone_number: '08064000004', branch_id: 2, assigned_marketer_id: mkt3Id
     }
   });
   assert(mdLead.status === 200, 'MD cross-branch lead create expected 200');

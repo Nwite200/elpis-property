@@ -36,7 +36,7 @@ for (const suffix of ['', '-wal', '-shm']) rmSync(TEMP_DB + suffix, { force: tru
 mkdirSync(dirname(TEMP_DB), { recursive: true });
 
 console.log('\n========================================================');
-console.log('   elpis LEGACY — SEED / WIPE ENVIRONMENT SECURITY');
+console.log('   Elpis Property — SEED / WIPE ENVIRONMENT SECURITY');
 console.log('========================================================\n');
 
 test('seed refuses a production environment', () => {

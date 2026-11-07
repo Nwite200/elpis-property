@@ -57,8 +57,8 @@ function upsertUser(email, fullName, roleName, branch) {
 }
 
 const headOffice = branchId('Head Office');
-const ikeja = branchId('Ikeja');
-const ajah = branchId('Ajah');
+const ikeja = branchId('Branch 1');
+const ajah = branchId('Branch 2');
 
 db.exec(`
   DELETE FROM terms_acceptances;
@@ -113,18 +113,18 @@ db.exec(`
 db.prepare("INSERT INTO terms_versions (version_no, title, body_text, is_active) VALUES (1, 'Terms and Conditions', 'Phase 8 test terms and conditions', 1)").run();
 
 const mdId = upsertUser('md.p8@elpisproperty.test', 'Phase 8 MD', 'Managing Director', null);
-const bm1Id = upsertUser('bm.ikeja.p8@elpisproperty.test', 'Phase 8 Ikeja BM', 'Branch Manager', ikeja);
-const bm2Id = upsertUser('bm.ajah.p8@elpisproperty.test', 'Phase 8 Ajah BM', 'Branch Manager', ajah);
-const tlId = upsertUser('tl.ikeja.p8@elpisproperty.test', 'Phase 8 Ikeja TL', 'Team Lead', ikeja);
+const bm1Id = upsertUser('bm.ikeja.p8@elpisproperty.test', 'Phase 8 Branch 1 BM', 'Branch Manager', ikeja);
+const bm2Id = upsertUser('bm.ajah.p8@elpisproperty.test', 'Phase 8 Branch 2 BM', 'Branch Manager', ajah);
+const tlId = upsertUser('tl.ikeja.p8@elpisproperty.test', 'Phase 8 Branch 1 TL', 'Team Lead', ikeja);
 const mkt1Id = upsertUser('mkt1.p8@elpisproperty.test', 'Phase 8 Marketer One', 'Marketer', ikeja);
 const mkt2Id = upsertUser('mkt2.p8@elpisproperty.test', 'Phase 8 Marketer Two', 'Marketer', ikeja);
-const mkt3Id = upsertUser('mkt3.p8@elpisproperty.test', 'Phase 8 Ajah Marketer', 'Marketer', ajah);
+const mkt3Id = upsertUser('mkt3.p8@elpisproperty.test', 'Phase 8 Branch 2 Marketer', 'Marketer', ajah);
 const finId = upsertUser('fin.p8@elpisproperty.test', 'Phase 8 Finance', 'Finance Officer', headOffice);
 const clientUserId = upsertUser('client.p8@example.com', 'Phase 8 Client', 'Client', ikeja);
 const saId = upsertUser('sa.p8@elpisproperty.test', 'Phase 8 Super Admin', 'Super Admin', headOffice);
 const pmId = upsertUser('pm.ikeja.p8@elpisproperty.test', 'Phase 8 Project Manager', 'Project Manager', ikeja);
 const haId = upsertUser('ha.p8@elpisproperty.test', 'Phase 8 Head Accountant', 'Head Accountant', headOffice);
-const mktNoTeamId = upsertUser('mkt.noteam.p8@elpisproperty.test', 'Phase 8 Ikeja Direct Marketer', 'Marketer', ikeja);
+const mktNoTeamId = upsertUser('mkt.noteam.p8@elpisproperty.test', 'Phase 8 Branch 1 Direct Marketer', 'Marketer', ikeja);
 const careBranchId = upsertUser('care.branch.p8@elpisproperty.test', 'Phase 13 Branch Care', 'Customer Care', ikeja);
 const careNationalId = upsertUser('care.national.p8@elpisproperty.test', 'Phase 13 National Care', 'Customer Care', null);
 db.prepare("UPDATE users SET care_scope='branch' WHERE id=?").run(careBranchId);
@@ -134,9 +134,9 @@ db.prepare("UPDATE users SET referral_code='BL-P8-MKT' WHERE id=?").run(mkt1Id);
 
 const categoryId = Number(db.prepare("INSERT INTO property_categories (name) VALUES ('Phase 8 Category')").run().lastInsertRowid);
 const propPublished = Number(db.prepare(`INSERT INTO properties (reference,title,description,category_id,sale_price,state,city,address,branch_id,status,is_published,created_by)
-  VALUES ('BLP-P8-PUB','Phase 8 Published Property','Audit property',?,20000000,'Lagos','Ikeja','8 Audit Road',?,'Available',1,?)`).run(categoryId, ikeja, mdId).lastInsertRowid);
+  VALUES ('BLP-P8-PUB','Phase 8 Published Property','Audit property',?,20000000,'Lagos','Branch 1','8 Audit Road',?,'Available',1,?)`).run(categoryId, ikeja, mdId).lastInsertRowid);
 const propDraft = Number(db.prepare(`INSERT INTO properties (reference,title,description,category_id,sale_price,state,city,address,branch_id,status,is_published,created_by)
-  VALUES ('BLP-P8-DRAFT','Phase 8 Draft Property','Audit property',?,15000000,'Lagos','Ikeja','8 Draft Road',?,'Available',0,?)`).run(categoryId, ikeja, mdId).lastInsertRowid);
+  VALUES ('BLP-P8-DRAFT','Phase 8 Draft Property','Audit property',?,15000000,'Lagos','Branch 1','8 Draft Road',?,'Available',0,?)`).run(categoryId, ikeja, mdId).lastInsertRowid);
 
 const adaId = Number(db.prepare(`INSERT INTO clients (client_reference, full_name, phone_number, email_address, status, sale_type,
   assigned_branch_id, created_by, original_marketer_id, team_lead_id, agreed_purchase_price, interested_property_id, user_id)
@@ -149,10 +149,10 @@ db.prepare(`INSERT INTO clients (client_reference, full_name, phone_number, emai
   assigned_branch_id, created_by, original_marketer_id, team_lead_id, agreed_purchase_price, interested_property_id)
   VALUES ('BLC-P8-OTHER','Other Phase 8 Client','08088000002','other.p8@example.com','Active Buyer','New Sale',?,?,?,?,10000000,?)`)
   .run(ikeja, mkt2Id, mkt2Id, tlId, propPublished);
-const teamIkejaId = Number(db.prepare("INSERT INTO teams (name, branch_id, team_lead_user_id, is_active) VALUES (?,?,?,1)")
-  .run('Phase 8 Ikeja Team', ikeja, tlId).lastInsertRowid);
+const teamBranch 1Id = Number(db.prepare("INSERT INTO teams (name, branch_id, team_lead_user_id, is_active) VALUES (?,?,?,1)")
+  .run('Phase 8 Branch 1 Team', ikeja, tlId).lastInsertRowid);
 for (const userId of [tlId, mkt1Id, mkt2Id]) {
-  db.prepare("INSERT INTO team_members (team_id, user_id) VALUES (?,?)").run(teamIkejaId, userId);
+  db.prepare("INSERT INTO team_members (team_id, user_id) VALUES (?,?)").run(teamBranch 1Id, userId);
 }
 db.prepare("UPDATE users SET manager_id=? WHERE id IN (?,?,?)").run(mdId, bm1Id, bm2Id, pmId);
 db.prepare("UPDATE users SET manager_id=? WHERE id=?").run(bm1Id, tlId);
@@ -163,7 +163,7 @@ db.prepare("UPDATE users SET manager_id=? WHERE id=?").run(mdId, haId);
 
 const ajahClientId = Number(db.prepare(`INSERT INTO clients (client_reference, full_name, phone_number, email_address, status, sale_type,
   assigned_branch_id, created_by, original_marketer_id, team_lead_id, agreed_purchase_price, interested_property_id)
-  VALUES ('BLC-P8-AJAH','Ajah Revenue Client','08088000401','ajah.p8@example.com','Active Buyer','New Sale',?,?,?,NULL,8000000,?)`)
+  VALUES ('BLC-P8-AJAH','Branch 2 Revenue Client','08088000401','ajah.p8@example.com','Active Buyer','New Sale',?,?,?,NULL,8000000,?)`)
   .run(ajah, mkt3Id, mkt3Id, propPublished).lastInsertRowid);
 
 function insertRevenuePayment(clientId, ref, amountKobo, attribution) {
@@ -297,7 +297,7 @@ await test('public enquiry creates a real lead with branch/property attribution'
   const res = await request('/api/public/enquiries', {
     method: 'POST', body: {
       full_name: 'Public Enquiry Person', phone_number: '08088000111', email_address: 'public.enquiry@example.com',
-      message: 'I would like a site inspection.', branch_name: 'Ikeja', property_reference: 'BLP-P8-PUB',
+      message: 'I would like a site inspection.', branch_name: 'Branch 1', property_reference: 'BLP-P8-PUB',
       acquisition_mode: 'inspection', source: 'Phase 8 test'
     }
   });
@@ -342,7 +342,7 @@ await test('client onboarding stores alternate phone, next of kin and valid staf
     method: 'POST', headers: { 'CF-Connecting-IP': '198.51.100.55' },
     body: {
       full_name: 'Referred Client', email: 'referred.p8@example.com', phone_number: '08088000331',
-      residential_address: '8 Signup Test Street', state: 'Lagos', city: 'Ikeja', branch_id: ikeja,
+      residential_address: '8 Signup Test Street', state: 'Lagos', city: 'Branch 1', branch_id: ikeja,
       alternate_phone: '08088000332', next_of_kin_name: 'Next Kin', next_of_kin_phone: '08088000333',
       next_of_kin_relationship: 'Sibling', next_of_kin_address: '3 Next of Kin Street',
       referral_code: 'BL-P8-MD', password: 'password123', terms_accepted: true
@@ -392,18 +392,18 @@ await test('invalid referral codes are rejected and ALATPay never invents virtua
 });
 
 await test('signup captures address, branch, masked identity and dedicated-account readiness', async () => {
-  const ajahBranch = db.prepare("SELECT id FROM branches WHERE name='Ajah'").get();
+  const ajahBranch = db.prepare("SELECT id FROM branches WHERE name='Branch 2'").get();
   const signup = await request('/api/signup', {
     method: 'POST', headers: { 'CF-Connecting-IP': '198.51.100.58' },
     body: {
       full_name: 'Identity Phase 15 Client', email: 'identity.phase15@example.com', phone_number: '08088000336',
-      residential_address: '12 Identity Way', state: 'Lagos', city: 'Ajah', branch_id: ajahBranch.id,
+      residential_address: '12 Identity Way', state: 'Lagos', city: 'Branch 2', branch_id: ajahBranch.id,
       identity_type: 'NIN', identity_number: '12345678901', bvn: '22222222222', password: 'password123', terms_accepted: true
     }
   });
   assert(signup.status === 200, `identity signup expected 200, got ${signup.status}: ${JSON.stringify(signup.data)}`);
   const client = db.prepare('SELECT * FROM clients WHERE client_reference=?').get(signup.data.client_reference);
-  assert(client.residential_address === '12 Identity Way' && client.state === 'Lagos' && client.city === 'Ajah', 'signup address not stored');
+  assert(client.residential_address === '12 Identity Way' && client.state === 'Lagos' && client.city === 'Branch 2', 'signup address not stored');
   assert(client.assigned_branch_id === ajahBranch.id, 'signup did not honour the client-selected branch');
   assert(client.identity_type === 'NIN', 'identity type not stored');
   assert(client.identity_number_masked === '12*****8901', `unexpected identity mask: ${client.identity_number_masked}`);
@@ -499,7 +499,7 @@ await test('property listing permissions, approval workflow, plan validation and
   });
   const baseProperty = {
     title: 'Phase 19 Workflow Property', description: 'Workflow test property', property_type: 'Apartment',
-    sale_price: 1000000, state: 'Lagos', city: 'Ikeja', address: '19 Workflow Road', branch_id: ikeja
+    sale_price: 1000000, state: 'Lagos', city: 'Branch 1', address: '19 Workflow Road', branch_id: ikeja
   };
   const mdCreate = await createProperty(mdCookie, baseProperty);
   assert(mdCreate.status === 200 && mdCreate.data.id, `MD property creation failed: ${JSON.stringify(mdCreate.data)}`);
@@ -895,19 +895,19 @@ await test('revenue scope is enforced by role, branch and team without cross-sco
   const mkt1 = await request('/api/revenue/overview?from=2026-01-01&to=2099-12-31', { headers: { Cookie: mkt1Cookie } });
   assert(md.status === 200 && ha.status === 200, 'MD/Head Accountant revenue APIs must return 200');
   assert(md.data.total_kobo === 1100000000 && ha.data.total_kobo === 1100000000, 'MD and Head Accountant must see national revenue');
-  assert(bm1.data.total_kobo === 800000000, `BM Ikeja revenue expected 800m kobo, got ${bm1.data.total_kobo}`);
+  assert(bm1.data.total_kobo === 800000000, `BM Branch 1 revenue expected 800m kobo, got ${bm1.data.total_kobo}`);
   assert(pm.data.total_kobo === 800000000, 'Project Manager must share branch revenue scope');
-  assert(bm2.data.total_kobo === 300000000, 'BM Ajah revenue scope incorrect');
+  assert(bm2.data.total_kobo === 300000000, 'BM Branch 2 revenue scope incorrect');
   assert(tl.data.total_kobo === 300000000, 'Team Lead must see team revenue only');
   assert(mkt1.data.total_kobo === 100000000, 'Marketer must see personally registered revenue only');
   assert(tl.data.level === 'team_lead', 'Team Lead should start at team level');
   assert(mkt1.data.level === 'staff', 'Staff should start at staff level');
   assert(md.data.reconciles === true && md.data.children_total_kobo === md.data.total_kobo, 'MD branch children must sum to national total');
   assert(bm1.data.reconciles === true && bm1.data.children_total_kobo === bm1.data.total_kobo, 'Branch children must sum to branch total');
-  const branchA = md.data.children.find(c => c.name === 'Ikeja');
-  const branchB = md.data.children.find(c => c.name === 'Ajah');
+  const branchA = md.data.children.find(c => c.name === 'Branch 1');
+  const branchB = md.data.children.find(c => c.name === 'Branch 2');
   assert(branchA && branchB && branchA.total_kobo === 800000000 && branchB.total_kobo === 300000000, 'National branch breakdown incorrect');
-  assert(bm2.data.children.some(c => c.type === 'staff' && c.name === 'Phase 8 Ajah Marketer'), 'No-team-lead branch must drill directly to staff');
+  assert(bm2.data.children.some(c => c.type === 'staff' && c.name === 'Phase 8 Branch 2 Marketer'), 'No-team-lead branch must drill directly to staff');
   assert(!bm2.data.children.some(c => c.type === 'team_lead'), 'No empty team-lead level should appear');
   const cross = await request('/api/revenue/overview?from=2026-01-01&to=2099-12-31&branch_id=' + ajah, { headers: { Cookie: bm1Cookie } });
   assert(cross.status === 403, 'BM must not request another branch');
@@ -1190,7 +1190,7 @@ console.log('\n--- 8. Property plans, customer care and SMS ---');
 
 async function createPropertyPlanProperty(ref) {
   return Number(db.prepare(`INSERT INTO properties (reference,title,description,category_id,sale_price,state,city,address,branch_id,status,is_published,created_by)
-    VALUES (?, ?, 'Plan catalogue property', ?, 20000000, 'Lagos', 'Ikeja', 'Plan Close', ?, 'Available', 1, ?)`)
+    VALUES (?, ?, 'Plan catalogue property', ?, 20000000, 'Lagos', 'Branch 1', 'Plan Close', ?, 'Available', 1, ?)`)
     .run(ref, 'Phase 13 Plan Property', categoryId, ikeja, mdId).lastInsertRowid);
 }
 
