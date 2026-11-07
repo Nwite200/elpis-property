@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#C6A45C" />
+  <meta name="theme-color" content="#071747" />
   <title>Verify Your Account | Elpis Property Limited</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,15 +13,15 @@
   <script src="assets/js/intro-config.js"></script>
   <script src="assets/js/motion.js"></script>
   <style>
-    body { background: var(--soft); min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 30px 16px; }
-    .verify-card { width: 100%; max-width: 480px; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 28px; box-shadow: var(--shadow-md); }
+    body { background: var(--brand-background); min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 30px 16px; }
+    .verify-card { width: 100%; max-width: 480px; background: #fff; border: 1px solid var(--brand-line); border-radius: 14px; padding: 28px; box-shadow: var(--shadow-md); }
     .verify-logo { width: 170px; display: block; margin: 0 auto 14px; }
     .verify-title { text-align: center; font-size: 23px; font-weight: 800; }
-    .verify-sub { text-align: center; color: var(--muted); font-size: 13px; margin: 6px 0 20px; line-height: 1.5; }
+    .verify-sub { text-align: center; color: var(--brand-muted); font-size: 13px; margin: 6px 0 20px; line-height: 1.5; }
     .code-input { font-family: 'Space Mono', monospace; font-size: 22px; letter-spacing: 8px; text-align: center; }
     .verify-msg { font-size: 12px; margin-top: 10px; min-height: 18px; }
-    .verify-msg.error { color: #B91C1C; }
-    .verify-msg.success { color: var(--green-dark); }
+    .verify-msg.error { color: #b91c1c; }
+    .verify-msg.success { color: var(--brand-primary-dark); }
   </style>
   <link rel="manifest" href="manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -40,7 +40,7 @@
 
     <div id="verifiedState" style="display:none">
       <div class="route-note" style="margin-bottom:16px">Your account is already verified.</div>
-      <a class="btn btn-green btn-block" href="client-dashboard.html">Go to my dashboard</a>
+      <a class="btn btn-brand btn-block" href="client-dashboard.html">Go to my dashboard</a>
     </div>
 
     <div id="verifyFormWrap">
@@ -51,14 +51,14 @@
           <option value="email">Email</option>
         </select>
       </div>
-      <button class="btn btn-green btn-block" type="button" id="sendOtpBtn">Send verification code</button>
+      <button class="btn btn-brand btn-block" type="button" id="sendOtpBtn">Send verification code</button>
       <div class="small muted" id="otpStatus" style="margin-top:8px"></div>
 
       <div style="margin-top:18px">
         <label class="field-label" for="otpCode">Enter the 6-digit code</label>
         <input class="field-input code-input" id="otpCode" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="000000">
       </div>
-      <button class="btn btn-green btn-block mt-16" type="button" id="verifyOtpBtn">Verify account</button>
+      <button class="btn btn-brand btn-block mt-16" type="button" id="verifyOtpBtn">Verify account</button>
       <div class="verify-msg" id="verifyMsg"></div>
       <div style="text-align:center;margin-top:14px">
         <a class="small muted" href="client-dashboard.html">Skip for now</a>

@@ -4,13 +4,21 @@ window.ELPIS_CONFIG = {
   companyName: "Elpis Property Limited",
   tagline: "Your future begins with the right property",
   whatsappNumber: "",
-  phone: "",
+  phone: "0805 070 0000",
   email: "hr@elpisproperty.org",
-  address: "",
+  address: "1st Building by the 1st Pedestrian Bridge along Government Secondary School 3 road, Nyanya, Abuja, FCT, Nigeria.",
   showDemoProperties: true,
   social: { facebook: "", instagram: "", twitter: "", linkedin: "" },
   branches: [
-    { name: "Head Office", city: "", state: "", type: "Corporate Headquarters", address: "", phone: "", isHeadOffice: true }
+    {
+      name: "Nyanya",
+      city: "Nyanya",
+      state: "Abuja, FCT",
+      type: "Head Office",
+      address: "1st Building by the 1st Pedestrian Bridge along Government Secondary School 3 road, Nyanya, Abuja, FCT, Nigeria.",
+      phone: "0805 070 0000",
+      isHeadOffice: true
+    }
   ]
 };
 

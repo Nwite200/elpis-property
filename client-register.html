@@ -19,7 +19,7 @@
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
-  <meta name="theme-color" content="#C6A45C" />
+  <meta name="theme-color" content="#071747" />
 </head>
 <body>
   <div class="dash">
@@ -34,7 +34,7 @@
     <main class="dash-main">
       <div class="dash-top"><h1>Register Client</h1></div>
       <div class="card" style="max-width:760px">
-        <form id="clientForm" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <form id="clientForm" class="form-grid">
           <div style="grid-column:1/-1"><label class="field-label">Full name <span class="req">*</span></label><input id="full_name" type="text" required></div>
           <div style="grid-column:1/-1"><label class="field-label">Phone number <span class="req">*</span></label><input id="phone_number" type="tel" required></div>
           <div style="grid-column:1/-1"><label class="field-label">Alternate phone number</label><input id="alternate_phone" type="tel"></div>
@@ -75,7 +75,7 @@
           <div style="grid-column:1/-1"><label class="field-label">Notes</label><textarea id="notes" rows="3"></textarea></div>
           <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
             <a class="btn btn-outline" href="clients.html">Cancel</a>
-            <button class="btn btn-green" type="submit">Register Client</button>
+            <button class="btn btn-brand" type="submit">Register Client</button>
           </div>
           <div id="formMsg" style="color:#c0392b;font-size:13px;margin-top:8px"></div>
         </form>

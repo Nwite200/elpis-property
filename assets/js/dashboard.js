@@ -123,7 +123,7 @@
       `<a class="btn btn-outline-white" href="performance.html">Performance analytics</a>`
     ];
     if (["Managing Director", "Branch Manager", "Team Lead", "Marketer"].includes(me.role)) {
-      actions.push(`<a class="btn btn-green" href="leads.html">Open lead pipeline</a>`);
+      actions.push(`<a class="btn btn-brand" href="leads.html">Open lead pipeline</a>`);
     }
     if (["Managing Director", "Branch Manager"].includes(me.role)) {
       actions.push(`<a class="btn btn-outline-white" href="staff-management.html">Staff & teams</a>`);
@@ -248,7 +248,7 @@
         <div class="bar-stack">
           <div class="bar contract" style="height:${contractH}%"></div>
           <div class="bar verified" style="height:${verifiedH}%"></div>
-          ${me.role === "Finance Officer" ? "" : `<div class="bar" style="height:${leadsH}%;background:#F0C34B"></div><div class="bar" style="height:${conversionsH}%;background:#414141"></div>`}
+          ${me.role === "Finance Officer" ? "" : `<div class="bar" style="height:${leadsH}%;background:#e8b52d"></div><div class="bar" style="height:${conversionsH}%;background:#26344f"></div>`}
         </div>
         <div class="bar-label">${S.escape(shortPeriod(t.period))}</div>
       </div>`;

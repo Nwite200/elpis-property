@@ -7,12 +7,12 @@
     const unread = notifications.filter(n => !n.is_read).length;
     el("unreadLabel").textContent = `${unread} unread`;
     el("staffNotificationList").innerHTML = notifications.length ? notifications.map(item => `
-      <div class="notif-item ${item.is_read ? "" : "unread"}" style="padding:14px 12px;border-bottom:1px solid var(--line)">
+      <div class="notif-item ${item.is_read ? "" : "unread"}" style="padding:14px 12px;border-bottom:1px solid var(--brand-line)">
         <div style="display:flex;justify-content:space-between;gap:12px">
           <div style="min-width:0">
-            <strong style="display:block;font-size:13px;color:var(--ink)">${S.escape(item.title)}</strong>
-            <p style="margin:4px 0 0;font-size:12px;line-height:1.55;color:var(--muted)">${S.escape(item.message)}</p>
-            <span style="font-size:11px;color:var(--muted)">${S.formatDateTime(item.created_at)}</span>
+            <strong style="display:block;font-size:13px;color:var(--brand-text)">${S.escape(item.title)}</strong>
+            <p style="margin:4px 0 0;font-size:12px;line-height:1.55;color:var(--brand-muted)">${S.escape(item.message)}</p>
+            <span style="font-size:11px;color:var(--brand-muted)">${S.formatDateTime(item.created_at)}</span>
           </div>
           ${item.is_read ? "" : `<button class="btn btn-outline btn-sm" type="button" data-read="${item.id}">Mark read</button>`}
         </div>

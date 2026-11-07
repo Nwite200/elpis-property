@@ -10,7 +10,7 @@
   function renderPermissions(role) {
     const selected = new Set(role ? role.permissions : []);
     el("permissionGrid").innerHTML = allPermissions.map(permission => `
-      <label style="display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;padding:10px;font-size:12px">
+      <label style="display:flex;align-items:center;gap:8px;border:1px solid var(--brand-line);border-radius:8px;padding:10px;font-size:12px">
         <input type="checkbox" value="${S.escape(permission)}" ${selected.has(permission) ? "checked" : ""}>
         <span>${S.escape(permission)}</span>
       </label>

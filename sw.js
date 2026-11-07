@@ -1,6 +1,6 @@
 /* Elpis Property Limited — PWA service worker.
    Static assets only. API and authenticated financial data are never cached. */
-const CACHE_VERSION = "elpis-pwa-v7";
+const CACHE_VERSION = "elpis-pwa-v8";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const CORE_ASSETS = [
   "/",

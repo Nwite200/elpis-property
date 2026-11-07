@@ -19,7 +19,7 @@
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
-  <meta name="theme-color" content="#C6A45C" />
+  <meta name="theme-color" content="#071747" />
 </head>
 <body data-page="dashboard">
   <div class="dash">
@@ -35,11 +35,11 @@
       <div class="card" id="referralCard" style="margin-bottom:16px;display:none">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
           <div style="flex:1;min-width:240px">
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700">Your client referral link</div>
-            <p style="font-size:12px;color:var(--muted);margin:5px 0 10px">Share this link with prospective clients. Anyone who signs up through it is attributed to you and your branch.</p>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--brand-muted);font-weight:700">Your client referral link</div>
+            <p style="font-size:12px;color:var(--brand-muted);margin:5px 0 10px">Share this link with prospective clients. Anyone who signs up through it is attributed to you and your branch.</p>
             <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
               <input class="field-input" id="referralLinkInput" readonly style="flex:1;min-width:240px;font-size:12px">
-              <button class="btn btn-green btn-sm" type="button" id="copyReferralBtn">Copy link</button>
+              <button class="btn btn-brand btn-sm" type="button" id="copyReferralBtn">Copy link</button>
               <button class="btn btn-outline btn-sm" type="button" id="copyReferralCodeBtn">Copy code</button>
               <a class="btn btn-outline btn-sm" id="shareReferralBtn" target="_blank" rel="noopener">Share on WhatsApp</a>
             </div>
@@ -50,27 +50,27 @@
 
       <div class="card" id="revenueTodayCard" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
         <div>
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700">Total paid today</div>
-          <div id="revenueTodayTotal" style="font-family:var(--font-display);font-size:30px;font-weight:800;color:var(--green-dark);margin-top:4px">₦0</div>
-          <div id="revenueTodayMeta" style="font-size:11px;color:var(--muted)">Verified payments in your scope</div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--brand-muted);font-weight:700">Total paid today</div>
+          <div id="revenueTodayTotal" style="font-family:var(--font-display);font-size:30px;font-weight:800;color:var(--brand-primary-dark);margin-top:4px">₦0</div>
+          <div id="revenueTodayMeta" style="font-size:11px;color:var(--brand-muted)">Verified payments in your scope</div>
         </div>
-        <a class="btn btn-green" href="revenue.html">Open revenue drill-down →</a>
+        <a class="btn btn-brand" href="revenue.html">Open revenue drill-down →</a>
       </div>
 
       <div class="card" id="smsBalanceCard" style="margin-bottom:16px;display:none;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
         <div>
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700">SMS provider credit</div>
-          <div id="smsBalanceTotal" style="font-family:var(--font-display);font-size:30px;font-weight:800;color:var(--green-dark);margin-top:4px">—</div>
-          <div id="smsBalanceMeta" style="font-size:11px;color:var(--muted)">Provider balance and low-credit threshold</div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--brand-muted);font-weight:700">SMS provider credit</div>
+          <div id="smsBalanceTotal" style="font-family:var(--font-display);font-size:30px;font-weight:800;color:var(--brand-primary-dark);margin-top:4px">—</div>
+          <div id="smsBalanceMeta" style="font-size:11px;color:var(--brand-muted)">Provider balance and low-credit threshold</div>
         </div>
         <a class="btn btn-outline" href="sms-center.html">Open SMS centre →</a>
       </div>
 
       <div class="card" id="defaultingCard" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
         <div>
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700">Defaulting clients</div>
-          <div id="defaultingTotal" style="font-family:var(--font-display);font-size:30px;font-weight:800;color:#B45309;margin-top:4px">0</div>
-          <div id="defaultingMeta" style="font-size:11px;color:var(--muted)">Clients behind their own payment plan</div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--brand-muted);font-weight:700">Defaulting clients</div>
+          <div id="defaultingTotal" style="font-family:var(--font-display);font-size:30px;font-weight:800;color:#9a6b00;margin-top:4px">0</div>
+          <div id="defaultingMeta" style="font-size:11px;color:var(--brand-muted)">Clients behind their own payment plan</div>
         </div>
         <a class="btn btn-outline" href="defaulting.html">Open defaulting clients →</a>
       </div>
@@ -97,7 +97,7 @@
           <label class="field-label" for="branchFilter">Branch</label>
           <select class="field-input" id="branchFilter"><option value="">All branches</option></select>
         </div>
-        <button class="btn btn-green btn-sm" id="applyFilters" type="button">Apply filters</button>
+        <button class="btn btn-brand btn-sm" id="applyFilters" type="button">Apply filters</button>
         <button class="btn btn-ghost btn-sm" id="resetFilters" type="button">Reset</button>
       </div>
 

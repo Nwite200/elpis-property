@@ -106,7 +106,7 @@
             <form id="careClearanceForm" class="form-grid">
               <div class="field-group"><label class="field-label">Care status</label><select class="field-input" id="careClearanceStatus"><option value="cleared" ${client.care_status === "cleared" ? "selected" : ""}>Cleared</option><option value="pending_clearance" ${client.care_status !== "cleared" ? "selected" : ""}>Pending clearance</option></select></div>
               <div class="field-group full"><label class="field-label">Clearance note</label><textarea class="field-input" id="careClearanceNote" rows="2">${S.escape(client.clearance_note || "")}</textarea></div>
-              <div class="field-group full"><button class="btn btn-green btn-sm" type="submit">Save clearance</button></div>
+              <div class="field-group full"><button class="btn btn-brand btn-sm" type="submit">Save clearance</button></div>
             </form>
           </div>
         </div>
@@ -118,7 +118,7 @@
               <div class="field-group"><label class="field-label">Next follow-up</label><input class="field-input" type="date" id="careCallDate"></div>
               <div class="field-group full"><label class="field-label">What was discussed</label><textarea class="field-input" id="careCallNote" rows="3" required></textarea></div>
               <div class="field-group full"><label class="field-label">Outcome</label><input class="field-input" id="careCallOutcome" placeholder="e.g. Client confirmed details"></div>
-              <div class="field-group full"><button class="btn btn-green btn-sm" type="submit">Save call note</button></div>
+              <div class="field-group full"><button class="btn btn-brand btn-sm" type="submit">Save call note</button></div>
             </form>
           </div>
         </div>

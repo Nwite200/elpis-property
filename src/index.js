@@ -7869,6 +7869,68 @@ async function handleFetch(request, env) {
       });
     }
 
+    // 4b. Existing client requests an additional property.
+    if (path === "/api/client/property-requests" && request.method === "POST") {
+      if (!csrfOk(request)) return json({ error: "CSRF check failed" }, 403);
+      const actor = await getSessionUser(env, request);
+      if (!actor || actor.role_name !== "Client") return json({ error: "Forbidden" }, 403);
+      const client = await getClientForActor(env, actor);
+      if (!client) return json({ error: "Client record not found" }, 404);
+
+      const body = await request.json().catch(() => ({}));
+      const propertyId = Number(body.property_id);
+      const notes = String(body.notes || "").trim().slice(0, 500);
+      if (!propertyId) return json({ error: "Choose a property to add." }, 400);
+
+      const property = await env.DB.prepare(
+        "SELECT id, reference, title, sale_price, branch_id FROM properties WHERE id=? AND is_published=1"
+      ).bind(propertyId).first();
+      if (!property) return json({ error: "Property not available." }, 404);
+
+      const existing = await env.DB.prepare(
+        "SELECT id FROM client_properties WHERE client_id=? AND property_id=?"
+      ).bind(client.id, propertyId).first();
+      if (existing) return json({ error: "This property is already part of your portfolio." }, 409);
+
+      const openRequest = await env.DB.prepare(`
+        SELECT id FROM leads
+        WHERE converted_client_id=? AND property_id=? AND source LIKE 'Existing client%'
+          AND status NOT IN ('Converted','Lost')
+        LIMIT 1
+      `).bind(client.id, propertyId).first();
+      if (openRequest) return json({ error: "Your advisor is already reviewing a request for this property." }, 409);
+
+      const requestRef = `LEAD-ADD-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+      const branchId = client.assigned_branch_id || property.branch_id || null;
+      const message = [
+        `Existing client ${client.client_reference} requested an additional property.`,
+        notes ? `Client note: ${notes}` : ""
+      ].filter(Boolean).join(" ");
+
+      await env.DB.prepare(`
+        INSERT INTO leads (lead_reference, full_name, phone_number, email_address, source, status,
+          property_id, assigned_marketer_id, team_lead_id, branch_id, estimated_value_kobo, notes,
+          next_follow_up_date, lead_temperature, temperature_updated_at, converted_client_id,
+          created_by, is_demo)
+        VALUES (?, ?, ?, ?, 'Existing client — additional property', 'Interested', ?, ?, ?, ?, ?, ?,
+          date('now','+1 day'), 'Hot', datetime('now'), ?, ?, 0)
+      `).bind(
+        requestRef, client.full_name, client.phone_number || "", client.email_address || "",
+        propertyId, client.original_marketer_id || null, client.team_lead_id || null, branchId,
+        Number(property.sale_price || 0) * 100, message, client.id, actor.id
+      ).run();
+
+      await audit(env, actor.id, "client.additional_property.request", "client", String(client.id), {
+        property_id: propertyId, property_reference: property.reference, lead_reference: requestRef
+      }, branchId);
+
+      return json({
+        ok: true,
+        request_reference: requestRef,
+        message: "Your request has been sent to your advisor."
+      });
+    }
+
     // 5. Client Payment History
     if (path === "/api/client/payments" && request.method === "GET") {
       const actor = await getSessionUser(env, request);

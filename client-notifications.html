@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#C6A45C" />
+  <meta name="theme-color" content="#071747" />
   <title>Notifications | Elpis Property Limited</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,11 +14,11 @@
       display: grid;
       grid-template-columns: 260px 1fr;
       min-height: 100vh;
-      background-color: var(--soft);
+      background-color: var(--brand-background);
     }
     .portal-sidebar {
-      background-color: #17231A;
-      color: #D3DED5;
+      background-color: #071747;
+      color: #e9ecf4;
       padding: 28px 20px;
       display: flex;
       flex-direction: column;
@@ -27,7 +27,7 @@
     .portal-sidebar .brand-logo {
       width: 165px;
       height: auto;
-      background-color: #FFFFFF;
+      background-color: #ffffff;
       padding: 6px 10px;
       border-radius: var(--radius-sm);
       margin-bottom: 24px;
@@ -37,7 +37,7 @@
       font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 1.5px;
-      color: #7E9383;
+      color: #6b7690;
       margin: 16px 8px 6px;
       font-weight: 700;
     }
@@ -47,20 +47,20 @@
       gap: 12px;
       padding: 10px 14px;
       border-radius: var(--radius-sm);
-      color: #A3B5A7;
+      color: #aeb6c8;
       font-size: 13px;
       font-weight: 600;
       transition: var(--transition);
     }
     .portal-sidebar a:hover,
     .portal-sidebar a.active {
-      background-color: rgba(0, 181, 34, 0.15);
-      color: #7FE58D;
+      background-color: rgba(232,181,45, 0.15);
+      color: #e8b52d;
     }
     .portal-sidebar .nav-count {
       margin-left: auto;
-      background: #C6A45C;
-      color: #06260C;
+      background: #e8b52d;
+      color: #04102f;
       font-size: 10px;
       font-weight: 800;
       border-radius: 999px;
@@ -80,15 +80,15 @@
       gap: 12px; flex-wrap: wrap; margin-bottom: 18px;
     }
     .notif-summary {
-      font-size: 13px; color: var(--muted);
+      font-size: 13px; color: var(--brand-muted);
     }
-    .notif-summary strong { color: var(--charcoal); }
+    .notif-summary strong { color: var(--brand-text); }
 
     .notif-list { display: flex; flex-direction: column; gap: 10px; }
     .notif-card {
-      background: #FFFFFF;
-      border: 1px solid var(--line);
-      border-left: 4px solid var(--line);
+      background: #ffffff;
+      border: 1px solid var(--brand-line);
+      border-left: 4px solid var(--brand-line);
       border-radius: var(--radius-sm);
       padding: 16px 18px;
       display: flex;
@@ -97,8 +97,8 @@
       transition: var(--transition);
     }
     .notif-card.unread {
-      border-left-color: #C6A45C;
-      background: #FBFEFC;
+      border-left-color: #e8b52d;
+      background: #f7f6f2;
       box-shadow: var(--shadow-sm);
     }
     .notif-icon {
@@ -106,32 +106,32 @@
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       font-size: 17px;
-      background: #EAF7EC;
+      background: #f7f6f2;
     }
     .notif-body { flex: 1; min-width: 0; }
     .notif-body h3 {
-      font-size: 14px; font-weight: 800; color: var(--charcoal);
+      font-size: 14px; font-weight: 800; color: var(--brand-text);
       margin: 0 0 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
     }
     .notif-body p {
-      font-size: 13px; color: #4B5563; line-height: 1.55; margin: 0 0 6px;
+      font-size: 13px; color: #26344f; line-height: 1.55; margin: 0 0 6px;
     }
     .notif-meta {
-      font-size: 11px; color: var(--muted);
+      font-size: 11px; color: var(--brand-muted);
       font-family: 'Space Mono', monospace;
       display: flex; gap: 12px; flex-wrap: wrap;
     }
     .notif-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
     .notif-dot {
       display: inline-block; width: 7px; height: 7px; border-radius: 50%;
-      background: #C6A45C;
+      background: #e8b52d;
     }
     .notif-empty {
-      background: #FFFFFF; border: 1px dashed var(--line);
+      background: #ffffff; border: 1px dashed var(--brand-line);
       border-radius: var(--radius-md); padding: 60px 20px; text-align: center;
     }
     .notif-empty h3 { font-size: 16px; font-weight: 800; margin-bottom: 6px; }
-    .notif-empty p { font-size: 13px; color: var(--muted); margin: 0; }
+    .notif-empty p { font-size: 13px; color: var(--brand-muted); margin: 0; }
   </style>
   <link rel="stylesheet" href="assets/css/motion.css">
   <script src="assets/js/intro-config.js"></script>
@@ -161,17 +161,17 @@
       <a href="client-profile.html">👤 Profile & Security</a>
       <span class="nav-section-title" style="margin-top:auto">Actions</span>
       <a href="index.html">🌐 Public Website</a>
-      <a href="#" id="logoutBtn" style="color:#E74C3C">🚪 Sign Out</a>
+      <a href="#" id="logoutBtn" style="color:#e74c3c">🚪 Sign Out</a>
     </aside>
 
     <main class="portal-main">
       <h1 style="font-size:26px;font-weight:800;margin-bottom:6px">Notifications</h1>
-      <p style="font-size:14px;color:var(--muted);margin-bottom:22px">Payment confirmations, installment reminders and account updates for your Elpis Property purchase.</p>
+      <p style="font-size:14px;color:var(--brand-muted);margin-bottom:22px">Payment confirmations, installment reminders and account updates for your Elpis Property purchase.</p>
 
       <div class="notif-toolbar">
         <div class="notif-summary" id="notifSummary">Loading notifications…</div>
         <div style="display:flex;gap:8px">
-          <select id="notifFilter" style="height:36px;padding:0 10px;border:1px solid var(--line);border-radius:4px;font-size:12px;background:#fff">
+          <select id="notifFilter" style="height:36px;padding:0 10px;border:1px solid var(--brand-line);border-radius:4px;font-size:12px;background:#fff">
             <option value="all">All notifications</option>
             <option value="unread">Unread only</option>
           </select>
@@ -179,7 +179,7 @@
         </div>
       </div>
 
-      <div id="notifLoading" style="text-align:center;padding:40px;color:var(--muted)">Loading your notifications…</div>
+      <div id="notifLoading" style="text-align:center;padding:40px;color:var(--brand-muted)">Loading your notifications…</div>
 
       <div id="notifEmpty" class="notif-empty" style="display:none">
         <h3>No notifications yet</h3>

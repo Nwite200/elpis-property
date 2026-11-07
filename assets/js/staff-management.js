@@ -71,7 +71,7 @@
           <td>${S.escape(row.access_valid_until || "-")}</td>
           <td>${row.access_lapsed_at ? S.formatDateTime(row.access_lapsed_at) : "-"}</td>
           <td>${S.staffBadge(row.is_active)}</td>
-          <td><button class="btn btn-green btn-xs" type="button" data-reactivate="${row.id}">Reactivate</button></td>
+          <td><button class="btn btn-brand btn-xs" type="button" data-reactivate="${row.id}">Reactivate</button></td>
         </tr>`).join("") : '<tr><td colspan="6"><div class="empty-state">No marketers waiting for reactivation.</div></td></tr>';
       el("reactivationBody").querySelectorAll("[data-reactivate]").forEach(button => {
         button.addEventListener("click", async () => {
@@ -138,7 +138,7 @@
         <td class="toolbar">
           <button class="btn btn-ghost btn-xs" type="button" data-action="edit-staff" data-id="${row.id}">Edit</button>
           <button class="btn btn-ghost btn-xs" type="button" data-action="staff-activity" data-id="${row.id}">Activity</button>
-          <button class="btn ${row.is_active ? "btn-danger" : "btn-green"} btn-xs" type="button" data-action="toggle-staff" data-id="${row.id}" data-active="${row.is_active ? "1" : "0"}">${row.is_active ? "Deactivate" : "Activate"}</button>
+          <button class="btn ${row.is_active ? "btn-danger" : "btn-brand"} btn-xs" type="button" data-action="toggle-staff" data-id="${row.id}" data-active="${row.is_active ? "1" : "0"}">${row.is_active ? "Deactivate" : "Activate"}</button>
         </td>
       </tr>`;
     }).join("") : '<tr><td colspan="7"><div class="empty-state">No staff records.</div></td></tr>';
@@ -154,7 +154,7 @@
         <td>${S.escape(team.branch_name || branchName(team.branch_id))}</td>
         <td>${S.escape(team.team_lead_name || "-")}</td>
         <td>${team.member_count || 0}</td>
-        <td>${team.is_active ? '<span class="badge badge-green">Active</span>' : '<span class="badge badge-gray">Inactive</span>'}</td>
+        <td>${team.is_active ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-gray">Inactive</span>'}</td>
         <td><button class="btn btn-ghost btn-xs" type="button" data-action="edit-team" data-id="${team.id}">Edit</button></td>
       </tr>`).join("") : '<tr><td colspan="6"><div class="empty-state">No teams yet.</div></td></tr>';
     el("teamBody").querySelectorAll("[data-action='edit-team']").forEach(button => {

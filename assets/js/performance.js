@@ -136,8 +136,8 @@
         <div class="bar-stack">
           <div class="bar contract" style="height:${contractH}%"></div>
           <div class="bar verified" style="height:${verifiedH}%"></div>
-          <div class="bar" style="height:${leadsH}%;background:#F0C34B"></div>
-          <div class="bar" style="height:${conversionsH}%;background:#414141"></div>
+          <div class="bar" style="height:${leadsH}%;background:#e8b52d"></div>
+          <div class="bar" style="height:${conversionsH}%;background:#26344f"></div>
         </div>
         <div class="bar-label">${S.escape(shortPeriod(t.period))}</div>
       </div>`;

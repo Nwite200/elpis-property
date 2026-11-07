@@ -546,6 +546,29 @@ await test('demo receipts are excluded from the client portal and marked DEMO fo
   assert(text.includes('NOT A VALID FINANCIAL DOCUMENT'), 'PDF carries the demo disclaimer');
 });
 
+console.log('\n--- 6b. Existing client adds another property ---');
+await test('an existing client can request an additional property and duplicate requests are blocked', async () => {
+  const r = db.prepare(`INSERT INTO properties (reference, title, sale_price, state, city, status, is_published, branch_id, created_by)
+    VALUES ('ELP-TEST-ADD-001', 'Additional Test Property', 15000000, 'Lagos', 'Ikeja', 'Available', 1, 1, ?)`).run(finId);
+  const extraPropertyId = Number(r.lastInsertRowid);
+  const res = await request('/api/client/property-requests', {
+    method: 'POST', headers: { Cookie: adaCookie },
+    body: { property_id: extraPropertyId, notes: 'I would like a second property.' }
+  });
+  assert(res.status === 200, `additional property request expected 200, got ${res.status}`);
+  assert(res.data.request_reference && res.data.request_reference.startsWith('LEAD-ADD-'), 'request reference not returned');
+  const lead = db.prepare('SELECT * FROM leads WHERE lead_reference=?').get(res.data.request_reference);
+  assert(lead && Number(lead.converted_client_id) === adaId && Number(lead.property_id) === extraPropertyId, 'additional property lead not recorded');
+  assert(lead.source.includes('additional property'), 'lead source does not identify the request');
+  const duplicate = await request('/api/client/property-requests', {
+    method: 'POST', headers: { Cookie: adaCookie },
+    body: { property_id: extraPropertyId }
+  });
+  assert(duplicate.status === 409, `duplicate request expected 409, got ${duplicate.status}`);
+  db.prepare('DELETE FROM leads WHERE lead_reference=?').run(res.data.request_reference);
+  db.prepare('DELETE FROM properties WHERE id=?').run(extraPropertyId);
+});
+
 console.log('\n--- 7. ALAT by Wema Bank integration placeholder ---');
 await test('virtual account is never fabricated and shows the exact pending message', async () => {
   const res = await request('/api/client/virtual-account', { headers: { Cookie: adaCookie } });

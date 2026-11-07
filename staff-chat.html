@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#C6A45C" />
+  <meta name="theme-color" content="#071747" />
   <title>Staff Chat | Elpis Property Limited</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,22 +22,22 @@
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
   <style>
     .chat-shell { display:grid; grid-template-columns:280px 1fr; gap:16px; min-height:560px; }
-    .chat-rooms { background:#fff; border:1px solid var(--line); border-radius:12px; overflow:hidden; }
-    .chat-room-tools { padding:12px; border-bottom:1px solid var(--line); display:grid; gap:8px; }
+    .chat-rooms { background:#fff; border:1px solid var(--brand-line); border-radius:12px; overflow:hidden; }
+    .chat-room-tools { padding:12px; border-bottom:1px solid var(--brand-line); display:grid; gap:8px; }
     .chat-room-list { max-height:520px; overflow:auto; }
-    .chat-room-item { display:block; padding:12px; border-bottom:1px solid var(--line); color:var(--charcoal); cursor:pointer; }
-    .chat-room-item:hover, .chat-room-item.active { background:var(--soft); }
+    .chat-room-item { display:block; padding:12px; border-bottom:1px solid var(--brand-line); color:var(--brand-text); cursor:pointer; }
+    .chat-room-item:hover, .chat-room-item.active { background:var(--brand-background); }
     .chat-room-item strong { display:block; font-size:12px; }
-    .chat-room-item span { display:block; font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .chat-panel { background:#fff; border:1px solid var(--line); border-radius:12px; display:flex; flex-direction:column; min-height:560px; }
-    .chat-head { padding:14px 16px; border-bottom:1px solid var(--line); font-weight:700; }
-    .chat-messages { flex:1; padding:16px; overflow:auto; background:#fbfdfb; }
+    .chat-room-item span { display:block; font-size:11px; color:var(--brand-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .chat-panel { background:#fff; border:1px solid var(--brand-line); border-radius:12px; display:flex; flex-direction:column; min-height:560px; }
+    .chat-head { padding:14px 16px; border-bottom:1px solid var(--brand-line); font-weight:700; }
+    .chat-messages { flex:1; padding:16px; overflow:auto; background:#f7f6f2; }
     .chat-message { margin-bottom:12px; max-width:78%; }
     .chat-message.mine { margin-left:auto; text-align:right; }
-    .chat-message-bubble { display:inline-block; padding:9px 12px; border-radius:12px; background:#fff; border:1px solid var(--line); font-size:13px; line-height:1.45; text-align:left; }
-    .chat-message.mine .chat-message-bubble { background:#E8F9EB; border-color:#C9EED0; }
-    .chat-message-meta { font-size:10px; color:var(--muted); margin-bottom:3px; }
-    .chat-compose { display:flex; gap:8px; padding:12px; border-top:1px solid var(--line); }
+    .chat-message-bubble { display:inline-block; padding:9px 12px; border-radius:12px; background:#fff; border:1px solid var(--brand-line); font-size:13px; line-height:1.45; text-align:left; }
+    .chat-message.mine .chat-message-bubble { background:#f7f6f2; border-color:#d5dae8; }
+    .chat-message-meta { font-size:10px; color:var(--brand-muted); margin-bottom:3px; }
+    .chat-compose { display:flex; gap:8px; padding:12px; border-top:1px solid var(--brand-line); }
     .chat-compose input { flex:1; }
     @media(max-width:800px){ .chat-shell { grid-template-columns:1fr; } .chat-room-list { max-height:220px; } .chat-panel { min-height:420px; } }
   </style>
@@ -49,7 +49,7 @@
       <div class="dash-top">
         <div>
           <h1>Staff Chat</h1>
-          <p style="color:var(--muted);font-size:13px">Internal staff communication. Messages are persisted and delivered through Cloudflare Durable Objects.</p>
+          <p style="color:var(--brand-muted);font-size:13px">Internal staff communication. Messages are persisted and delivered through Cloudflare Durable Objects.</p>
         </div>
         <span class="badge badge-gray" id="chatStatus">Offline</span>
       </div>
@@ -57,7 +57,7 @@
         <div class="chat-rooms">
           <div class="chat-room-tools">
             <select id="chatStaffSelect" class="field-input"><option value="">Select staff for direct chat</option></select>
-            <button class="btn btn-green btn-sm" type="button" id="startChatBtn">Start direct chat</button>
+            <button class="btn btn-brand btn-sm" type="button" id="startChatBtn">Start direct chat</button>
           </div>
           <div class="chat-room-list" id="chatRoomList"><div class="empty-state">Loading rooms…</div></div>
         </div>
@@ -66,7 +66,7 @@
           <div class="chat-messages" id="chatMessages"><div class="empty-state">Choose a branch or direct conversation.</div></div>
           <form class="chat-compose" id="chatForm">
             <input id="chatInput" class="field-input" placeholder="Write a message…" maxlength="2000" autocomplete="off" disabled>
-            <button class="btn btn-green" type="submit" id="chatSendBtn" disabled>Send</button>
+            <button class="btn btn-brand" type="submit" id="chatSendBtn" disabled>Send</button>
           </form>
         </div>
       </div>

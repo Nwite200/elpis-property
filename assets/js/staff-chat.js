@@ -44,7 +44,7 @@
     socket = new WebSocket(`${protocol}//${window.location.host}/api/chat/rooms/${room.id}/socket`);
     socket.addEventListener("open", () => {
       if (generation !== socketGeneration) return;
-      setStatus("Connected", "badge-green");
+      setStatus("Connected", "badge-success");
       el("chatInput").disabled = false;
       el("chatSendBtn").disabled = false;
     });

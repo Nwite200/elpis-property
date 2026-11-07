@@ -856,6 +856,21 @@ await test('Phase 6 pages declare responsive viewport, shared shell and mobile C
   assert(!shell.includes('localStorage'), 'staff shell must not store session data in localStorage');
 });
 
+await test('brand system uses the official navy, gold and ivory tokens without green', async () => {
+  const css = readFileSync('assets/css/styles.css', 'utf8');
+  assert(css.includes('--brand-primary: #071747'), 'royal navy token missing');
+  assert(css.includes('--brand-secondary: #E8B52D'), 'Elpis gold token missing');
+  assert(css.includes('--brand-background: #F7F6F2'), 'warm ivory token missing');
+  assert(css.includes('--brand-text: #26344F'), 'slate navy text token missing');
+  assert(!css.includes('--green'), 'legacy green variables must be removed');
+  assert(!css.includes('--forest'), 'legacy forest variables must be removed');
+  assert(!/#142c27|#c6a45c|#0b1f1b/i.test(css), 'legacy green/gold palette values remain');
+  const motion = readFileSync('assets/css/motion.css', 'utf8');
+  assert(!/#142c27|#c6a45c|#0b1f1b/i.test(motion), 'legacy palette values remain in the intro');
+  const intro = readFileSync('assets/js/intro-config.js', 'utf8');
+  assert(intro.includes('#e8b52d') && intro.includes('#071747'), 'intro must use the official palette');
+});
+
 console.log('\n========================================================');
 console.log(`   RESULT: ${passed} PASSED | ${failed} FAILED`);
 if (failures.length) {

@@ -8,12 +8,12 @@ window.ELPIS_INTRO_CONFIG = {
   TAGLINE: "Spaces. Assets. Possibilities.",
 
   COLORS: {
-    accent: "#C5A16B",
-    accentBright: "#E9D8B9",
-    charcoal: "#142C27",
-    dark: "#0D211D",
-    soft: "#F5F2EC",
-    white: "#FFFFFF"
+    accent: "#e8b52d",
+    accentBright: "#f4d06a",
+    charcoal: "#071747",
+    dark: "#071747",
+    soft: "#f7f6f2",
+    white: "#ffffff"
   },
 
   FULL: {

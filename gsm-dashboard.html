@@ -29,7 +29,7 @@
           <div class="field-group"><label class="field-label" for="targetAmount">Amount (₦)</label><input class="field-input" type="number" min="1" step="1" id="targetAmount"></div>
           <div class="field-group full"><label class="field-label" for="targetNotes">Notes</label><input class="field-input" id="targetNotes"></div>
         </div>
-        <div style="display:flex;gap:8px;margin-top:12px"><button class="btn btn-green" id="saveTargetBtn">Save target</button><span class="small" id="targetMsg"></span></div>
+        <div style="display:flex;gap:8px;margin-top:12px"><button class="btn btn-brand" id="saveTargetBtn">Save target</button><span class="small" id="targetMsg"></span></div>
       </div>
 
       <div class="card" style="margin-top:16px">
@@ -84,7 +84,11 @@
           await load();
         } catch (error) { msg.textContent = error.message; }
       });
-      await load();
+      try {
+        await load();
+      } catch (error) {
+        ElpisStaff.toast(error.message || 'GSM targets are not enabled yet.', true);
+      }
     })();
   </script>
 </body>

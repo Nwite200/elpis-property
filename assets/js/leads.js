@@ -377,7 +377,7 @@
             <h3>Update status</h3>
             <div class="toolbar">
               <select class="field-input" id="detailStatus" ${lead.converted_client_id ? "disabled" : ""}>${statusOptions}</select>
-              <button class="btn btn-green btn-sm" type="button" id="updateStatusBtn" ${lead.converted_client_id ? "disabled" : ""}>Update</button>
+              <button class="btn btn-brand btn-sm" type="button" id="updateStatusBtn" ${lead.converted_client_id ? "disabled" : ""}>Update</button>
               ${!lead.converted_client_id ? '<button class="btn btn-ghost btn-sm" type="button" id="detailInspectBtn">Schedule inspection</button>' : ""}
             </div>
             ${!lead.converted_client_id ? `
@@ -396,7 +396,7 @@
               <div class="mt-16">
                 <h3>Convert lead</h3>
                 ${canSetPrice ? '<div class="field-group"><label class="field-label" for="convertPrice">Agreed contract price (₦)</label><input class="field-input" type="number" min="0" step="0.01" id="convertPrice" placeholder="Optional"></div>' : '<div class="route-note">Conversion creates a client under your branch. Contract price can only be set by a Branch Manager or Managing Director.</div>'}
-                <button class="btn btn-green btn-sm mt-16" type="button" id="convertLeadBtn">Convert to client</button>
+                <button class="btn btn-brand btn-sm mt-16" type="button" id="convertLeadBtn">Convert to client</button>
               </div>` : ""}
           </div>
         </div>
@@ -411,7 +411,7 @@
           <div class="field-group"><label class="field-label" for="followUpChannel">Channel</label><select class="field-input" id="followUpChannel"><option>Phone</option><option>WhatsApp</option><option>Email</option><option>In person</option><option>Other</option></select></div>
           <div class="field-group"><label class="field-label" for="followUpOutcome">Outcome</label><input class="field-input" id="followUpOutcome" placeholder="e.g. Interested, call back"></div>
           <div class="field-group"><label class="field-label" for="followUpDate">Next follow-up date</label><input class="field-input" type="date" id="followUpDate"></div>
-          <div class="field-group" style="display:flex;align-items:flex-end;gap:8px"><button class="btn btn-green btn-sm" type="submit" id="followUpSubmit">Save follow-up</button><button class="btn btn-ghost btn-sm" type="button" id="cancelFollowUpEdit" style="display:none">Cancel edit</button></div>
+          <div class="field-group" style="display:flex;align-items:flex-end;gap:8px"><button class="btn btn-brand btn-sm" type="submit" id="followUpSubmit">Save follow-up</button><button class="btn btn-ghost btn-sm" type="button" id="cancelFollowUpEdit" style="display:none">Cancel edit</button></div>
         </form>
         <div class="activity-feed mt-16" id="followUpList">${followUps.length ? followUps.map(item => `
           <div class="activity-item">

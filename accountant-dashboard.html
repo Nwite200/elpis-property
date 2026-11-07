@@ -22,7 +22,7 @@
           <div class="field-group"><label class="field-label" for="from">From</label><input class="field-input" type="date" id="from"></div>
           <div class="field-group"><label class="field-label" for="to">To</label><input class="field-input" type="date" id="to"></div>
           <div class="field-group"><label class="field-label" for="branch">Branch</label><select class="field-input" id="branch"><option value="">All branches</option></select></div>
-          <div class="field-group" style="display:flex;align-items:flex-end;gap:8px"><button class="btn btn-green" id="loadBtn">Load</button><button class="btn btn-outline" id="exportBtn">Export CSV</button><button class="btn btn-ghost" id="printBtn">Print branch statement</button></div>
+          <div class="field-group" style="display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap"><button class="btn btn-brand" id="loadBtn">Load</button><button class="btn btn-outline" id="exportBtn">Export CSV</button><button class="btn btn-ghost" id="printBtn">Print branch statement</button></div>
         </div>
       </div>
 
@@ -98,8 +98,12 @@
         win.document.close();
         win.print();
       });
-      await loadBranches();
-      await load();
+      try {
+        await loadBranches();
+        await load();
+      } catch (error) {
+        ElpisStaff.toast(error.message || 'Accountant dashboard is not enabled yet.', true);
+      }
     })();
   </script>
 </body>

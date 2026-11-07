@@ -62,7 +62,7 @@
         <td>${row.client_name ? `<strong>${S.escape(row.client_name)}</strong><div class="small muted">${S.escape(row.client_reference || "")}</div>` : '<span class="small muted">Test / no client</span>'}</td>
         <td>${S.escape(row.phone_e164)}</td>
         <td>${S.escape(row.template_key || "-")}</td>
-        <td style="max-width:320px;font-size:12px">${S.escape(row.body)}${row.error ? `<div style="color:#B91C1C">${S.escape(row.error)}</div>` : ""}</td>
+        <td style="max-width:320px;font-size:12px">${S.escape(row.body)}${row.error ? `<div style="color:#b91c1c">${S.escape(row.error)}</div>` : ""}</td>
         <td>${S.badge(row.status, statusTone(row.status))}</td>
         <td>${S.escape(row.provider || "-")}<div class="small muted">${S.escape(row.provider_message_id || "")}</div></td>
         <td>${row.provider_cost_kobo ? S.money(row.provider_cost_kobo) : "-"}</td>

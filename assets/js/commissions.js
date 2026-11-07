@@ -72,10 +72,10 @@
           <td>${plan.rule_count || (plan.rules || []).filter(r => r.is_active).length}</td>
           <td>${plan.effective_from ? S.formatDate(plan.effective_from) : 'Any'} – ${plan.effective_to ? S.formatDate(plan.effective_to) : 'Open'}</td>
           <td>${plan.approval_required ? 'Required' : 'Not required'}</td>
-          <td>${plan.is_active ? '<span class="badge badge-green">Active</span>' : '<span class="badge badge-gray">Inactive</span>'}</td>
+          <td>${plan.is_active ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-gray">Inactive</span>'}</td>
           <td class="toolbar">
             <button class="btn btn-ghost btn-xs" type="button" data-edit-plan="${plan.id}">Edit</button>
-            <button class="btn ${plan.is_active ? 'btn-danger' : 'btn-green'} btn-xs" type="button" data-plan-status="${plan.id}" data-active="${plan.is_active ? '1' : '0'}">${plan.is_active ? 'Deactivate' : 'Activate'}</button>
+            <button class="btn ${plan.is_active ? 'btn-danger' : 'btn-brand'} btn-xs" type="button" data-plan-status="${plan.id}" data-active="${plan.is_active ? '1' : '0'}">${plan.is_active ? 'Deactivate' : 'Activate'}</button>
           </td>
         </tr>`).join('') : '<tr><td colspan="9"><div class="empty-state">No commission plans configured.</div></td></tr>';
       el('planBody').querySelectorAll('[data-edit-plan]').forEach(btn => btn.addEventListener('click', () => openPlanModal(Number(btn.getAttribute('data-edit-plan')))));
@@ -309,12 +309,12 @@
     }
     const canAct = canManage();
     const actionButtons = [];
-    if (canAct && ["Draft", "Calculated"].includes(entry.status)) actionButtons.push(`<button class="btn btn-green btn-sm" data-action="submit">Submit for approval</button>`);
+    if (canAct && ["Draft", "Calculated"].includes(entry.status)) actionButtons.push(`<button class="btn btn-brand btn-sm" data-action="submit">Submit for approval</button>`);
     if (canAct && entry.status === 'Pending Approval') {
-      actionButtons.push(`<button class="btn btn-green btn-sm" data-action="approve">Approve</button>`);
+      actionButtons.push(`<button class="btn btn-brand btn-sm" data-action="approve">Approve</button>`);
       actionButtons.push(`<button class="btn btn-danger btn-sm" data-action="reject">Reject</button>`);
     }
-    if (canAct && ["Approved", "Partially Paid"].includes(entry.status)) actionButtons.push(`<button class="btn btn-green btn-sm" data-action="pay">Record payment</button>`);
+    if (canAct && ["Approved", "Partially Paid"].includes(entry.status)) actionButtons.push(`<button class="btn btn-brand btn-sm" data-action="pay">Record payment</button>`);
     if (canAct && !["Rejected", "Cancelled"].includes(entry.status)) actionButtons.push(`<button class="btn btn-ghost btn-sm" data-action="adjust">Adjust</button>`);
     const payments = (data.payments || []).map(p => `<div class="mini-item"><div class="mini-main"><strong>${S.escape(p.payment_ref)} · ${money(p.amount_kobo)}</strong><span>${S.escape(p.method)} · ${S.formatDateTime(p.paid_at)} · ${S.escape(p.paid_by_name || '')}</span></div><a class="btn btn-ghost btn-xs" href="/api/commissions/payments/${p.id}/receipt" target="_blank" rel="noopener">Receipt</a></div>`).join('');
     const approvals = (data.approvals || []).map(a => `<div class="mini-item"><div class="mini-main"><strong>${S.escape(a.action)}</strong><span>${S.escape(a.actor_name || '')} · ${S.formatDateTime(a.created_at)}${a.reason ? ' · ' + S.escape(a.reason) : ''}</span></div></div>`).join('');
@@ -382,7 +382,7 @@
         <div class="field-group"><label class="field-label">External reference</label><input class="field-input" id="payExternal"></div>
         <div class="field-group"><label class="field-label">Idempotency key</label><input class="field-input" id="payIdempotency" placeholder="Optional"></div>
         <div class="field-group full"><label class="field-label">Notes / evidence</label><textarea class="field-input" id="payNotes" rows="2"></textarea></div>
-        <div class="field-group full"><button class="btn btn-green" type="submit">Record payment</button></div>
+        <div class="field-group full"><button class="btn btn-brand" type="submit">Record payment</button></div>
       </form></div>`;
       el('payForm').addEventListener('submit', async event => {
         event.preventDefault();
@@ -404,7 +404,7 @@
         <div class="field-group"><label class="field-label">Type</label><select class="field-input" id="adjustType"><option value="correction">Correction</option><option value="manual">Manual</option><option value="refund">Refund</option><option value="reversal">Reversal</option></select></div>
         <div class="field-group"><label class="field-label">Amount (₦, negative to reduce)</label><input class="field-input" id="adjustAmount" type="number" step="0.01" required></div>
         <div class="field-group full"><label class="field-label">Reason</label><textarea class="field-input" id="adjustReason" rows="2" required></textarea></div>
-        <div class="field-group full"><button class="btn btn-green" type="submit">Record adjustment</button></div>
+        <div class="field-group full"><button class="btn btn-brand" type="submit">Record adjustment</button></div>
       </form></div>`;
       el('adjustForm').addEventListener('submit', async event => {
         event.preventDefault();

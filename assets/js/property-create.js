@@ -88,7 +88,7 @@ function updatePlanBalance(row) {
   if (type === "outright") {
     const total = Number(planInput(row, "total").value || 0);
     balanceEl.textContent = total > 0 ? "Paid in full" : "Enter total";
-    balanceEl.style.color = total > 0 ? "#047857" : "#b45309";
+    balanceEl.style.color = total > 0 ? "#9a6b00" : "#9a6b00";
     return;
   }
   const total = Number(planInput(row, "total").value || 0);
@@ -99,17 +99,17 @@ function updatePlanBalance(row) {
   if (!count && duration > 0) count = deriveCount(type, duration);
   if (total <= 0) {
     balanceEl.textContent = "Enter total";
-    balanceEl.style.color = "#b45309";
+    balanceEl.style.color = "#9a6b00";
     return;
   }
   if (count <= 0) {
     balanceEl.textContent = "Enter instalments or duration";
-    balanceEl.style.color = "#b45309";
+    balanceEl.style.color = "#9a6b00";
     return;
   }
   const difference = Math.round((total - deposit - installment * count) * 100) / 100;
   balanceEl.textContent = Math.abs(difference) < 0.01 ? "Adds up" : naira(difference) + " off";
-  balanceEl.style.color = Math.abs(difference) < 0.01 ? "#047857" : "#b91c1c";
+  balanceEl.style.color = Math.abs(difference) < 0.01 ? "#9a6b00" : "#b91c1c";
 }
 
 function renderPlanEditor() {

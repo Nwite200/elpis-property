@@ -102,7 +102,7 @@ Elpis.renderHeader = function (activePage) {
 
       <div class="nav-actions">
         <a href="client-login.html" class="btn btn-login" title="Client Portal">Client Portal</a>
-        <a href="${homePrefix}#properties" class="btn btn-green btn-nav-cta">Explore Portfolio ${Elpis.icon("arrow")}</a>
+        <a href="${homePrefix}#properties" class="btn btn-gold btn-nav-cta">Explore Portfolio ${Elpis.icon("arrow")}</a>
         <button class="menu-btn" id="menuBtn" aria-label="Toggle navigation menu" aria-expanded="false">
           <span class="menu-bar"></span>
           <span class="menu-bar"></span>
@@ -158,7 +158,7 @@ Elpis.renderFooter = function () {
         <div class="footer-col">
           <h4 class="footer-heading">Our Branches</h4>
           <ul class="footer-links-list">
-            <li><a href="index.html#branches">Head Office — details to be confirmed</a></li>
+            <li><a href="index.html#branches">Nyanya — Abuja, FCT</a></li>
           </ul>
         </div>
 

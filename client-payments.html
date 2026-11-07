@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#C6A45C" />
+  <meta name="theme-color" content="#071747" />
   <title>Payment History & Receipts | Elpis Property Limited</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,11 +14,11 @@
       display: grid;
       grid-template-columns: 260px 1fr;
       min-height: 100vh;
-      background-color: var(--soft);
+      background-color: var(--brand-background);
     }
     .portal-sidebar {
-      background-color: #17231A;
-      color: #D3DED5;
+      background-color: #071747;
+      color: #e9ecf4;
       padding: 28px 20px;
       display: flex;
       flex-direction: column;
@@ -27,7 +27,7 @@
     .portal-sidebar .brand-logo {
       width: 165px;
       height: auto;
-      background-color: #FFFFFF;
+      background-color: #ffffff;
       padding: 6px 10px;
       border-radius: var(--radius-sm);
       margin-bottom: 24px;
@@ -37,7 +37,7 @@
       font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 1.5px;
-      color: #7E9383;
+      color: #6b7690;
       margin: 16px 8px 6px;
       font-weight: 700;
     }
@@ -47,23 +47,23 @@
       gap: 12px;
       padding: 10px 14px;
       border-radius: var(--radius-sm);
-      color: #A3B5A7;
+      color: #aeb6c8;
       font-size: 13px;
       font-weight: 600;
       transition: var(--transition);
     }
     .portal-sidebar a:hover,
     .portal-sidebar a.active {
-      background-color: rgba(0, 181, 34, 0.15);
-      color: #7FE58D;
+      background-color: rgba(232,181,45, 0.15);
+      color: #e8b52d;
     }
     .portal-main {
       padding: 32px 40px;
       max-width: 1100px;
     }
     .payments-table-card {
-      background: #FFFFFF;
-      border: 1px solid var(--line);
+      background: #ffffff;
+      border: 1px solid var(--brand-line);
       border-radius: var(--radius-md);
       overflow: hidden;
       box-shadow: var(--shadow-sm);
@@ -72,40 +72,40 @@
       display: flex;
       gap: 12px;
       padding: 16px 20px;
-      background: #FFFFFF;
-      border-bottom: 1px solid var(--line);
+      background: #ffffff;
+      border-bottom: 1px solid var(--brand-line);
       flex-wrap: wrap;
       align-items: center;
     }
     .payments-filter-bar select {
       height: 38px;
       padding: 0 12px;
-      border: 1px solid var(--line);
+      border: 1px solid var(--brand-line);
       border-radius: var(--radius-sm);
       font-size: 13px;
-      background: #FFFFFF;
-      color: var(--ink);
+      background: #ffffff;
+      color: var(--brand-text);
     }
     .status-badge.status-verified {
-      background-color: #E8F9EB;
-      color: #A9853F;
+      background-color: #f7f6f2;
+      color: #9a6b00;
     }
     .status-badge.status-pending {
-      background-color: #FEF8E7;
-      color: #8D6B17;
+      background-color: #f7f6f2;
+      color: #9a6b00;
     }
     .status-badge.status-failed {
-      background-color: #FDE8E8;
-      color: #C0392B;
+      background-color: #fde8e8;
+      color: #c0392b;
     }
     .status-badge.status-reversed,
     .status-badge.status-refunded {
-      background-color: #F3F4F6;
-      color: #4B5563;
+      background-color: #f7f6f2;
+      color: #26344f;
     }
     .total-verified-banner {
-      background: linear-gradient(135deg, #1C2B20 0%, #293D2E 100%);
-      color: #FFFFFF;
+      background: linear-gradient(135deg, #071747 0%, #12245a 100%);
+      color: #ffffff;
       border-radius: var(--radius-md);
       padding: 22px 28px;
       display: flex;
@@ -119,7 +119,7 @@
       font-family: var(--font-display);
       font-size: 28px;
       font-weight: 800;
-      color: #7FE58D;
+      color: #e8b52d;
     }
   </style>
   <link rel="stylesheet" href="assets/css/motion.css">
@@ -150,27 +150,27 @@
       <a href="client-profile.html">👤 Profile & Security</a>
       <span class="nav-section-title" style="margin-top:auto">Actions</span>
       <a href="index.html">🌐 Public Website</a>
-      <a href="#" id="logoutBtn" style="color:#E74C3C">🚪 Sign Out</a>
+      <a href="#" id="logoutBtn" style="color:#e74c3c">🚪 Sign Out</a>
     </aside>
 
     <main class="portal-main">
       <h1 style="font-size:26px;font-weight:800;margin-bottom:6px">Payment History & Transaction Records</h1>
-      <p style="font-size:14px;color:var(--muted);margin-bottom:24px">Authoritative financial records for your property purchase. Only verified transactions count towards your total property completion balance.</p>
+      <p style="font-size:14px;color:var(--brand-muted);margin-bottom:24px">Authoritative financial records for your property purchase. Only verified transactions count towards your total property completion balance.</p>
 
       <!-- Verified Total Banner -->
       <div class="total-verified-banner">
         <div>
           <span style="font-size:12px;text-transform:uppercase;letter-spacing:1px;opacity:0.8">Authoritative Verified Collections</span>
           <div class="verified-large-amt" id="verifiedBannerAmt">₦0.00</div>
-          <span style="font-size:12px;color:#A9F3B6">Calculated in integer kobo from verified bank transactions</span>
+          <span style="font-size:12px;color:#f4d06a">Calculated in integer kobo from verified bank transactions</span>
         </div>
-        <a href="client-receipts.html" class="btn btn-green btn-sm">View Downloadable Receipts →</a>
+        <a href="client-receipts.html" class="btn btn-brand btn-sm">View Downloadable Receipts →</a>
       </div>
 
       <!-- Filter Controls & Table -->
       <div class="payments-table-card">
         <div class="payments-filter-bar">
-          <label style="font-size:12px;font-weight:600;color:var(--charcoal)">Filter Status:</label>
+          <label style="font-size:12px;font-weight:600;color:var(--brand-text)">Filter Status:</label>
           <select id="statusFilterSelect">
             <option value="">All Transactions</option>
             <option value="verified">Verified Payments Only</option>
@@ -179,18 +179,18 @@
             <option value="reversed">Reversed</option>
             <option value="refunded">Refunded</option>
           </select>
-          <label style="font-size:12px;font-weight:600;color:var(--charcoal)">From:</label>
-          <input type="date" id="dateFromFilter" style="height:36px;padding:0 10px;border:1px solid var(--line);border-radius:4px;font-size:12px">
-          <label style="font-size:12px;font-weight:600;color:var(--charcoal)">To:</label>
-          <input type="date" id="dateToFilter" style="height:36px;padding:0 10px;border:1px solid var(--line);border-radius:4px;font-size:12px">
+          <label style="font-size:12px;font-weight:600;color:var(--brand-text)">From:</label>
+          <input type="date" id="dateFromFilter" style="height:36px;padding:0 10px;border:1px solid var(--brand-line);border-radius:4px;font-size:12px">
+          <label style="font-size:12px;font-weight:600;color:var(--brand-text)">To:</label>
+          <input type="date" id="dateToFilter" style="height:36px;padding:0 10px;border:1px solid var(--brand-line);border-radius:4px;font-size:12px">
           <button type="button" class="btn btn-outline btn-sm" id="applyDateFilterBtn">Apply</button>
-          <span id="txCountBadge" style="font-size:12px;color:var(--muted);margin-left:auto">Loading transactions...</span>
+          <span id="txCountBadge" style="font-size:12px;color:var(--brand-muted);margin-left:auto">Loading transactions...</span>
         </div>
 
         <div style="overflow-x:auto">
           <table class="table" style="margin:0">
             <thead>
-              <tr style="background:#F9FBF9">
+              <tr style="background:#f7f6f2">
                 <th>Reference</th>
                 <th>Payment Date</th>
                 <th>Method</th>
@@ -200,7 +200,7 @@
               </tr>
             </thead>
             <tbody id="paymentsTbody">
-              <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">Loading payment history...</td></tr>
+              <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--brand-muted)">Loading payment history...</td></tr>
             </tbody>
           </table>
         </div>
@@ -232,7 +232,7 @@
 
           const tbody = document.getElementById('paymentsTbody');
           if (!data.payments || !data.payments.length) {
-            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:36px;color:var(--muted)">No payment transactions found matching the selected filter.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:36px;color:var(--brand-muted)">No payment transactions found matching the selected filter.</td></tr>`;
             return;
           }
 
@@ -244,7 +244,7 @@
                 <td><strong>${p.transaction_ref}</strong></td>
                 <td>${dateStr}</td>
                 <td>${p.method || 'Bank Transfer'}</td>
-                <td style="font-weight:800;color:${p.status === 'verified' ? 'var(--green-dark)' : 'var(--ink)'}">
+                <td style="font-weight:800;color:${p.status === 'verified' ? 'var(--brand-primary-dark)' : 'var(--brand-text)'}">
                   ${Elpis.money(p.amount)}
                 </td>
                 <td>
@@ -253,7 +253,7 @@
                 <td>
                   ${p.receipt_available
                     ? `<a href="client-receipts.html" class="btn btn-outline btn-sm" style="padding:4px 8px;font-size:11px">View Receipt #${p.receipt_ref || ''}</a>`
-                    : `<span style="font-size:11px;color:var(--muted-light)">${p.status === 'verified' ? 'Receipt available' : 'Pending Verification'}</span>`
+                    : `<span style="font-size:11px;color:var(--brand-muted-light)">${p.status === 'verified' ? 'Receipt available' : 'Pending Verification'}</span>`
                   }
                 </td>
               </tr>

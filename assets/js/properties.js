@@ -106,18 +106,18 @@ function renderKpis(props) {
 function render(props) {
   const tbody = document.getElementById("propertyTableBody");
   if (!props.length) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:var(--muted)">No properties found.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:var(--brand-muted)">No properties found.</td></tr>`;
     return;
   }
   tbody.innerHTML = props.map(p => {
     const actions = [`<a class="btn btn-ghost btn-xs" href="property-details.html?id=${p.id}">Open</a>`];
     if (canManageProperties()) {
       if (p.workflow_status === "pending_approval" && canApproveProperties()) {
-        actions.push(`<button class="btn btn-green btn-xs" data-action="approve" data-id="${p.id}">Approve</button>`);
+        actions.push(`<button class="btn btn-brand btn-xs" data-action="approve" data-id="${p.id}">Approve</button>`);
       }
       if (!p.is_archived && p.workflow_status !== "published" && p.workflow_status !== "pending_approval") {
         const label = actualRole() === "Branch Manager" ? "Submit" : "Publish";
-        actions.push(`<button class="btn btn-green btn-xs" data-action="publish" data-id="${p.id}">${label}</button>`);
+        actions.push(`<button class="btn btn-brand btn-xs" data-action="publish" data-id="${p.id}">${label}</button>`);
       }
       if (p.workflow_status === "published") {
         actions.push(`<button class="btn btn-outline btn-xs" data-action="unpublish" data-id="${p.id}">Unpublish</button>`);
@@ -180,8 +180,8 @@ function renderPagination(total, limit, page) {
   const add = (label, pg, disabled, active) => {
     const btn = document.createElement("button");
     btn.textContent = label; btn.disabled = disabled;
-    btn.style.padding = "6px 10px"; btn.style.border = "1px solid var(--line)"; btn.style.background = active ? "var(--green)" : "#fff";
-    btn.style.color = active ? "#fff" : "var(--ink)"; btn.style.borderRadius = "6px";
+    btn.style.padding = "6px 10px"; btn.style.border = "1px solid var(--brand-line)"; btn.style.background = active ? "var(--brand-primary)" : "#fff";
+    btn.style.color = active ? "#fff" : "var(--brand-text)"; btn.style.borderRadius = "6px";
     if (!disabled && !active) btn.onclick = () => { currentPage = pg; loadProperties(); };
     el.appendChild(btn);
   };

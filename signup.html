@@ -3,44 +3,44 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#C6A45C" />
+  <meta name="theme-color" content="#071747" />
   <title>Create Client Account | Elpis Property Limited</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css">
   <style>
-    body { background: var(--soft); min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 28px 16px 40px; }
-    .signup-card { width: 100%; max-width: 540px; background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md); padding: 30px 30px 26px; box-shadow: var(--shadow-md); }
+    body { background: var(--brand-background); min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 28px 16px 40px; }
+    .signup-card { width: 100%; max-width: 540px; background: #fff; border: 1px solid var(--brand-line); border-radius: var(--radius-md); padding: 30px 30px 26px; box-shadow: var(--shadow-md); }
     .signup-header { text-align: center; margin-bottom: 22px; }
     .signup-logo { width: 190px; height: auto; display: block; margin: 0 auto 14px; }
-    .signup-title { font-size: 24px; font-weight: 800; color: var(--ink); }
-    .signup-subtitle { font-size: 13px; color: var(--muted); margin-top: 5px; line-height: 1.55; }
+    .signup-title { font-size: 24px; font-weight: 800; color: var(--brand-text); }
+    .signup-subtitle { font-size: 13px; color: var(--brand-muted); margin-top: 5px; line-height: 1.55; }
     .signup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .signup-grid .full { grid-column: 1 / -1; }
-    .signup-grid label { display: block; font-size: 12px; font-weight: 700; color: var(--charcoal); margin-bottom: 6px; }
-    .signup-grid input, .signup-grid select { width: 100%; height: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: 13px; background: #fff; }
+    .signup-grid label { display: block; font-size: 12px; font-weight: 700; color: var(--brand-text); margin-bottom: 6px; }
+    .signup-grid input, .signup-grid select { width: 100%; height: 44px; padding: 0 12px; border: 1px solid var(--brand-line); border-radius: var(--radius-sm); font-size: 13px; background: #fff; }
     .signup-msg { margin-top: 12px; font-size: 12px; line-height: 1.5; min-height: 18px; }
-    .signup-msg.error { color: #B91C1C; }
-    .signup-msg.success { color: var(--green-dark); }
-    .signup-plan-detail { display: none; margin-top: 8px; padding: 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--soft); }
+    .signup-msg.error { color: #b91c1c; }
+    .signup-msg.success { color: var(--brand-primary-dark); }
+    .signup-plan-detail { display: none; margin-top: 8px; padding: 12px; border: 1px solid var(--brand-line); border-radius: var(--radius-sm); background: var(--brand-background); }
     .signup-plan-detail.show { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; }
     .signup-plan-detail .plan-item { min-width: 0; }
-    .signup-plan-detail .plan-item span { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); font-weight: 700; }
-    .signup-plan-detail .plan-item strong { display: block; font-size: 13px; color: var(--ink); margin-top: 2px; }
-    .signup-plan-empty { margin-top: 8px; font-size: 12px; color: #B45309; background: #FFFBEB; border: 1px solid #FDE68A; border-radius: var(--radius-sm); padding: 10px 12px; }
+    .signup-plan-detail .plan-item span { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: .4px; color: var(--brand-muted); font-weight: 700; }
+    .signup-plan-detail .plan-item strong { display: block; font-size: 13px; color: var(--brand-text); margin-top: 2px; }
+    .signup-plan-empty { margin-top: 8px; font-size: 12px; color: #9a6b00; background: #f7f6f2; border: 1px solid #f4d06a; border-radius: var(--radius-sm); padding: 10px 12px; }
     .terms-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 6px; }
     .terms-head label { margin-bottom: 0 !important; }
-    .terms-download { font-size: 11px; font-weight: 700; color: var(--green-dark); white-space: nowrap; }
-    .terms-box { position: relative; max-height: 118px; overflow: hidden; background: #FAFBFA; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 12px; line-height: 1.65; color: var(--charcoal); white-space: pre-line; transition: max-height .2s ease; }
+    .terms-download { font-size: 11px; font-weight: 700; color: var(--brand-primary-dark); white-space: nowrap; }
+    .terms-box { position: relative; max-height: 118px; overflow: hidden; background: #f7f6f2; border: 1px solid var(--brand-line); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 12px; line-height: 1.65; color: var(--brand-text); white-space: pre-line; transition: max-height .2s ease; }
     .terms-box.expanded { max-height: 360px; overflow-y: auto; }
-    .terms-box:not(.expanded)::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 42px; background: linear-gradient(to bottom, rgba(250,251,250,0), #FAFBFA); pointer-events: none; }
-    .terms-box.empty { color: #B45309; background: #FFFBEB; border-color: #FDE68A; }
+    .terms-box:not(.expanded)::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 42px; background: linear-gradient(to bottom, rgba(247,246,242,0), #f7f6f2); pointer-events: none; }
+    .terms-box.empty { color: #9a6b00; background: #f7f6f2; border-color: #f4d06a; }
     .terms-box.empty::after { display: none; }
-    .terms-readmore { border: 0; background: none; color: var(--green-dark); font-size: 11px; font-weight: 800; cursor: pointer; padding: 0; }
+    .terms-readmore { border: 0; background: none; color: var(--brand-primary-dark); font-size: 11px; font-weight: 800; cursor: pointer; padding: 0; }
     .terms-readmore:hover { text-decoration: underline; }
     .signup-links { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 16px; font-size: 12px; }
-    .signup-links a { color: var(--green-dark); font-weight: 700; }
+    .signup-links a { color: var(--brand-primary-dark); font-weight: 700; }
     @media (max-width: 520px) { .signup-grid { grid-template-columns: 1fr; } .signup-card { padding: 24px 20px; } .signup-plan-detail.show { grid-template-columns: 1fr; } }
   </style>
   <link rel="stylesheet" href="assets/css/motion.css">
@@ -59,7 +59,7 @@
   <div class="signup-card">
     <div class="signup-header">
       <a href="index.html"><img src="assets/images/elpis-property-logo-original.png" alt="Elpis Property Limited Official Logo" class="signup-logo" onerror="this.src='assets/images/elpis-property-logo-original.png'"></a>
-      <span class="badge badge-green">Client Self-Service Portal</span>
+      <span class="badge badge-success">Client Self-Service Portal</span>
       <h1 class="signup-title">Create your client account</h1>
       <p class="signup-subtitle">Register to track your property interest, verified payments, receipts and account information.</p>
     </div>
@@ -177,20 +177,20 @@
           </div>
         </div>
         <div class="full">
-          <label style="display:flex;align-items:flex-start;gap:8px;font-weight:600;color:var(--charcoal);line-height:1.5">
+          <label style="display:flex;align-items:flex-start;gap:8px;font-weight:600;color:var(--brand-text);line-height:1.5">
             <input id="termsAccepted" type="checkbox" required style="width:auto;height:auto;margin-top:2px">
             <span>I have read, understood and accept the Terms and Conditions.</span>
           </label>
         </div>
         <div class="full">
-          <label style="display:flex;align-items:flex-start;gap:8px;font-weight:500;color:var(--muted);line-height:1.5">
+          <label style="display:flex;align-items:flex-start;gap:8px;font-weight:500;color:var(--brand-muted);line-height:1.5">
             <input id="consent" type="checkbox" required style="width:auto;height:auto;margin-top:2px">
             <span>I confirm the information provided is accurate and consent to Elpis Property Limited contacting me about my enquiry.</span>
           </label>
         </div>
       </div>
 
-      <button class="btn btn-green btn-block mt-16" type="submit" id="signupBtn">Create Account</button>
+      <button class="btn btn-brand btn-block mt-16" type="submit" id="signupBtn">Create Account</button>
       <div class="signup-msg" id="signupMsg"></div>
     </form>
 

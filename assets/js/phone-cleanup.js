@@ -5,7 +5,7 @@
   const el = id => document.getElementById(id);
 
   function reasonLabel(reason) {
-    return ({ missing_phone: "Missing", invalid_number: "Invalid", normalise_to_+234: "Not +234" })[reason] || reason;
+    return ({ missing_phone: "Missing", invalid_number: "Invalid", "normalise_to_+234": "Not +234" })[reason] || reason;
   }
 
   async function load() {
@@ -30,7 +30,7 @@
         <td class="nowrap">${S.escape(row.stored_value || "—")}</td>
         <td class="nowrap">${S.escape(row.proposed_value || "—")}</td>
         <td>${S.badge(reasonLabel(row.reason), row.reason === "invalid_number" || row.reason === "missing_phone" ? "red" : "amber")}</td>
-        <td><div class="toolbar"><input class="field-input" style="min-width:160px" id="phoneFix${index}" value="${S.escape(row.proposed_value || "")}" placeholder="+234..."><button class="btn btn-green btn-xs" type="button" data-fix="${index}">Save</button></div></td>
+        <td><div class="toolbar"><input class="field-input" style="min-width:160px" id="phoneFix${index}" value="${S.escape(row.proposed_value || "")}" placeholder="+234..."><button class="btn btn-brand btn-xs" type="button" data-fix="${index}">Save</button></div></td>
       </tr>`).join("") : '<tr><td colspan="7"><div class="empty-state">No phone numbers need cleanup.</div></td></tr>';
     el("phoneBody").querySelectorAll("[data-fix]").forEach(button => {
       button.addEventListener("click", async () => {

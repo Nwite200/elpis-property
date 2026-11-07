@@ -15,13 +15,13 @@
 
 .elpis-intro.style-hype {
   background:
-    radial-gradient(circle at 50% 44%, #142C27 0%, #0D211D 55%, #070D18 100%);
+    radial-gradient(circle at 50% 44%, #071747 0%, #071747 55%, #04102f 100%);
 }
 
 .elpis-intro.style-classic,
 .elpis-intro.style-reduced {
   background:
-    radial-gradient(circle at 50% 42%, #ffffff 0%, #F5F3EE 56%, #F1EBDD 100%);
+    radial-gradient(circle at 50% 42%, #ffffff 0%, #f7f6f2 56%, #efeee8 100%);
 }
 
 .elpis-intro__halo {
@@ -29,7 +29,7 @@
   width: min(82vw, 660px);
   aspect-ratio: 1;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,255,255,0.98) 0%, rgba(245,247,245,0.92) 34%, rgba(198,164,92,0.14) 62%, transparent 73%);
+  background: radial-gradient(circle, rgba(255,255,255,0.98) 0%, rgba(247,246,242,0.92) 34%, rgba(232,181,45,0.14) 62%, transparent 73%);
   filter: blur(22px);
   opacity: 0.96;
   z-index: 0;
@@ -48,8 +48,8 @@
   height: 124%;
   z-index: 1;
   opacity: 0;
-  background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.9) 28%, rgba(226,201,139,0.95) 50%, rgba(255,255,255,0.8) 72%, transparent 100%);
-  box-shadow: 0 0 16px rgba(226,201,139,0.7);
+  background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.9) 28%, rgba(244,208,106,0.95) 50%, rgba(255,255,255,0.8) 72%, transparent 100%);
+  box-shadow: 0 0 16px rgba(244,208,106,0.7);
   transform: translate3d(-42vw, 0, 0) rotate(8deg);
 }
 
@@ -88,10 +88,10 @@
   z-index: 4;
   width: 190px;
   height: 190px;
-  border: 2px solid rgba(197,161,107,0.9);
+  border: 2px solid rgba(232,181,45,0.9);
   border-radius: 50%;
   opacity: 0;
-  box-shadow: 0 0 34px rgba(197,161,107,0.28);
+  box-shadow: 0 0 34px rgba(232,181,45,0.28);
 }
 
 .elpis-intro__flash {
@@ -129,7 +129,7 @@
   height: auto;
   max-height: 36vh;
   object-fit: contain;
-  filter: drop-shadow(0 18px 38px rgba(34,43,36,0.10));
+  filter: drop-shadow(0 18px 38px rgba(7,23,71,0.10));
   transform-origin: center;
 }
 
@@ -139,7 +139,7 @@
   font-size: clamp(20px, 4.4vw, 38px);
   font-weight: 800;
   letter-spacing: 0.08em;
-  color: #C5A16B;
+  color: #e8b52d;
   text-align: center;
 }
 
@@ -164,8 +164,8 @@
 }
 
 .style-hype .elpis-intro__tagline {
-  color: rgba(245,242,236,0.9);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+  color: rgba(247,246,242,0.9);
+  text-shadow: 0 1px 0 rgba(255,255,255, 0.55);
 }
 
 .style-classic .elpis-intro__tagline,
@@ -185,7 +185,7 @@
 
 .style-classic .elpis-intro__logo,
 .style-reduced .elpis-intro__logo {
-  filter: drop-shadow(0 18px 38px rgba(34,43,36,0.10));
+  filter: drop-shadow(0 18px 38px rgba(7,23,71,0.10));
 }
 
 /* Glitch uses filter only for a few frames; transform remains owned by WAAPI. */
@@ -194,9 +194,9 @@
 }
 
 @keyframes elpis-glitch {
-  0% { filter: drop-shadow(3px 0 rgba(255,45,90,0.55)) drop-shadow(-3px 0 rgba(0,220,255,0.45)); }
-  50% { filter: drop-shadow(-2px 0 rgba(255,45,90,0.45)) drop-shadow(2px 0 rgba(0,220,255,0.4)); }
-  100% { filter: drop-shadow(0 18px 38px rgba(34,43,36,0.10)); }
+  0% { filter: drop-shadow(3px 0 rgba(232,181,45,0.55)) drop-shadow(-3px 0 rgba(232,181,45,0.45)); }
+  50% { filter: drop-shadow(-2px 0 rgba(232,181,45,0.45)) drop-shadow(2px 0 rgba(232,181,45,0.4)); }
+  100% { filter: drop-shadow(0 18px 38px rgba(7,23,71,0.10)); }
 }
 
 @media (max-width: 640px) {
@@ -252,18 +252,18 @@
 /* 15-second Elpis signature motion-film treatment */
 .elpis-intro.style-hype {
   background:
-    radial-gradient(ellipse at 50% 44%, rgba(42,81,68,.98) 0%, #142C27 42%, #0D211D 78%, #07130F 100%);
+    radial-gradient(ellipse at 50% 44%, rgba(7,23,71,.98) 0%, #071747 42%, #071747 78%, #04102f 100%);
 }
 .elpis-intro__halo {
-  background: radial-gradient(circle, rgba(255,255,255,.16) 0%, rgba(197,161,107,.20) 36%, rgba(197,161,107,.08) 58%, transparent 74%);
+  background: radial-gradient(circle, rgba(255,255,255,.16) 0%, rgba(232,181,45,.20) 36%, rgba(232,181,45,.08) 58%, transparent 74%);
   filter: blur(30px);
 }
 .elpis-intro__ring {
-  border-color: rgba(233,216,185,.86);
-  box-shadow: 0 0 42px rgba(197,161,107,.32), inset 0 0 24px rgba(197,161,107,.12);
+  border-color: rgba(244,208,106,.86);
+  box-shadow: 0 0 42px rgba(232,181,45,.32), inset 0 0 24px rgba(232,181,45,.12);
 }
 .elpis-intro__tagline {
-  color: #E9D8B9;
+  color: #f4d06a;
   letter-spacing: .22em;
   text-transform: uppercase;
   font-size: clamp(11px,1.3vw,15px);
@@ -275,16 +275,16 @@
   left: 0;
   right: 0;
   text-align: center;
-  color: rgba(245,242,236,.48);
+  color: rgba(247,246,242,.48);
   font: 600 9px/1 var(--font-body, sans-serif);
   letter-spacing: .2em;
 }
 .elpis-intro__logo {
-  filter: drop-shadow(0 20px 48px rgba(0,0,0,.34)) drop-shadow(0 0 22px rgba(197,161,107,.16));
+  filter: drop-shadow(0 20px 48px rgba(0,0,0,.34)) drop-shadow(0 0 22px rgba(232,181,45,.16));
 }
 @media (prefers-reduced-motion: reduce) {
   .elpis-intro.style-hype::after { display:none; }
 }
 
 /* Ensure the cinematic intro tagline keeps the Elpis champagne treatment. */
-.elpis-intro.style-hype .elpis-intro__tagline { color:#E9D8B9; text-shadow:0 2px 14px rgba(0,0,0,.32); }
+.elpis-intro.style-hype .elpis-intro__tagline { color:#f4d06a; text-shadow:0 2px 14px rgba(0,0,0,.32); }

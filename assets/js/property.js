@@ -4,14 +4,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Render persistent site header and footer
   const headerSlot = document.getElementById('header-slot');
   const footerSlot = document.getElementById('footer-slot');
-  if (headerSlot) headerSlot.innerHTML = elpis.renderHeader('property-detail');
-  if (footerSlot) footerSlot.innerHTML = elpis.renderFooter();
-  elpis.initNav();
+  if (headerSlot) headerSlot.innerHTML = Elpis.renderHeader('property-detail');
+  if (footerSlot) footerSlot.innerHTML = Elpis.renderFooter();
+  Elpis.initNav();
 
   const container = document.getElementById('propertyContainer');
   const params = new URLSearchParams(window.location.search);
   const propertyId = params.get('id');
-  let p = elpis.findProperty(propertyId);
+  let p = Elpis.findProperty(propertyId);
 
   // Live D1 listings use numeric IDs. Load them from the public API so the
   // homepage never links a live property to a "Property Not Found" page.
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="empty-icon">⚠️</div>
         <h2>Property Not Found</h2>
         <p>The requested property could not be found or has been moved from our active listings.</p>
-        <a class="btn btn-green" href="index.html#properties" style="margin-top:16px">← Return to All Properties</a>
+        <a class="btn btn-brand" href="index.html#properties" style="margin-top:16px">← Return to All Properties</a>
       </div>
     `;
     return;
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const allImages = (p.images && p.images.length) ? p.images : [coverImage];
 
   // Pre-formatted WhatsApp message
-  const waMessage = `Hello Elpis Property Limited, I am interested in ${p.name} located at ${p.location} (${p.branch} Branch), listed at ${elpis.money(p.price)}. Please provide more details.`;
+  const waMessage = `Hello Elpis Property Limited, I am interested in ${p.name} located at ${p.location} (${p.branch} Branch), listed at ${Elpis.money(p.price)}. Please provide more details.`;
 
   container.innerHTML = `
     <!-- Breadcrumb & Back Link -->
@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="header-right">
         <div class="prop-price-card">
           <span class="price-type">Outright Investment Price</span>
-          <span class="price-val">${elpis.money(p.price)}</span>
+          <span class="price-val">${Elpis.money(p.price)}</span>
           <span class="units-status">✓ ${p.units} of ${p.totalUnits || 10} Units Available</span>
         </div>
       </div>
@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               <textarea id="enqMsg" rows="3" placeholder="Tell us your timeline or questions regarding ${p.name}..."></textarea>
             </div>
 
-            <button type="submit" class="btn btn-green btn-block">
+            <button type="submit" class="btn btn-brand btn-block">
               Send Property Enquiry
             </button>
             <p class="form-privacy-note">🔒 Your information is confidential and will only be used to answer your inquiry.</p>
@@ -292,7 +292,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (detailWa) {
     detailWa.addEventListener('click', (e) => {
       e.preventDefault();
-      elpis.enquireWhatsApp(waMessage);
+      Elpis.enquireWhatsApp(waMessage);
     });
   }
 
@@ -356,7 +356,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Render Related Properties (excluding current property)
   const relatedGrid = document.getElementById('relatedGrid');
   if (relatedGrid) {
-    const related = elpis.properties().filter(item => item.id !== p.id).slice(0, 3);
+    const related = Elpis.properties().filter(item => item.id !== p.id).slice(0, 3);
     relatedGrid.innerHTML = related.map(item => {
       const img = (item.images && item.images[0]) || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80';
       return `
@@ -376,7 +376,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="prop-pricing-row">
               <div class="price-box">
                 <span class="price-lbl">Price</span>
-                <span class="price-amt">${elpis.money(item.price)}</span>
+                <span class="price-amt">${Elpis.money(item.price)}</span>
               </div>
             </div>
             <div class="prop-actions-row">
@@ -392,10 +392,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       a.addEventListener('click', (e) => {
         e.preventDefault();
         const msg = a.getAttribute('data-message') || 'Hello Elpis Property.';
-        elpis.enquireWhatsApp(msg);
+        Elpis.enquireWhatsApp(msg);
       });
     });
   }
 
-  elpis.observeFade();
+  Elpis.observeFade();
 });

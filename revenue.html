@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#C6A45C" />
+  <meta name="theme-color" content="#071747" />
   <title>Revenue Drill-down | Elpis Property Limited</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,17 +21,17 @@
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
   <style>
-    .revenue-hero { background:linear-gradient(135deg,#17231A,#0d1710); color:#fff; border-radius:14px; padding:24px; margin-bottom:18px; }
-    .revenue-hero .label { font-size:11px; letter-spacing:1.2px; text-transform:uppercase; color:#9FB2A3; }
-    .revenue-total { font:800 clamp(30px,5vw,46px)/1.1 var(--font-display,Manrope,sans-serif); color:#7FE58D; margin:8px 0 4px; }
-    .revenue-breadcrumbs { display:flex; flex-wrap:wrap; gap:6px; align-items:center; font-size:12px; color:#A3B5A7; }
-    .revenue-breadcrumbs button { background:none; border:0; color:#7FE58D; cursor:pointer; font:inherit; padding:2px 4px; }
+    .revenue-hero { background:linear-gradient(135deg,#071747,#04102f); color:#fff; border-radius:14px; padding:24px; margin-bottom:18px; }
+    .revenue-hero .label { font-size:11px; letter-spacing:1.2px; text-transform:uppercase; color:#aeb6c8; }
+    .revenue-total { font:800 clamp(30px,5vw,46px)/1.1 var(--font-display,Manrope,sans-serif); color:#e8b52d; margin:8px 0 4px; }
+    .revenue-breadcrumbs { display:flex; flex-wrap:wrap; gap:6px; align-items:center; font-size:12px; color:#aeb6c8; }
+    .revenue-breadcrumbs button { background:none; border:0; color:#e8b52d; cursor:pointer; font:inherit; padding:2px 4px; }
     .revenue-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px; }
-    .revenue-child { background:#fff; border:1px solid var(--line); border-radius:10px; padding:16px; text-align:left; cursor:pointer; }
-    .revenue-child:hover { border-color:var(--green); box-shadow:0 8px 24px rgba(0,34,0,.08); }
-    .revenue-child .type { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); }
-    .revenue-child .name { font-weight:700; color:var(--charcoal); margin:4px 0; }
-    .revenue-child .amount { color:var(--green-dark); font-weight:800; font-size:18px; }
+    .revenue-child { background:#fff; border:1px solid var(--brand-line); border-radius:10px; padding:16px; text-align:left; cursor:pointer; }
+    .revenue-child:hover { border-color:var(--brand-primary); box-shadow:0 8px 24px rgba(7,23,71,.08); }
+    .revenue-child .type { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--brand-muted); }
+    .revenue-child .name { font-weight:700; color:var(--brand-text); margin:4px 0; }
+    .revenue-child .amount { color:var(--brand-primary-dark); font-weight:800; font-size:18px; }
     @media(max-width:640px){ .revenue-hero{padding:18px;} .revenue-child{padding:13px;} }
   </style>
 </head>
@@ -42,7 +42,7 @@
       <div class="dash-top">
         <div>
           <h1>Revenue Drill-down</h1>
-          <p style="color:var(--muted);font-size:13px">Verified payments only. Scope is enforced by your role and hierarchy.</p>
+          <p style="color:var(--brand-muted);font-size:13px">Verified payments only. Scope is enforced by your role and hierarchy.</p>
         </div>
         <a class="btn btn-outline" href="dashboard.html">Dashboard</a>
       </div>
@@ -50,7 +50,7 @@
       <div class="filter-panel" style="margin-bottom:18px">
         <div class="field-group"><label class="field-label" for="revFrom">From</label><input class="field-input" type="date" id="revFrom"></div>
         <div class="field-group"><label class="field-label" for="revTo">To</label><input class="field-input" type="date" id="revTo"></div>
-        <button class="btn btn-green btn-sm" type="button" id="revApply">Apply</button>
+        <button class="btn btn-brand btn-sm" type="button" id="revApply">Apply</button>
         <button class="btn btn-ghost btn-sm" type="button" data-period="today">Today</button>
         <button class="btn btn-ghost btn-sm" type="button" data-period="week">This week</button>
         <button class="btn btn-ghost btn-sm" type="button" data-period="month">This month</button>
@@ -60,7 +60,7 @@
         <div class="label" id="revScopeLabel">Total paid</div>
         <div class="revenue-total" id="revTotal">₦0</div>
         <div class="revenue-breadcrumbs" id="revBreadcrumbs"></div>
-        <div style="font-size:12px;color:#9FB2A3;margin-top:10px" id="revMeta">Loading…</div>
+        <div style="font-size:12px;color:#aeb6c8;margin-top:10px" id="revMeta">Loading…</div>
       </section>
 
       <div class="card" style="margin-bottom:18px">

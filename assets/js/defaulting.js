@@ -85,7 +85,7 @@
           <td>${S.badge(planLabel(row.plan_type), row.is_easy_buy ? "blue" : "gray")}</td>
           <td>${S.money(row.expected_to_date_kobo)}</td>
           <td>${S.money(row.paid_to_date_kobo)}</td>
-          <td><strong style="color:${row.amount_behind_kobo > 0 ? "var(--red,#DC2626)" : "var(--green-dark)"}">${S.money(row.amount_behind_kobo)}</strong></td>
+          <td><strong style="color:${row.amount_behind_kobo > 0 ? "var(--red,#dc2626)" : "var(--brand-primary-dark)"}">${S.money(row.amount_behind_kobo)}</strong></td>
           <td>${row.days_overdue || 0}</td>
           <td>${row.status === "defaulting" ? S.badge("Defaulting", "red") : S.badge("Performing", "green")}</td>
           <td>${row.follow_up_status ? `${S.escape(row.follow_up_status)}<div class="small muted">${row.next_follow_up_date ? S.formatDate(row.next_follow_up_date) : ""}</div>` : '<span class="small muted">None</span>'}</td>

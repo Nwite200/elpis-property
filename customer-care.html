@@ -19,7 +19,7 @@
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
-  <meta name="theme-color" content="#C6A45C" />
+  <meta name="theme-color" content="#071747" />
 </head>
 <body data-page="care">
   <div class="dash">
@@ -34,11 +34,11 @@
       <div class="card" id="referralCard" style="margin-bottom:16px;display:none">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
           <div style="flex:1;min-width:240px">
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700">Your client referral link</div>
-            <p style="font-size:12px;color:var(--muted);margin:5px 0 10px">Share this link with a prospective client. When they sign up, the client is automatically attributed to you.</p>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--brand-muted);font-weight:700">Your client referral link</div>
+            <p style="font-size:12px;color:var(--brand-muted);margin:5px 0 10px">Share this link with a prospective client. When they sign up, the client is automatically attributed to you.</p>
             <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
               <input class="field-input" id="referralLinkInput" readonly style="flex:1;min-width:220px;font-size:12px">
-              <button class="btn btn-green btn-sm" type="button" id="copyReferralBtn">Copy link</button>
+              <button class="btn btn-brand btn-sm" type="button" id="copyReferralBtn">Copy link</button>
               <button class="btn btn-outline btn-sm" type="button" id="copyReferralCodeBtn">Copy code</button>
               <a class="btn btn-outline btn-sm" id="shareReferralBtn" target="_blank" rel="noopener">Share on WhatsApp</a>
             </div>
@@ -59,7 +59,7 @@
           <label class="small muted" for="careTo">To</label>
           <input type="date" id="careTo" title="Client registered to">
           <select id="careBranch"><option value="">All branches</option></select>
-          <button class="btn btn-green btn-sm" type="button" id="applyCareFilters">Filter</button>
+          <button class="btn btn-brand btn-sm" type="button" id="applyCareFilters">Filter</button>
           <button class="btn btn-ghost btn-sm" type="button" id="resetCareFilters">Reset</button>
         </div>
         <div class="table-responsive"><table class="table">

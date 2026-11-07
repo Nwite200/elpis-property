@@ -155,7 +155,7 @@
         <div class="kpi"><div class="label">Status</div><div class="value" style="font-size:20px">${S.badge(a.status || "Pending", statusTone(a.status))}</div><div class="delta">${S.escape(planLabel(a))}</div></div>
       </div>
 
-      ${a.flag_reason ? `<div class="route-note" style="margin:14px 0;border-left-color:#D97706"><strong>Action required:</strong> ${S.escape(a.flag_reason)}</div>` : ""}
+      ${a.flag_reason ? `<div class="route-note" style="margin:14px 0;border-left-color:#9a6b00"><strong>Action required:</strong> ${S.escape(a.flag_reason)}</div>` : ""}
 
       <div class="card" style="margin-top:16px">
         <div class="card-head"><h3>Calculation breakdown</h3><span class="small muted">Payment-stage, not calendar-month</span></div>
@@ -194,7 +194,7 @@
           </div>
         </div>
         <div class="toolbar" style="margin-top:10px">
-          <button class="btn btn-green" type="button" id="refPayBtn">Record payment</button>
+          <button class="btn btn-brand" type="button" id="refPayBtn">Record payment</button>
           <button class="btn btn-outline" type="button" id="refRecalcBtn">Recalculate account</button>
         </div>
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#C6A45C" />
+  <meta name="theme-color" content="#071747" />
   <title>Client Profile & Security | Elpis Property Limited</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,11 +14,11 @@
       display: grid;
       grid-template-columns: 260px 1fr;
       min-height: 100vh;
-      background-color: var(--soft);
+      background-color: var(--brand-background);
     }
     .portal-sidebar {
-      background-color: #17231A;
-      color: #D3DED5;
+      background-color: #071747;
+      color: #e9ecf4;
       padding: 28px 20px;
       display: flex;
       flex-direction: column;
@@ -27,7 +27,7 @@
     .portal-sidebar .brand-logo {
       width: 165px;
       height: auto;
-      background-color: #FFFFFF;
+      background-color: #ffffff;
       padding: 6px 10px;
       border-radius: var(--radius-sm);
       margin-bottom: 24px;
@@ -37,7 +37,7 @@
       font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 1.5px;
-      color: #7E9383;
+      color: #6b7690;
       margin: 16px 8px 6px;
       font-weight: 700;
     }
@@ -47,23 +47,23 @@
       gap: 12px;
       padding: 10px 14px;
       border-radius: var(--radius-sm);
-      color: #A3B5A7;
+      color: #aeb6c8;
       font-size: 13px;
       font-weight: 600;
       transition: var(--transition);
     }
     .portal-sidebar a:hover,
     .portal-sidebar a.active {
-      background-color: rgba(0, 181, 34, 0.15);
-      color: #7FE58D;
+      background-color: rgba(232,181,45, 0.15);
+      color: #e8b52d;
     }
     .portal-main {
       padding: 32px 40px;
       max-width: 900px;
     }
     .profile-card {
-      background: #FFFFFF;
-      border: 1px solid var(--line);
+      background: #ffffff;
+      border: 1px solid var(--brand-line);
       border-radius: var(--radius-md);
       padding: 32px;
       box-shadow: var(--shadow-sm);
@@ -76,16 +76,16 @@
     }
     .card-desc {
       font-size: 13px;
-      color: var(--muted);
+      color: var(--brand-muted);
       margin-bottom: 22px;
     }
     .immutable-badge {
       font-size: 11px;
-      color: #8D6B17;
-      background: #FEF8E7;
+      color: #9a6b00;
+      background: #f7f6f2;
       padding: 4px 8px;
       border-radius: 4px;
-      border: 1px solid #F5E5B8;
+      border: 1px solid #f4d06a;
       display: inline-block;
       margin-top: 4px;
     }
@@ -118,12 +118,12 @@
       <a href="client-profile.html" class="active">👤 Profile & Security</a>
       <span class="nav-section-title" style="margin-top:auto">Actions</span>
       <a href="index.html">🌐 Public Website</a>
-      <a href="#" id="logoutBtn" style="color:#E74C3C">🚪 Sign Out</a>
+      <a href="#" id="logoutBtn" style="color:#e74c3c">🚪 Sign Out</a>
     </aside>
 
     <main class="portal-main">
       <h1 style="font-size:26px;font-weight:800;margin-bottom:8px">Client Profile & Account Security</h1>
-      <p style="font-size:14px;color:var(--muted);margin-bottom:28px">View and update your personal contact details, residential address, next of kin, and manage your account password.</p>
+      <p style="font-size:14px;color:var(--brand-muted);margin-bottom:28px">View and update your personal contact details, residential address, next of kin, and manage your account password.</p>
 
       <!-- Permitted Profile Information Form -->
       <div class="profile-card">
@@ -193,7 +193,7 @@
             <span class="immutable-badge">🔒 Note: Property ownership, agreed purchase price, assigned branch, and marketer attribution are strictly immutable from this portal.</span>
           </div>
 
-          <button type="submit" class="btn btn-green" id="saveProfileBtn" style="max-width:200px">
+          <button type="submit" class="btn btn-brand" id="saveProfileBtn" style="max-width:200px">
             Save Profile Changes
           </button>
           <span id="profileMsg" style="font-size:13px;font-weight:600"></span>
@@ -221,7 +221,7 @@
             <input type="password" id="confirmPass" required placeholder="••••••••">
           </div>
 
-          <button type="submit" class="btn btn-green" id="changePassBtn">
+          <button type="submit" class="btn btn-brand" id="changePassBtn">
             Update Password
           </button>
           <span id="passMsg" style="font-size:13px;font-weight:600"></span>
@@ -285,13 +285,13 @@
         });
         btn.disabled = false;
         if (res.ok) {
-          msg.style.color = '#C6A45C';
+          msg.style.color = '#e8b52d';
           msg.textContent = '✓ Profile updated successfully.';
           document.getElementById('profIdentityNumber').value = '';
           if (body.identity_number) document.getElementById('profKycStatus').textContent = 'Identity review: pending review';
         } else {
           const err = await res.json();
-          msg.style.color = '#C0392B';
+          msg.style.color = '#c0392b';
           msg.textContent = err.error || 'Failed to update profile.';
         }
       });
@@ -306,7 +306,7 @@
         msg.textContent = '';
 
         if (n1 !== n2) {
-          msg.style.color = '#C0392B';
+          msg.style.color = '#c0392b';
           msg.textContent = 'Passwords do not match.';
           return;
         }
@@ -318,12 +318,12 @@
         });
 
         if (res.ok) {
-          msg.style.color = '#C6A45C';
+          msg.style.color = '#e8b52d';
           msg.textContent = '✓ Password changed successfully.';
           document.getElementById('passwordForm').reset();
         } else {
           const err = await res.json();
-          msg.style.color = '#C0392B';
+          msg.style.color = '#c0392b';
           msg.textContent = err.error || 'Password update failed.';
         }
       });

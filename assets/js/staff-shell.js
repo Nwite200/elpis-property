@@ -75,18 +75,18 @@
   };
 
   elpisStaff.badge = function (text, tone) {
-    const map = { green: "badge-green", amber: "badge-amber", red: "badge-red", blue: "badge-blue", gray: "badge-gray", dark: "badge-dark" };
+    const map = { green: "badge-success", amber: "badge-amber", red: "badge-red", blue: "badge-blue", gray: "badge-gray", dark: "badge-dark" };
     return `<span class="badge ${map[tone] || "badge-gray"}">${elpisStaff.escape(text)}</span>`;
   };
 
   elpisStaff.leadBadge = function (status) {
     const tone = status === "Converted" ? "green" : status === "Lost" ? "red" : status === "New Lead" ? "blue" : "amber";
     const dot = status === "New Lead" ? "new" : status === "Contacted" ? "contacted" : status === "Interested" ? "interested" : status === "Inspection Scheduled" ? "inspection" : status === "Negotiation" ? "negotiation" : status === "Converted" ? "converted" : "lost";
-    return `<span class="lead-status badge ${tone === "green" ? "badge-green" : tone === "red" ? "badge-red" : tone === "blue" ? "badge-blue" : "badge-amber"}"><span class="status-dot ${dot}"></span>${elpisStaff.escape(status)}</span>`;
+    return `<span class="lead-status badge ${tone === "green" ? "badge-success" : tone === "red" ? "badge-red" : tone === "blue" ? "badge-blue" : "badge-amber"}"><span class="status-dot ${dot}"></span>${elpisStaff.escape(status)}</span>`;
   };
 
   elpisStaff.staffBadge = function (active) {
-    return active ? '<span class="badge badge-green">Active</span>' : '<span class="badge badge-gray">Inactive</span>';
+    return active ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-gray">Inactive</span>';
   };
 
   elpisStaff.toast = function (message, isError) {
@@ -159,13 +159,13 @@
       (!item.requiresSmsAccess || me.sms_access) &&
       (!item.commissionNav || me.can_access_commissions || ["Marketer", "Team Lead", "Branch Manager"].includes(role))).map(item => {
       if (item.section) return `<div class="section-label">${item.section}</div>`;
-      return `<a href="${item.href}" ${item.page === activePage ? 'class="active"' : ""} ${item.id ? `id="${item.id}"` : ""} ${item.page === "logout" ? 'style="color:#E74C3C"' : ""}>${item.label}</a>`;
+      return `<a href="${item.href}" ${item.page === activePage ? 'class="active"' : ""} ${item.id ? `id="${item.id}"` : ""} ${item.page === "logout" ? 'style="color:#e74c3c"' : ""}>${item.label}</a>`;
     }).join("");
     if (["Super Admin", "Managing Director"].includes(me.actual_role || role)) {
       items += `<div class="section-label">System</div><a href="super-admin.html" class="${activePage === "super-admin" ? "active" : ""}">🛡️ System Administration</a>`;
     }
     if (role === "Customer Care") {
-      items += `<div class="section-label">Account</div><a href="index.html">🌐 Public Website</a><a href="#" id="logoutBtn" style="color:#E74C3C">🚪 Logout</a>`;
+      items += `<div class="section-label">Account</div><a href="index.html">🌐 Public Website</a><a href="#" id="logoutBtn" style="color:#e74c3c">🚪 Logout</a>`;
     }
     const scopeLabel = role === "Customer Care"
       ? (me.care_scope === "national" ? "National" : (me.branch_name || "Branch"))
@@ -174,8 +174,8 @@
         : (me.branch_name || "Branch"));
     return `
       <div class="brand"><a href="dashboard.html"><img src="assets/images/elpis-property-logo-original.png" alt="Elpis Property" onerror="this.src='elpis-property-logo-original.png'"></a></div>
-      ${me.payment_mode === "test" ? '<div style="margin:0 8px 10px;padding:8px;border:1px solid #E0A800;background:#FFF8E1;color:#7A5200;border-radius:7px;font-size:11px;font-weight:800;text-align:center">TEST MODE — no real money</div>' : ""}
-      <div style="padding:0 8px 8px;font-size:11px;color:#9FB2A3">${elpisStaff.escape(me.full_name)}<br><span style="color:#6F8575">${elpisStaff.escape(me.actual_role || role)} · ${elpisStaff.escape(scopeLabel)}</span></div>
+      ${me.payment_mode === "test" ? '<div style="margin:0 8px 10px;padding:8px;border:1px solid #e8b52d;background:#f7f6f2;color:#9a6b00;border-radius:7px;font-size:11px;font-weight:800;text-align:center">TEST MODE — no real money</div>' : ""}
+      <div style="padding:0 8px 8px;font-size:11px;color:#aeb6c8">${elpisStaff.escape(me.full_name)}<br><span style="color:#6b7690">${elpisStaff.escape(me.actual_role || role)} · ${elpisStaff.escape(scopeLabel)}</span></div>
       ${items}
       <div class="sidebar-note">In-app notifications are active. Email and WhatsApp delivery adapters remain pending provider integration.</div>
     `;

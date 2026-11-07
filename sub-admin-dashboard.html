@@ -36,7 +36,7 @@
           <div class="field-group"><label class="field-label" for="editCity">City</label><input class="field-input" id="editCity"></div>
           <div class="field-group full"><label class="field-label" for="editReason">Reason for edit</label><input class="field-input" id="editReason" placeholder="Required"></div>
         </div>
-        <div style="display:flex;gap:8px;margin-top:12px"><button class="btn btn-green" id="saveClientBtn">Save non-financial edits</button><span class="small" id="editMsg"></span></div>
+        <div style="display:flex;gap:8px;margin-top:12px"><button class="btn btn-brand" id="saveClientBtn">Save non-financial edits</button><span class="small" id="editMsg"></span></div>
       </div>
 
       <div class="card" style="margin-top:16px">
@@ -109,7 +109,7 @@
           el('editCity').value = c.city || '';
           el('changeBranch').value = String(c.assigned_branch_id || '');
           el('editHistory').innerHTML = (data.edit_history || []).length
-            ? data.edit_history.map(h => `<div style="padding:6px 0;border-bottom:1px solid var(--line)"><strong>${esc(h.action)}</strong> · ${esc(h.created_at)} · ${esc(h.actor_name || 'System')}<div style="font-size:11px">${esc(JSON.stringify(h.metadata || {}))}</div></div>`).join('')
+            ? data.edit_history.map(h => `<div style="padding:6px 0;border-bottom:1px solid var(--brand-line)"><strong>${esc(h.action)}</strong> · ${esc(h.created_at)} · ${esc(h.actor_name || 'System')}<div style="font-size:11px">${esc(JSON.stringify(h.metadata || {}))}</div></div>`).join('')
             : 'No edits recorded.';
         } catch (error) { el('editMsg').textContent = error.message; }
       }
@@ -146,7 +146,11 @@
           await Promise.all([loadClient(), loadUnassigned()]);
         } catch (error) { msg.textContent = error.message; }
       });
-      await Promise.all([loadApprovals(), loadOptions(), loadUnassigned()]);
+      try {
+        await Promise.all([loadApprovals(), loadOptions(), loadUnassigned()]);
+      } catch (error) {
+        ElpisStaff.toast(error.message || 'Sub-admin approvals are not enabled yet.', true);
+      }
     })();
   </script>
 </body>

@@ -95,7 +95,7 @@
           <div class="type">${S.escape(typeLabel(child.type))}</div>
           <div class="name">${S.escape(child.name)}</div>
           <div class="amount">${S.money(child.total_kobo)}</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:4px">${child.payment_count} payment(s)</div>
+          <div style="font-size:11px;color:var(--brand-muted);margin-top:4px">${child.payment_count} payment(s)</div>
         </button>`).join("") : '<div class="empty-state">No payments in this period.</div>';
       el("revChildren").querySelectorAll("[data-child]").forEach(button => {
         button.addEventListener("click", () => {

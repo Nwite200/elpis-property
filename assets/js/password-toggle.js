@@ -11,13 +11,13 @@
     eye.textContent = "👁";
     eye.title = "Show / hide password";
     eye.setAttribute("aria-label", "Show or hide password");
-    eye.style.cssText = "border:1px solid var(--line);background:#fff;border-radius:6px;padding:7px 9px;cursor:pointer;line-height:1";
+    eye.style.cssText = "border:1px solid var(--brand-line);background:#fff;border-radius:6px;padding:7px 9px;cursor:pointer;line-height:1";
     const copy = document.createElement("button");
     copy.type = "button";
     copy.textContent = "⧉";
     copy.title = "Copy password";
     copy.setAttribute("aria-label", "Copy password");
-    copy.style.cssText = "border:1px solid var(--line);background:#fff;border-radius:6px;padding:7px 9px;cursor:pointer;line-height:1";
+    copy.style.cssText = "border:1px solid var(--brand-line);background:#fff;border-radius:6px;padding:7px 9px;cursor:pointer;line-height:1";
     eye.addEventListener("click", () => {
       const showing = input.type === "text";
       input.type = showing ? "password" : "text";

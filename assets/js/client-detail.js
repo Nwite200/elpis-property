@@ -46,36 +46,36 @@ async function load() {
   const summary = document.getElementById("portfolioSummary");
   if (summary) {
     summary.innerHTML = `Contract: <strong>${money(financials.agreed_price_ngn)}</strong><br>
-      Verified: <strong style="color:var(--green-dark)">${money(financials.total_verified_ngn)}</strong><br>
+      Verified: <strong style="color:var(--brand-primary-dark)">${money(financials.total_verified_ngn)}</strong><br>
       Outstanding: <strong>${money(financials.outstanding_balance_ngn)}</strong>`;
   }
   if (portfolio) {
     if (!properties.length) {
-      portfolio.innerHTML = `<p style="color:var(--muted);font-size:13px">No property allocation recorded for this client.</p>`;
+      portfolio.innerHTML = `<p style="color:var(--brand-muted);font-size:13px">No property allocation recorded for this client.</p>`;
     } else {
       portfolio.innerHTML = properties.map(p => `
-        <div style="border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:10px">
+        <div style="border:1px solid var(--brand-line);border-radius:8px;padding:12px;margin-bottom:10px">
           <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
             <div>
               <strong>${esc(p.title)}</strong>
-              <div style="font-size:11px;color:var(--muted);margin-top:2px">${esc(p.reference)} · ${esc(p.category_name || "Property")} · ${esc(p.location || "")}</div>
+              <div style="font-size:11px;color:var(--brand-muted);margin-top:2px">${esc(p.reference)} · ${esc(p.category_name || "Property")} · ${esc(p.location || "")}</div>
             </div>
-            <div style="font-size:11px;color:var(--muted);text-align:right">
+            <div style="font-size:11px;color:var(--brand-muted);text-align:right">
               ${p.verified_payments_count || 0} verified payment(s)<br>
               ${p.last_payment_at ? "Last: " + new Date(p.last_payment_at).toLocaleDateString() : "No verified payments"}
             </div>
           </div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:10px;font-size:12px">
-            <div><span style="color:var(--muted)">Agreed</span><br><strong>${money(p.agreed_purchase_price)}</strong></div>
-            <div><span style="color:var(--muted)">Paid</span><br><strong style="color:var(--green-dark)">${money(p.verified_ngn)}</strong></div>
-            <div><span style="color:var(--muted)">Remaining</span><br><strong>${money(p.outstanding_ngn)}</strong></div>
+            <div><span style="color:var(--brand-muted)">Agreed</span><br><strong>${money(p.agreed_purchase_price)}</strong></div>
+            <div><span style="color:var(--brand-muted)">Paid</span><br><strong style="color:var(--brand-primary-dark)">${money(p.verified_ngn)}</strong></div>
+            <div><span style="color:var(--brand-muted)">Remaining</span><br><strong>${money(p.outstanding_ngn)}</strong></div>
           </div>
-          <div style="height:8px;background:var(--line);border-radius:99px;margin-top:10px;overflow:hidden">
-            <div style="height:100%;width:${Number(p.progress || 0)}%;background:var(--green)"></div>
+          <div style="height:8px;background:var(--brand-line);border-radius:99px;margin-top:10px;overflow:hidden">
+            <div style="height:100%;width:${Number(p.progress || 0)}%;background:var(--brand-primary)"></div>
           </div>
-          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--brand-muted);margin-top:4px">
             <span>${esc(p.allocation_status || p.status || "Active")}</span>
-            <strong style="color:var(--green-dark)">${Number(p.progress || 0)}% complete</strong>
+            <strong style="color:var(--brand-primary-dark)">${Number(p.progress || 0)}% complete</strong>
           </div>
         </div>`).join("");
     }
@@ -83,17 +83,17 @@ async function load() {
   const plan = data.payment_plan;
   if (plan) {
     const planLabel = ({ outright: "Outright", part_payment: "Part payment", daily: "Daily", weekly: "Weekly", bi_monthly: "Bi-monthly", monthly: "Monthly" })[plan.plan_type] || plan.plan_type;
-    document.getElementById("planStatus").innerHTML = plan.status === "defaulting" ? '<span class="badge badge-red">Defaulting</span>' : '<span class="badge badge-green">Performing</span>';
+    document.getElementById("planStatus").innerHTML = plan.status === "defaulting" ? '<span class="badge badge-red">Defaulting</span>' : '<span class="badge badge-success">Performing</span>';
     document.getElementById("paymentPlan").innerHTML = `
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px">
-        <div><span style="color:var(--muted)">Plan type</span><br><strong>${esc(planLabel)}${plan.is_easy_buy ? " · easy buy" : ""}</strong></div>
-        <div><span style="color:var(--muted)">Agreed total</span><br><strong>${money(plan.total_agreed_price)}</strong></div>
-        <div><span style="color:var(--muted)">Instalment</span><br><strong>${money(plan.installment_amount)}</strong></div>
-        <div><span style="color:var(--muted)">Expected to date</span><br><strong>${money((plan.expected_to_date_kobo || 0) / 100)}</strong></div>
-        <div><span style="color:var(--muted)">Paid to date</span><br><strong>${money((plan.paid_to_date_kobo || 0) / 100)}</strong></div>
-        <div><span style="color:var(--muted)">Amount behind</span><br><strong style="color:${plan.amount_behind_kobo ? "var(--red,#DC2626)" : "var(--green-dark)"}">${money((plan.amount_behind_kobo || 0) / 100)}</strong></div>
-        <div><span style="color:var(--muted)">Days overdue</span><br><strong>${plan.days_overdue || 0}</strong></div>
-        <div><span style="color:var(--muted)">Grace period</span><br><strong>${plan.grace_days || 0} day(s)</strong></div>
+        <div><span style="color:var(--brand-muted)">Plan type</span><br><strong>${esc(planLabel)}${plan.is_easy_buy ? " · easy buy" : ""}</strong></div>
+        <div><span style="color:var(--brand-muted)">Agreed total</span><br><strong>${money(plan.total_agreed_price)}</strong></div>
+        <div><span style="color:var(--brand-muted)">Instalment</span><br><strong>${money(plan.installment_amount)}</strong></div>
+        <div><span style="color:var(--brand-muted)">Expected to date</span><br><strong>${money((plan.expected_to_date_kobo || 0) / 100)}</strong></div>
+        <div><span style="color:var(--brand-muted)">Paid to date</span><br><strong>${money((plan.paid_to_date_kobo || 0) / 100)}</strong></div>
+        <div><span style="color:var(--brand-muted)">Amount behind</span><br><strong style="color:${plan.amount_behind_kobo ? "var(--red,#dc2626)" : "var(--brand-primary-dark)"}">${money((plan.amount_behind_kobo || 0) / 100)}</strong></div>
+        <div><span style="color:var(--brand-muted)">Days overdue</span><br><strong>${plan.days_overdue || 0}</strong></div>
+        <div><span style="color:var(--brand-muted)">Grace period</span><br><strong>${plan.grace_days || 0} day(s)</strong></div>
       </div>`;
     const items = plan.expected_items || [];
     document.getElementById("planItemsWrap").style.display = items.length ? "" : "none";
@@ -136,9 +136,9 @@ async function load() {
   if (assignmentHistory) {
     const el = document.getElementById("assignHistoryList");
     el.innerHTML = assignmentHistory.map(h => `
-      <div style="padding:6px 0;border-bottom:1px solid var(--line)">
-        <div style="font-size:11px;color:var(--muted)">${new Date(h.changed_at).toLocaleString()}</div>
-        <div><span style="color:var(--green-dark)">→</span> ${esc(h.new_manager_name || "-")} · ${esc(h.new_branch_id || "-")}</div>
+      <div style="padding:6px 0;border-bottom:1px solid var(--brand-line)">
+        <div style="font-size:11px;color:var(--brand-muted)">${new Date(h.changed_at).toLocaleString()}</div>
+        <div><span style="color:var(--brand-primary-dark)">→</span> ${esc(h.new_manager_name || "-")} · ${esc(h.new_branch_id || "-")}</div>
         <div style="font-size:11px">Authorized by ${esc(h.authorized_by_name || "-")} · ${esc(h.reason || "")}</div>
       </div>`).join("");
   }
@@ -147,16 +147,16 @@ async function load() {
   if (data.status_history) {
     const el = document.getElementById("statusHistoryList");
     el.innerHTML = data.status_history.map(h => `
-      <div style="padding:6px 0;border-bottom:1px solid var(--line)">
-        <div style="font-size:11px;color:var(--muted)">${new Date(h.changed_at).toLocaleString()}</div>
-        <div>${esc(h.old_status || "-")} → <strong>${esc(h.new_status)}</strong> <span style="color:var(--muted);font-size:11px">by ${esc(h.changed_by_name || "-")}</span></div>
+      <div style="padding:6px 0;border-bottom:1px solid var(--brand-line)">
+        <div style="font-size:11px;color:var(--brand-muted)">${new Date(h.changed_at).toLocaleString()}</div>
+        <div>${esc(h.old_status || "-")} → <strong>${esc(h.new_status)}</strong> <span style="color:var(--brand-muted);font-size:11px">by ${esc(h.changed_by_name || "-")}</span></div>
       </div>`).join("");
   }
 
   // Notes
   if (data.notes) {
     const el = document.getElementById("notesList");
-    el.innerHTML = data.notes.map(n => `<div style="padding:6px 0;border-bottom:1px solid var(--line)"><div style="font-size:11px;color:var(--muted)">${new Date(n.created_at).toLocaleString()}</div><div style="padding-left:12px">${esc(n.note)}</div></div>`).join("");
+    el.innerHTML = data.notes.map(n => `<div style="padding:6px 0;border-bottom:1px solid var(--brand-line)"><div style="font-size:11px;color:var(--brand-muted)">${new Date(n.created_at).toLocaleString()}</div><div style="padding-left:12px">${esc(n.note)}</div></div>`).join("");
   }
 
   async function loadStaticWallet() {
@@ -175,7 +175,7 @@ async function load() {
       return;
     }
     statusEl.innerHTML = wallet.status === "active"
-      ? '<span class="badge badge-green">Active</span>'
+      ? '<span class="badge badge-success">Active</span>'
       : '<span class="badge badge-amber">OTP pending</span>';
     details.innerHTML = `
       <div><strong>${esc(wallet.account_number || "—")}</strong></div>
@@ -219,14 +219,14 @@ async function load() {
   const kycMessage = document.getElementById("kycMessage");
   const kycState = c.kyc_status || "pending";
   kycBadge.innerHTML = kycState === "verified"
-    ? '<span class="badge badge-green">Verified</span>'
+    ? '<span class="badge badge-success">Verified</span>'
     : (kycState === "rejected" ? '<span class="badge badge-red">Rejected</span>' : '<span class="badge badge-amber">Pending review</span>');
   kycDetails.innerHTML = `
-    <div><span style="color:var(--muted)">Type:</span> <strong>${esc(c.identity_type || "Not provided")}</strong></div>
-    <div><span style="color:var(--muted)">Number:</span> <strong>${esc(c.identity_number_masked || "—")}</strong></div>
-    <div><span style="color:var(--muted)">BVN:</span> <strong>${c.bvn_last4 ? "•••••••" + esc(c.bvn_last4) : "Not supplied"}</strong></div>
-    <div><span style="color:var(--muted)">Submitted:</span> ${c.kyc_submitted_at ? new Date(c.kyc_submitted_at).toLocaleString() : "—"}</div>
-    <div><span style="color:var(--muted)">Reviewed:</span> ${c.kyc_reviewed_at ? new Date(c.kyc_reviewed_at).toLocaleString() : "—"}</div>`;
+    <div><span style="color:var(--brand-muted)">Type:</span> <strong>${esc(c.identity_type || "Not provided")}</strong></div>
+    <div><span style="color:var(--brand-muted)">Number:</span> <strong>${esc(c.identity_number_masked || "—")}</strong></div>
+    <div><span style="color:var(--brand-muted)">BVN:</span> <strong>${c.bvn_last4 ? "•••••••" + esc(c.bvn_last4) : "Not supplied"}</strong></div>
+    <div><span style="color:var(--brand-muted)">Submitted:</span> ${c.kyc_submitted_at ? new Date(c.kyc_submitted_at).toLocaleString() : "—"}</div>
+    <div><span style="color:var(--brand-muted)">Reviewed:</span> ${c.kyc_reviewed_at ? new Date(c.kyc_reviewed_at).toLocaleString() : "—"}</div>`;
   document.getElementById("kycNotes").value = c.kyc_notes || "";
   async function reviewKyc(status) {
     kycMessage.textContent = "";
@@ -252,7 +252,7 @@ async function load() {
     const statusEl = document.getElementById("verificationStatus");
     const msg = document.getElementById("verificationMessage");
     statusEl.innerHTML = state.verification_status === "verified"
-      ? '<span class="badge badge-green">Verified</span>'
+      ? '<span class="badge badge-success">Verified</span>'
       : '<span class="badge badge-amber">Unverified</span>';
     const channel = document.getElementById("verificationChannel");
     channel.querySelector('option[value="email"]').disabled = !(state.has_email && state.email_ready);

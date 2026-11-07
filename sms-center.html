@@ -19,7 +19,7 @@
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
-  <meta name="theme-color" content="#C6A45C" />
+  <meta name="theme-color" content="#071747" />
 </head>
 <body data-page="sms">
   <div class="dash">
@@ -30,7 +30,7 @@
         <p>Client SMS delivery, templates, opt-outs, provider credit and the delivery log. Provider keys are Worker secrets only.</p>
         <div class="role-hero-meta" id="smsMeta"></div>
         <div class="hero-actions">
-          <button class="btn btn-green" type="button" id="smsRefreshBalance">Refresh provider balance</button>
+          <button class="btn btn-brand" type="button" id="smsRefreshBalance">Refresh provider balance</button>
           <button class="btn btn-outline-white" type="button" id="smsSendTestBtn">Send test SMS</button>
         </div>
       </section>
@@ -50,7 +50,7 @@
             <select id="smsStatusFilter"><option value="">All statuses</option><option value="queued">Queued</option><option value="sent">Sent</option><option value="delivered">Delivered</option><option value="failed">Failed</option><option value="opted_out">Opted out</option><option value="skipped">Skipped</option></select>
             <select id="smsTemplateFilter"><option value="">All templates</option></select>
             <input type="date" id="smsFrom"><input type="date" id="smsTo">
-            <button class="btn btn-green btn-sm" type="button" id="smsApplyFilters">Filter</button>
+            <button class="btn btn-brand btn-sm" type="button" id="smsApplyFilters">Filter</button>
             <button class="btn btn-ghost btn-sm" type="button" id="smsResetFilters">Reset</button>
           </div>
           <div class="table-responsive"><table class="table">
@@ -87,7 +87,7 @@
             <div class="field-group"><label class="field-label">Defaulting reminders</label><select class="field-input" id="smsDefaulting"><option value="0">Off</option><option value="1">On</option></select></div>
             <div class="field-group"><label class="field-label">Defaulting frequency (days)</label><input class="field-input" type="number" min="1" max="60" id="smsDefaultingDays"></div>
             <div class="field-group"><label class="field-label">Monthly statement day</label><input class="field-input" type="number" min="1" max="28" id="smsStatementDay"></div>
-            <div class="field-group" style="display:flex;align-items:flex-end"><button class="btn btn-green" type="submit">Save controls</button></div>
+            <div class="field-group" style="display:flex;align-items:flex-end"><button class="btn btn-brand" type="submit">Save controls</button></div>
           </form>
         </div>
       </section>
@@ -100,7 +100,7 @@
       <form id="smsTestForm" class="form-grid">
         <div class="field-group full"><label class="field-label">Phone number</label><input class="field-input" id="smsTestPhone" placeholder="08012345678" required></div>
         <div class="field-group full"><label class="field-label">Message</label><textarea class="field-input" id="smsTestBody" rows="4" placeholder="Test message from Elpis Property" required></textarea></div>
-        <div class="field-group full"><button class="btn btn-green" type="submit">Send test</button></div>
+        <div class="field-group full"><button class="btn btn-brand" type="submit">Send test</button></div>
       </form>
     </div>
   </div>
@@ -114,7 +114,7 @@
         <div class="field-group"><label class="field-label">Language</label><select class="field-input" id="smsTemplateLanguage"><option value="en">English</option><option value="pcm">Pidgin</option><option value="yo">Yoruba</option><option value="ig">Igbo</option><option value="ha">Hausa</option></select></div>
         <div class="field-group"><label class="field-label">Status</label><select class="field-input" id="smsTemplateActive"><option value="1">Active</option><option value="0">Inactive</option></select></div>
         <div class="field-group full"><label class="field-label">Message body</label><textarea class="field-input" id="smsTemplateBody" rows="5" required></textarea></div>
-        <div class="field-group full"><button class="btn btn-green" type="submit">Save template</button></div>
+        <div class="field-group full"><button class="btn btn-brand" type="submit">Save template</button></div>
       </form>
     </div>
   </div>

@@ -16,8 +16,8 @@
       margin-bottom: 24px;
     }
     .fin-kpi-card {
-      background: #FFFFFF;
-      border: 1px solid var(--line);
+      background: #ffffff;
+      border: 1px solid var(--brand-line);
       border-radius: var(--radius-md);
       padding: 18px 20px;
       box-shadow: var(--shadow-sm);
@@ -30,26 +30,26 @@
       text-transform: uppercase;
       letter-spacing: 1px;
       font-weight: 700;
-      color: var(--muted);
+      color: var(--brand-muted);
     }
     .fin-kpi-card .amount {
       font-family: var(--font-display);
       font-size: 22px;
       font-weight: 800;
-      color: var(--charcoal);
+      color: var(--brand-text);
     }
     .fin-kpi-card .meta {
       font-size: 12px;
-      color: var(--muted);
+      color: var(--brand-muted);
     }
 
     .demo-mode-active {
-      border: 2px dashed #DC2626 !important;
-      background: #FFF5F5 !important;
+      border: 2px dashed #dc2626 !important;
+      background: #fff5f5 !important;
     }
     .demo-banner-top {
-      background: #DC2626;
-      color: #FFFFFF;
+      background: #dc2626;
+      color: #ffffff;
       padding: 8px 16px;
       font-size: 13px;
       font-weight: 700;
@@ -62,7 +62,7 @@
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 17, 0.7);
+      background: rgba(7,23,71, 0.7);
       backdrop-filter: blur(4px);
       z-index: 1000;
       display: none;
@@ -74,7 +74,7 @@
       display: flex;
     }
     .modal-box {
-      background: #FFFFFF;
+      background: #ffffff;
       width: 100%;
       max-width: 560px;
       border-radius: var(--radius-md);
@@ -86,7 +86,7 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
-      border-bottom: 1px solid var(--line);
+      border-bottom: 1px solid var(--brand-line);
       padding-bottom: 14px;
     }
     .modal-header h3 {
@@ -102,22 +102,22 @@
       display: block;
       font-size: 12px;
       font-weight: 700;
-      color: var(--charcoal);
+      color: var(--brand-text);
       margin-bottom: 6px;
     }
     .form-group input, .form-group select, .form-group textarea {
       width: 100%;
       padding: 10px 12px;
-      border: 1px solid var(--line);
+      border: 1px solid var(--brand-line);
       border-radius: var(--radius-sm);
       font-size: 13px;
       box-sizing: border-box;
-      background: #FFFFFF;
+      background: #ffffff;
     }
 
     .wema-widget {
-      background: #FFFFFF;
-      border: 1px solid var(--line);
+      background: #ffffff;
+      border: 1px solid var(--brand-line);
       border-radius: var(--radius-md);
       padding: 20px;
       margin-bottom: 24px;
@@ -139,7 +139,7 @@
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
-  <meta name="theme-color" content="#C6A45C" />
+  <meta name="theme-color" content="#071747" />
 </head>
 <body>
   <div id="demoBanner" class="demo-banner-top">
@@ -163,7 +163,7 @@
 
       <div class="section-label">Mode & Environment</div>
       <div style="padding:10px 14px">
-        <label style="font-size:12px;color:#A3B5A7;display:flex;align-items:center;gap:8px;cursor:pointer">
+        <label style="font-size:12px;color:#aeb6c8;display:flex;align-items:center;gap:8px;cursor:pointer">
           <input type="checkbox" id="toggleDemoMode">
           <span>Demo Test Mode</span>
         </label>
@@ -171,7 +171,7 @@
 
       <div class="section-label" style="margin-top:auto">Session</div>
       <a href="index.html">🌐 Public Website</a>
-      <a href="#" id="logoutBtn" style="color:#E74C3C">🚪 Logout</a>
+      <a href="#" id="logoutBtn" style="color:#e74c3c">🚪 Logout</a>
     </aside>
 
     <!-- Main Workspace -->
@@ -179,10 +179,10 @@
       <div class="dash-top">
         <div>
           <h1 style="font-size:26px;font-weight:800;margin-bottom:4px">Financial Operations & Ledger</h1>
-          <p style="font-size:13px;color:var(--muted);margin:0">Verified collections, payment reconciliations, ALAT Wema integration & integer kobo audit.</p>
+          <p style="font-size:13px;color:var(--brand-muted);margin:0">Verified collections, payment reconciliations, ALAT Wema integration & integer kobo audit.</p>
         </div>
         <div style="display:flex;gap:10px;align-items:center">
-          <button type="button" class="btn btn-green btn-sm" id="openRecordPaymentBtn">+ Record Manual Payment</button>
+          <button type="button" class="btn btn-brand btn-sm" id="openRecordPaymentBtn">+ Record Manual Payment</button>
           <button type="button" class="btn btn-outline btn-sm" id="exportCsvBtn">📥 Export CSV</button>
         </div>
       </div>
@@ -193,10 +193,10 @@
           <div style="font-size:32px">🏦</div>
           <div>
             <div style="display:flex;align-items:center;gap:8px">
-              <span style="font-size:15px;font-weight:700;color:var(--charcoal)">ALAT by Wema Bank Virtual Accounts</span>
-              <span id="wemaStatusBadge" class="status-badge" style="background:#FEF3C7;color:#92400E">Awaiting onboarding</span>
+              <span style="font-size:15px;font-weight:700;color:var(--brand-text)">ALAT by Wema Bank Virtual Accounts</span>
+              <span id="wemaStatusBadge" class="status-badge" style="background:#f4d06a;color:#9a6b00">Awaiting onboarding</span>
             </div>
-            <div style="font-size:12px;color:var(--muted);margin-top:3px" id="wemaSubtext">
+            <div style="font-size:12px;color:var(--brand-muted);margin-top:3px" id="wemaSubtext">
               Direct automated virtual account issuance and webhook payment notifications.
             </div>
           </div>
@@ -206,7 +206,7 @@
 
       <!-- Financial KPI Cards -->
       <div class="finance-kpis">
-        <div class="fin-kpi-card" style="border-left:4px solid #C6A45C">
+        <div class="fin-kpi-card" style="border-left:4px solid #e8b52d">
           <span class="label">Total Verified Collections</span>
           <div class="amount" id="kpiTotalVerified">₦0.00</div>
           <span class="meta" id="kpiVerifiedCount">0 verified payments</span>
@@ -221,29 +221,29 @@
           <div class="amount" id="kpiMonthVerified">₦0.00</div>
           <span class="meta">Current calendar month</span>
         </div>
-        <div class="fin-kpi-card" style="border-left:4px solid #D97706">
+        <div class="fin-kpi-card" style="border-left:4px solid #9a6b00">
           <span class="label">Pending Verification</span>
-          <div class="amount" id="kpiPendingAmount" style="color:#D97706">₦0.00</div>
+          <div class="amount" id="kpiPendingAmount" style="color:#9a6b00">₦0.00</div>
           <span class="meta" id="kpiPendingCount">0 pending review</span>
         </div>
-        <div class="fin-kpi-card" style="border-left:4px solid #DC2626">
+        <div class="fin-kpi-card" style="border-left:4px solid #dc2626">
           <span class="label">Reversals & Refunds</span>
-          <div class="amount" id="kpiRefundsAmount" style="color:#DC2626">₦0.00</div>
+          <div class="amount" id="kpiRefundsAmount" style="color:#dc2626">₦0.00</div>
           <span class="meta" id="kpiRefundsCount">0 adjustments</span>
         </div>
-        <div class="fin-kpi-card" style="border-left:4px solid #2563EB">
+        <div class="fin-kpi-card" style="border-left:4px solid #071747">
           <span class="label">Outstanding Client Balances</span>
-          <div class="amount" id="kpiOutstandingAmount" style="color:#2563EB">₦0.00</div>
+          <div class="amount" id="kpiOutstandingAmount" style="color:#071747">₦0.00</div>
           <span class="meta">Across all active contracts</span>
         </div>
       </div>
 
       <!-- Transaction Ledger Table -->
       <div class="card" style="padding:0;overflow:hidden">
-        <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--brand-line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
           <div class="filters" style="gap:10px;flex-wrap:wrap">
-            <input id="txSearchInput" type="search" placeholder="Search reference, client..." style="width:240px;height:38px;padding:0 12px;border:1px solid var(--line);border-radius:4px;font-size:13px">
-            <select id="txStatusFilter" style="height:38px;padding:0 12px;border:1px solid var(--line);border-radius:4px;font-size:13px">
+            <input id="txSearchInput" type="search" placeholder="Search reference, client..." style="width:240px;height:38px;padding:0 12px;border:1px solid var(--brand-line);border-radius:4px;font-size:13px">
+            <select id="txStatusFilter" style="height:38px;padding:0 12px;border:1px solid var(--brand-line);border-radius:4px;font-size:13px">
               <option value="">All Statuses</option>
               <option value="verified">Verified</option>
               <option value="pending">Pending</option>
@@ -251,27 +251,27 @@
               <option value="reversed">Reversed</option>
               <option value="refunded">Refunded</option>
             </select>
-            <select id="txBranchFilter" style="height:38px;padding:0 12px;border:1px solid var(--line);border-radius:4px;font-size:13px">
+            <select id="txBranchFilter" style="height:38px;padding:0 12px;border:1px solid var(--brand-line);border-radius:4px;font-size:13px">
               <option value="">All Branches</option>
             </select>
-            <select id="txMarketerFilter" style="height:38px;padding:0 12px;border:1px solid var(--line);border-radius:4px;font-size:13px">
+            <select id="txMarketerFilter" style="height:38px;padding:0 12px;border:1px solid var(--brand-line);border-radius:4px;font-size:13px">
               <option value="">All Marketers</option>
             </select>
-            <select id="txPropertyFilter" style="height:38px;padding:0 12px;border:1px solid var(--line);border-radius:4px;font-size:13px">
+            <select id="txPropertyFilter" style="height:38px;padding:0 12px;border:1px solid var(--brand-line);border-radius:4px;font-size:13px">
               <option value="">All Properties</option>
             </select>
-            <input type="date" id="txDateFrom" title="From date" style="height:38px;padding:0 10px;border:1px solid var(--line);border-radius:4px;font-size:12px">
-            <input type="date" id="txDateTo" title="To date" style="height:38px;padding:0 10px;border:1px solid var(--line);border-radius:4px;font-size:12px">
+            <input type="date" id="txDateFrom" title="From date" style="height:38px;padding:0 10px;border:1px solid var(--brand-line);border-radius:4px;font-size:12px">
+            <input type="date" id="txDateTo" title="To date" style="height:38px;padding:0 10px;border:1px solid var(--brand-line);border-radius:4px;font-size:12px">
             <label style="display:flex;align-items:center;gap:6px;font-size:12px;height:38px"><input type="checkbox" id="txIncludeTest"> Include test data</label>
             <button type="button" class="btn btn-outline btn-sm" id="clearTxFiltersBtn">Clear</button>
           </div>
-          <div id="txCountLabel" style="font-size:12px;color:var(--muted)">Loading transactions...</div>
+          <div id="txCountLabel" style="font-size:12px;color:var(--brand-muted)">Loading transactions...</div>
         </div>
 
         <div style="overflow-x:auto">
           <div class="table-responsive"><table class="table" style="margin:0">
             <thead>
-              <tr style="background:#F9FBF9">
+              <tr style="background:#f7f6f2">
                 <th>Reference</th>
                 <th>Client Name & Ref</th>
                 <th>Branch</th>
@@ -285,7 +285,7 @@
             </thead>
             <tbody id="txTableBody">
               <tr>
-                <td colspan="9" style="text-align:center;padding:40px;color:var(--muted)">Loading transaction ledger...</td>
+                <td colspan="9" style="text-align:center;padding:40px;color:var(--brand-muted)">Loading transaction ledger...</td>
               </tr>
             </tbody>
           </table></div>
@@ -293,17 +293,17 @@
       </div>
       <!-- Installment Plans -->
       <div class="card" style="padding:0;overflow:hidden;margin-top:24px">
-        <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--brand-line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
           <div>
             <h3 style="font-size:16px;font-weight:800;margin:0">Installment Plans</h3>
-            <p style="font-size:12px;color:var(--muted);margin:2px 0 0">Weekly, monthly, quarterly and custom schedules. Every change is audited.</p>
+            <p style="font-size:12px;color:var(--brand-muted);margin:2px 0 0">Weekly, monthly, quarterly and custom schedules. Every change is audited.</p>
           </div>
-          <button type="button" class="btn btn-green btn-sm" id="openScheduleBtn">+ Create Installment Plan</button>
+          <button type="button" class="btn btn-brand btn-sm" id="openScheduleBtn">+ Create Installment Plan</button>
         </div>
         <div style="overflow-x:auto">
           <div class="table-responsive"><table class="table" style="margin:0">
             <thead>
-              <tr style="background:#F9FBF9">
+              <tr style="background:#f7f6f2">
                 <th>Client</th>
                 <th>Property</th>
                 <th>Agreed Total</th>
@@ -316,7 +316,7 @@
               </tr>
             </thead>
             <tbody id="scheduleTableBody">
-              <tr><td colspan="9" style="text-align:center;padding:28px;color:var(--muted)">Loading installment plans...</td></tr>
+              <tr><td colspan="9" style="text-align:center;padding:28px;color:var(--brand-muted)">Loading installment plans...</td></tr>
             </tbody>
           </table></div>
         </div>
@@ -359,12 +359,12 @@
         <div class="form-group">
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
             <input type="checkbox" id="recordIsDemo">
-            <span style="font-weight:400;color:var(--charcoal)">Mark as Demo / Test Transaction</span>
+            <span style="font-weight:400;color:var(--brand-text)">Mark as Demo / Test Transaction</span>
           </label>
         </div>
         <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px">
           <button type="button" class="btn btn-outline" onclick="closeModal('recordPaymentModal')">Cancel</button>
-          <button type="submit" class="btn btn-green" id="submitRecordBtn">Record Payment</button>
+          <button type="submit" class="btn btn-brand" id="submitRecordBtn">Record Payment</button>
         </div>
       </form>
     </div>
@@ -377,26 +377,26 @@
         <h3>Verify & Authorize Payment</h3>
         <button type="button" class="btn btn-outline btn-sm" onclick="closeModal('verifyPaymentModal')">✕</button>
       </div>
-      <div style="font-size:13px;color:var(--charcoal);line-height:1.5;margin-bottom:18px">
+      <div style="font-size:13px;color:var(--brand-text);line-height:1.5;margin-bottom:18px">
         You are about to verify the following payment into the company's ledger. This action is <strong>authoritative</strong>, computes remaining balances in integer kobo, and generates an official receipt for the client.
       </div>
-      <div style="background:#F9FAF9;border:1px solid var(--line);border-radius:6px;padding:16px;margin-bottom:20px">
+      <div style="background:#f7f6f2;border:1px solid var(--brand-line);border-radius:6px;padding:16px;margin-bottom:20px">
         <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px">
-          <span style="color:var(--muted)">Reference:</span>
+          <span style="color:var(--brand-muted)">Reference:</span>
           <strong id="verifyModalTxRef" style="font-family:'Space Mono', monospace">--</strong>
         </div>
         <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px">
-          <span style="color:var(--muted)">Client:</span>
+          <span style="color:var(--brand-muted)">Client:</span>
           <strong id="verifyModalClient">--</strong>
         </div>
-        <div style="display:flex;justify-content:space-between;font-size:14px;border-top:1px dashed var(--line);padding-top:8px">
-          <span style="color:var(--muted)">Verified Amount:</span>
-          <strong id="verifyModalAmount" style="color:#A9853F;font-size:16px">₦0.00</strong>
+        <div style="display:flex;justify-content:space-between;font-size:14px;border-top:1px dashed var(--brand-line);padding-top:8px">
+          <span style="color:var(--brand-muted)">Verified Amount:</span>
+          <strong id="verifyModalAmount" style="color:#9a6b00;font-size:16px">₦0.00</strong>
         </div>
       </div>
       <div style="display:flex;justify-content:flex-end;gap:10px">
         <button type="button" class="btn btn-outline" onclick="closeModal('verifyPaymentModal')">Cancel</button>
-        <button type="button" class="btn btn-green" id="confirmVerifyBtn">Confirm & Issue Receipt</button>
+        <button type="button" class="btn btn-brand" id="confirmVerifyBtn">Confirm & Issue Receipt</button>
       </div>
     </div>
   </div>
@@ -423,7 +423,7 @@
         </div>
         <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px">
           <button type="button" class="btn btn-outline" onclick="closeModal('adjustPaymentModal')">Cancel</button>
-          <button type="submit" class="btn btn-sm" style="background:#DC2626;color:#FFF" id="submitAdjustBtn">Apply Adjustment</button>
+          <button type="submit" class="btn btn-sm" style="background:#dc2626;color:#FFF" id="submitAdjustBtn">Apply Adjustment</button>
         </div>
       </form>
     </div>
@@ -458,12 +458,12 @@
           <label>Webhook Secret Key</label>
           <input type="password" id="wemaSecretInput" placeholder="Enter bank webhook HMAC secret">
         </div>
-        <div style="font-size:12px;color:var(--muted);background:#F9FAF9;padding:12px;border-radius:6px;border:1px solid var(--line);margin-bottom:16px">
+        <div style="font-size:12px;color:var(--brand-muted);background:#f7f6f2;padding:12px;border-radius:6px;border:1px solid var(--brand-line);margin-bottom:16px">
           📌 <em>Architecture Notice:</em> Until status is set to <strong>Active</strong>, the client portal displays the official message: <em>"Your dedicated payment account will be available once our Wema Bank payment integration is activated. Please contact our finance team for payment assistance."</em>
         </div>
         <div style="display:flex;justify-content:flex-end;gap:10px">
           <button type="button" class="btn btn-outline" onclick="closeModal('wemaConfigModal')">Cancel</button>
-          <button type="submit" class="btn btn-green" id="saveWemaBtn">Save Configuration</button>
+          <button type="submit" class="btn btn-brand" id="saveWemaBtn">Save Configuration</button>
         </div>
       </form>
     </div>
@@ -556,12 +556,12 @@
           <label>Notes / Reason for Change</label>
           <textarea id="scheduleNotes" rows="2" placeholder="Optional note stored in the immutable schedule history"></textarea>
         </div>
-        <div style="font-size:12px;color:var(--muted);background:#F9FAF9;padding:10px;border-radius:6px;border:1px solid var(--line);margin-bottom:14px">
+        <div style="font-size:12px;color:var(--brand-muted);background:#f7f6f2;padding:10px;border-radius:6px;border:1px solid var(--brand-line);margin-bottom:14px">
           Overdue installments are flagged for the client. No penalties or interest are applied automatically.
         </div>
         <div style="display:flex;justify-content:flex-end;gap:10px">
           <button type="button" class="btn btn-outline" onclick="closeModal('scheduleModal')">Cancel</button>
-          <button type="submit" class="btn btn-green" id="saveScheduleBtn">Save Plan</button>
+          <button type="submit" class="btn btn-brand" id="saveScheduleBtn">Save Plan</button>
         </div>
       </form>
     </div>
@@ -702,11 +702,11 @@
         const wBadge = document.getElementById("wemaStatusBadge");
         wBadge.textContent = w.status;
         if (w.status === "Active") {
-          wBadge.style.background = "#E8F9EB";
-          wBadge.style.color = "#A9853F";
+          wBadge.style.background = "#f7f6f2";
+          wBadge.style.color = "#9a6b00";
         } else {
-          wBadge.style.background = "#FEF3C7";
-          wBadge.style.color = "#92400E";
+          wBadge.style.background = "#f4d06a";
+          wBadge.style.color = "#9a6b00";
         }
         document.getElementById("wemaSubtext").textContent = `Environment: ${w.environment.toUpperCase()} | Status: ${w.status}`;
       }
@@ -745,7 +745,7 @@
       tbody.innerHTML = "";
 
       if (currentTransactions.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--muted)">No transactions match the selected criteria.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--brand-muted)">No transactions match the selected criteria.</td></tr>`;
         return;
       }
 
@@ -764,26 +764,26 @@
         tr.innerHTML = `
           <td style="font-family:'Space Mono', monospace;font-size:12px;font-weight:700">
             ${esc(t.transaction_ref)}
-            ${t.is_demo ? '<div style="color:#DC2626;font-size:10px">DEMO</div>' : ''}
-            ${t.is_internal_test ? '<div style="color:#B91C1C;font-size:10px;font-weight:800">TEST</div>' : ''}
+            ${t.is_demo ? '<div style="color:#dc2626;font-size:10px">DEMO</div>' : ''}
+            ${t.is_internal_test ? '<div style="color:#b91c1c;font-size:10px;font-weight:800">TEST</div>' : ''}
           </td>
           <td>
             <div style="font-weight:700">${esc(t.client_name || "Unknown")}</div>
-            <div style="font-size:11px;color:var(--muted);font-family:'Space Mono', monospace">${esc(t.client_reference)}</div>
+            <div style="font-size:11px;color:var(--brand-muted);font-family:'Space Mono', monospace">${esc(t.client_reference)}</div>
           </td>
           <td style="font-size:12px">${esc(t.branch_name || "Head Office")}</td>
-          <td style="font-family:var(--font-display);font-weight:700;font-size:14px;color:${t.status === 'verified' ? '#A9853F' : 'var(--charcoal)'}">
+          <td style="font-family:var(--font-display);font-weight:700;font-size:14px;color:${t.status === 'verified' ? '#9a6b00' : 'var(--brand-text)'}">
             ${formatNGN(t.amount)}
           </td>
           <td style="font-size:12px">${t.method || "Transfer"}</td>
           <td><span class="status-badge ${statusClass}">${t.status}</span></td>
           <td style="font-size:12px">${t.created_at ? new Date(t.created_at).toLocaleDateString("en-NG", { dateStyle: "short" }) : "--"}</td>
           <td style="font-size:12px">
-            ${t.receipt_ref ? `<span style="font-family:'Space Mono', monospace;color:#A9853F;font-size:11px;font-weight:700">${t.receipt_ref}</span>` : '<span style="color:#9CA3AF">-</span>'}
+            ${t.receipt_ref ? `<span style="font-family:'Space Mono', monospace;color:#9a6b00;font-size:11px;font-weight:700">${t.receipt_ref}</span>` : '<span style="color:#98a0b3">-</span>'}
           </td>
           <td style="text-align:right">
             <div style="display:inline-flex;gap:6px">
-              ${canVerify ? `<button type="button" class="btn btn-green btn-sm" data-verify="${t.id}" data-ref="${esc(t.transaction_ref)}" data-client="${esc(t.client_name)}" data-amount="${Number(t.amount)}" style="padding:4px 8px;font-size:11px">Verify</button>` : ''}
+              ${canVerify ? `<button type="button" class="btn btn-brand btn-sm" data-verify="${t.id}" data-ref="${esc(t.transaction_ref)}" data-client="${esc(t.client_name)}" data-amount="${Number(t.amount)}" style="padding:4px 8px;font-size:11px">Verify</button>` : ''}
               ${canAdjust ? `<button type="button" class="btn btn-outline btn-sm" data-adjust="${t.id}" style="padding:4px 8px;font-size:11px">Adjust</button>` : ''}
             </div>
           </td>
@@ -1035,13 +1035,13 @@
       const res = await fetch("/api/installments");
       const tbody = document.getElementById("scheduleTableBody");
       if (!res.ok) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#DC2626">Unable to load installment plans.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#dc2626">Unable to load installment plans.</td></tr>`;
         return;
       }
       const data = await res.json();
       currentSchedules = data.schedules || [];
       if (!currentSchedules.length) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">No installment plans configured yet.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--brand-muted)">No installment plans configured yet.</td></tr>`;
         return;
       }
       tbody.innerHTML = currentSchedules.map(s => {
@@ -1049,19 +1049,19 @@
         const planBadge = s.is_easy_buy ? `<span class="status-badge status-pending">easy buy</span>` : "";
         return `
           <tr>
-            <td><strong>${s.client_name}</strong><div style="font-size:11px;color:var(--muted);font-family:'Space Mono', monospace">${s.client_reference}</div></td>
+            <td><strong>${s.client_name}</strong><div style="font-size:11px;color:var(--brand-muted);font-family:'Space Mono', monospace">${s.client_reference}</div></td>
             <td style="font-size:12px">${s.property_title || "-"}</td>
             <td style="font-weight:700">${formatNGN(s.total_agreed_price)}</td>
-            <td style="font-weight:700;color:#A9853F">${formatNGN(s.installment_amount)}</td>
+            <td style="font-weight:700;color:#9a6b00">${formatNGN(s.installment_amount)}</td>
             <td style="font-size:12px">${planTypeLabel(s.plan_type)}<div>${planBadge}</div></td>
-            <td style="font-size:12px">${formatNGN((s.expected_to_date_kobo || 0) / 100)}<div style="color:#DC2626">Behind ${formatNGN((s.amount_behind_kobo || 0) / 100)}</div></td>
+            <td style="font-size:12px">${formatNGN((s.expected_to_date_kobo || 0) / 100)}<div style="color:#dc2626">Behind ${formatNGN((s.amount_behind_kobo || 0) / 100)}</div></td>
             <td style="font-size:12px">${(s.next_due_date || "").slice(0, 10)}</td>
             <td><span class="status-badge ${badge}">${s.status}${s.status === "defaulting" || s.is_overdue ? " / overdue" : ""}</span></td>
             <td style="text-align:right">
               <div style="display:inline-flex;gap:5px">
                 ${s.status !== "cancelled" ? `<button type="button" class="btn btn-outline btn-sm" onclick="editSchedule(${s.id})" style="padding:3px 7px;font-size:11px">Edit</button>` : ""}
                 <button type="button" class="btn btn-outline btn-sm" onclick="scheduleHistory(${s.id})" style="padding:3px 7px;font-size:11px">History</button>
-                ${s.status === "active" ? `<button type="button" class="btn btn-outline btn-sm" onclick="cancelSchedule(${s.id})" style="padding:3px 7px;font-size:11px;color:#DC2626">Cancel</button>` : ""}
+                ${s.status === "active" ? `<button type="button" class="btn btn-outline btn-sm" onclick="cancelSchedule(${s.id})" style="padding:3px 7px;font-size:11px;color:#dc2626">Cancel</button>` : ""}
               </div>
             </td>
           </tr>`;
@@ -1117,16 +1117,16 @@
     window.scheduleHistory = async function(id) {
       const res = await fetch(`/api/installments/${id}/history`);
       const body = document.getElementById("scheduleHistoryBody");
-      if (!res.ok) { body.innerHTML = `<p style="color:#DC2626">Unable to load history.</p>`; openModal("scheduleHistoryModal"); return; }
+      if (!res.ok) { body.innerHTML = `<p style="color:#dc2626">Unable to load history.</p>`; openModal("scheduleHistoryModal"); return; }
       const data = await res.json();
       body.innerHTML = (data.history || []).map(h => `
-        <div style="border-bottom:1px solid var(--line);padding:10px 0">
+        <div style="border-bottom:1px solid var(--brand-line);padding:10px 0">
           <div style="display:flex;justify-content:space-between">
             <strong style="text-transform:uppercase;font-size:11px">${h.action}</strong>
-            <span style="color:var(--muted)">${(h.created_at || "").slice(0, 16)}</span>
+            <span style="color:var(--brand-muted)">${(h.created_at || "").slice(0, 16)}</span>
           </div>
-          <div style="color:var(--muted);margin-top:3px">By ${h.changed_by_name || "System"}${h.reason ? ` — ${h.reason}` : ""}</div>
-        </div>`).join("") || `<p style="color:var(--muted)">No history recorded.</p>`;
+          <div style="color:var(--brand-muted);margin-top:3px">By ${h.changed_by_name || "System"}${h.reason ? ` — ${h.reason}` : ""}</div>
+        </div>`).join("") || `<p style="color:var(--brand-muted)">No history recorded.</p>`;
       openModal("scheduleHistoryModal");
     };
 

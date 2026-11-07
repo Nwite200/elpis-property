@@ -57,7 +57,7 @@ async function load() {
   document.getElementById("detailParking").textContent = p.parking_spaces || "-";
   const feats = p.features ? JSON.parse(p.features) : [];
   const featEl = document.getElementById("detailFeatures");
-  featEl.innerHTML = feats.map(f => `<span style="background:#f3f8f4;padding:5px 9px;border-radius:5px;font-size:11px">${f}</span>`).join("");
+  featEl.innerHTML = feats.map(f => `<span style="background:#f7f6f2;padding:5px 9px;border-radius:5px;font-size:11px">${f}</span>`).join("");
 
   // gallery
   const mainImg = document.getElementById("mainImg");
@@ -67,8 +67,8 @@ async function load() {
     const thumb = document.createElement("img");
     thumb.src = "/api/files/" + encodeURIComponent(img.r2_key);
     thumb.style.width = "90px"; thumb.style.height = "90px"; thumb.style.objectFit = "cover"; thumb.style.borderRadius = "6px";
-    thumb.style.opacity = img.is_main ? "1" : "0.7"; thumb.style.border = img.is_main ? "2px solid var(--green)" : "1px solid var(--line)";
-    thumb.onclick = () => { mainImg.src = thumb.src; thumbs.querySelectorAll("img").forEach(x => { x.style.opacity="0.7"; x.style.border="1px solid var(--line)" }); thumb.style.opacity="1"; thumb.style.border="2px solid var(--green)" };
+    thumb.style.opacity = img.is_main ? "1" : "0.7"; thumb.style.border = img.is_main ? "2px solid var(--brand-primary)" : "1px solid var(--brand-line)";
+    thumb.onclick = () => { mainImg.src = thumb.src; thumbs.querySelectorAll("img").forEach(x => { x.style.opacity="0.7"; x.style.border="1px solid var(--brand-line)" }); thumb.style.opacity="1"; thumb.style.border="2px solid var(--brand-primary)" };
     thumbs.appendChild(thumb);
     if (i === 0) mainImg.src = thumb.src;
   });
@@ -80,7 +80,7 @@ async function load() {
     if (!imageList) return;
     if (!images.length) { imageList.innerHTML = "<p>No images uploaded yet.</p>"; return; }
     imageList.innerHTML = images.map(img => `
-      <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)">
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--brand-line)">
         <img src="/api/files/${encodeURIComponent(img.r2_key)}" alt="" style="width:46px;height:38px;object-fit:cover;border-radius:5px">
         <span style="flex:1">${img.is_main ? "<strong>Main image</strong>" : "Listing image"}</span>
         ${canManageAssets ? `<button class="btn btn-outline btn-sm" data-delete-image="${img.id}" style="padding:3px 8px;font-size:11px">Delete</button>` : ""}
@@ -98,7 +98,7 @@ async function load() {
     if (!docList) return;
     if (!documents.length) { docList.innerHTML = "<p>No internal documents uploaded.</p>"; return; }
     docList.innerHTML = documents.map(doc => `
-      <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)">
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--brand-line)">
         <span style="flex:1">${esc(doc.filename || "Property document")}</span>
         <a class="btn btn-outline btn-sm" href="/api/properties/${id}/documents/${doc.id}/download" style="padding:3px 8px;font-size:11px">Download</a>
         ${canManageAssets ? `<button class="btn btn-outline btn-sm" data-delete-doc="${doc.id}" style="padding:3px 8px;font-size:11px">Delete</button>` : ""}
@@ -132,8 +132,8 @@ async function load() {
         <td>${money(plan.total_price_kobo / 100)}</td>
         <td>${money((plan.deposit_kobo || 0) / 100)}</td>
         <td>${money((plan.installment_kobo || 0) / 100)}</td>
-        <td>${plan.duration_months ? plan.duration_months + ' month(s)' : '-'}${plan.number_of_installments ? ' · ' + plan.number_of_installments + ' instalment(s)' : ''}${Number(plan.balance_difference_kobo || 0) !== 0 ? `<div class="small" style="color:#B45309;margin-top:4px">Balance difference: ${money(Number(plan.balance_difference_kobo) / 100)}</div>` : ''}${plan.first_payment_rule ? `<div class="small muted" style="margin-top:4px">${esc(plan.first_payment_rule)}</div>` : ''}</td>
-        <td>${plan.is_enabled ? '<span class="badge badge-green">Enabled</span>' : '<span class="badge badge-gray">Disabled</span>'}</td>
+        <td>${plan.duration_months ? plan.duration_months + ' month(s)' : '-'}${plan.number_of_installments ? ' · ' + plan.number_of_installments + ' instalment(s)' : ''}${Number(plan.balance_difference_kobo || 0) !== 0 ? `<div class="small" style="color:#9a6b00;margin-top:4px">Balance difference: ${money(Number(plan.balance_difference_kobo) / 100)}</div>` : ''}${plan.first_payment_rule ? `<div class="small muted" style="margin-top:4px">${esc(plan.first_payment_rule)}</div>` : ''}</td>
+        <td>${plan.is_enabled ? '<span class="badge badge-success">Enabled</span>' : '<span class="badge badge-gray">Disabled</span>'}</td>
         <td>${canManagePlans ? `<button class="btn btn-ghost btn-xs" type="button" data-edit-plan="${plan.id}">Edit</button>` : ''}</td>
       </tr>`).join("");
     tbody.querySelectorAll("[data-edit-plan]").forEach(button => {
@@ -236,9 +236,9 @@ async function load() {
   const histEl = document.getElementById("statusHistory");
   const { data: histData } = await fetchJson("/properties/" + id + "/status-history");
   if (histData.history && histData.history.length) {
-    histEl.innerHTML = histData.history.map(h => `<div style="padding:6px 0;border-bottom:1px solid var(--line)"><div style="font-size:11px;color:var(--muted)">${h.changed_at}</div><div>${h.old_status ? h.old_status + " → " : ""}<strong>${h.new_status}</strong> <span style="color:var(--muted);font-size:11px">by ${h.changed_by || "system"}</span></div>`).join("");
+    histEl.innerHTML = histData.history.map(h => `<div style="padding:6px 0;border-bottom:1px solid var(--brand-line)"><div style="font-size:11px;color:var(--brand-muted)">${h.changed_at}</div><div>${h.old_status ? h.old_status + " → " : ""}<strong>${h.new_status}</strong> <span style="color:var(--brand-muted);font-size:11px">by ${h.changed_by || "system"}</span></div>`).join("");
   } else {
-    histEl.innerHTML = "<p style='color:var(--muted)'>No status history yet.</p>";
+    histEl.innerHTML = "<p style='color:var(--brand-muted)'>No status history yet.</p>";
   }
 
   // status select

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#C6A45C" />
+  <meta name="theme-color" content="#071747" />
   <title>Client Portal Dashboard | Elpis Property Limited</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,21 +14,21 @@
       display: grid;
       grid-template-columns: 260px 1fr;
       min-height: 100vh;
-      background-color: var(--soft);
+      background-color: var(--brand-background);
     }
     .portal-sidebar {
-      background-color: #17231A;
-      color: #D3DED5;
+      background-color: #071747;
+      color: #e9ecf4;
       padding: 28px 20px;
       display: flex;
       flex-direction: column;
       gap: 6px;
-      border-right: 1px solid rgba(255, 255, 255, 0.06);
+      border-right: 1px solid rgba(255,255,255, 0.06);
     }
     .portal-sidebar .brand-logo {
       width: 165px;
       height: auto;
-      background-color: #FFFFFF;
+      background-color: #ffffff;
       padding: 6px 10px;
       border-radius: var(--radius-sm);
       margin-bottom: 24px;
@@ -38,7 +38,7 @@
       font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 1.5px;
-      color: #7E9383;
+      color: #6b7690;
       margin: 16px 8px 6px;
       font-weight: 700;
     }
@@ -48,15 +48,15 @@
       gap: 12px;
       padding: 10px 14px;
       border-radius: var(--radius-sm);
-      color: #A3B5A7;
+      color: #aeb6c8;
       font-size: 13px;
       font-weight: 600;
       transition: var(--transition);
     }
     .portal-sidebar a:hover,
     .portal-sidebar a.active {
-      background-color: rgba(0, 181, 34, 0.15);
-      color: #7FE58D;
+      background-color: rgba(232,181,45, 0.15);
+      color: #e8b52d;
     }
     .portal-main {
       padding: 32px 40px;
@@ -73,19 +73,19 @@
     .client-welcome-box h1 {
       font-size: 26px;
       font-weight: 800;
-      color: var(--ink);
+      color: var(--brand-text);
     }
     .client-ref-badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
       font-size: 12px;
-      color: var(--muted);
+      color: var(--brand-muted);
       margin-top: 4px;
     }
     .client-ref-badge strong {
-      color: var(--green-dark);
-      background-color: var(--green-light);
+      color: var(--brand-primary-dark);
+      background-color: var(--brand-primary-tint);
       padding: 2px 8px;
       border-radius: 4px;
       letter-spacing: 0.5px;
@@ -97,8 +97,8 @@
     }
     .btn-notif {
       position: relative;
-      background: #FFFFFF;
-      border: 1px solid var(--line);
+      background: #ffffff;
+      border: 1px solid var(--brand-line);
       width: 40px;
       height: 40px;
       border-radius: var(--radius-sm);
@@ -112,8 +112,8 @@
       position: absolute;
       top: -4px;
       right: -4px;
-      background-color: #E74C3C;
-      color: #FFFFFF;
+      background-color: #e74c3c;
+      color: #ffffff;
       font-size: 10px;
       font-weight: 800;
       width: 18px;
@@ -131,15 +131,15 @@
       margin-bottom: 24px;
     }
     .finance-kpi-card {
-      background: #FFFFFF;
-      border: 1px solid var(--line);
+      background: #ffffff;
+      border: 1px solid var(--brand-line);
       border-radius: var(--radius-md);
       padding: 20px;
       box-shadow: var(--shadow-sm);
     }
     .kpi-lbl {
       font-size: 11px;
-      color: var(--muted);
+      color: var(--brand-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
       font-weight: 600;
@@ -148,20 +148,20 @@
       font-family: var(--font-display);
       font-size: 24px;
       font-weight: 800;
-      color: var(--ink);
+      color: var(--brand-text);
       margin: 6px 0 2px;
     }
     .kpi-green {
-      color: var(--green-dark);
+      color: var(--brand-primary-dark);
     }
     .kpi-sub {
       font-size: 11px;
-      color: var(--muted-light);
+      color: var(--brand-muted-light);
     }
     .progress-card {
       grid-column: 1 / -1;
-      background: #FFFFFF;
-      border: 1px solid var(--line);
+      background: #ffffff;
+      border: 1px solid var(--brand-line);
       border-radius: var(--radius-md);
       padding: 22px 24px;
       box-shadow: var(--shadow-sm);
@@ -176,24 +176,24 @@
     .progress-title {
       font-size: 14px;
       font-weight: 700;
-      color: var(--ink);
+      color: var(--brand-text);
     }
     .progress-pct {
       font-size: 16px;
       font-weight: 800;
-      color: var(--green-dark);
+      color: var(--brand-primary-dark);
     }
     .progress-bar-track {
       width: 100%;
       height: 12px;
-      background-color: var(--soft);
+      background-color: var(--brand-background);
       border-radius: 100px;
       overflow: hidden;
-      border: 1px solid var(--line);
+      border: 1px solid var(--brand-line);
     }
     .progress-bar-fill {
       height: 100%;
-      background: linear-gradient(90deg, #C6A45C 0%, #7FE58D 100%);
+      background: linear-gradient(90deg, #e8b52d 0%, #e8b52d 100%);
       border-radius: 100px;
       transition: width 0.8s ease;
     }
@@ -202,7 +202,7 @@
       justify-content: space-between;
       margin-top: 8px;
       font-size: 12px;
-      color: var(--muted);
+      color: var(--brand-muted);
     }
     /* Dashboard Split Content */
     .dashboard-split-grid {
@@ -211,8 +211,8 @@
       gap: 24px;
     }
     .dash-box {
-      background: #FFFFFF;
-      border: 1px solid var(--line);
+      background: #ffffff;
+      border: 1px solid var(--brand-line);
       border-radius: var(--radius-md);
       padding: 24px;
       box-shadow: var(--shadow-sm);
@@ -220,7 +220,7 @@
     .dash-box-title {
       font-size: 17px;
       font-weight: 800;
-      color: var(--ink);
+      color: var(--brand-text);
       margin-bottom: 16px;
       display: flex;
       justify-content: space-between;
@@ -229,23 +229,23 @@
     .dash-box-title a {
       font-size: 12px;
       font-weight: 700;
-      color: var(--green-dark);
+      color: var(--brand-primary-dark);
     }
     /* Property Preview Mini Card */
     .mini-prop-card {
       display: flex;
       gap: 16px;
-      border: 1px solid var(--line);
+      border: 1px solid var(--brand-line);
       border-radius: var(--radius-sm);
       padding: 14px;
-      background-color: var(--soft);
+      background-color: var(--brand-background);
     }
     .mini-prop-img {
       width: 120px;
       height: 90px;
       object-fit: cover;
       border-radius: var(--radius-sm);
-      background: #E2E8E2;
+      background: #e9ecf4;
     }
     .mini-prop-info h3 {
       font-size: 16px;
@@ -253,18 +253,18 @@
     }
     .mini-prop-info p {
       font-size: 12px;
-      color: var(--muted);
+      color: var(--brand-muted);
     }
     .mini-prop-price {
       font-size: 15px;
       font-weight: 800;
-      color: var(--green-dark);
+      color: var(--brand-primary-dark);
       margin-top: 6px;
     }
     /* Next Payment Box */
     .next-payment-banner {
-      background: linear-gradient(135deg, #F0FAF2 0%, #FFFFFF 100%);
-      border: 1px solid #BCE9C7;
+      background: linear-gradient(135deg, #f7f6f2 0%, #ffffff 100%);
+      border: 1px solid #d5dae8;
       border-radius: var(--radius-sm);
       padding: 16px;
       margin-top: 14px;
@@ -273,45 +273,45 @@
       font-family: var(--font-display);
       font-size: 22px;
       font-weight: 800;
-      color: var(--green-dark);
+      color: var(--brand-primary-dark);
       margin: 4px 0;
     }
     .next-pay-meta {
       font-size: 12px;
-      color: #38704A;
+      color: #9a6b00;
       line-height: 1.5;
     }
     .no-schedule-msg {
-      background-color: var(--soft);
-      border: 1px dashed var(--line);
+      background-color: var(--brand-background);
+      border: 1px dashed var(--brand-line);
       padding: 18px;
       border-radius: var(--radius-sm);
       font-size: 13px;
-      color: var(--muted);
+      color: var(--brand-muted);
       text-align: center;
     }
     /* Notifications modal/dropdown */
     .notif-item {
       padding: 12px 14px;
-      border-bottom: 1px solid var(--line);
+      border-bottom: 1px solid var(--brand-line);
       font-size: 13px;
     }
     .notif-item:last-child {
       border-bottom: none;
     }
     .notif-item.unread {
-      background-color: #F5FAF6;
-      border-left: 3px solid var(--green);
+      background-color: #f7f6f2;
+      border-left: 3px solid var(--brand-primary);
     }
     .notif-title {
       font-weight: 700;
-      color: var(--ink);
+      color: var(--brand-text);
       display: block;
       margin-bottom: 2px;
     }
     .notif-time {
       font-size: 11px;
-      color: var(--muted-light);
+      color: var(--brand-muted-light);
     }
     @media (max-width: 900px) {
       .portal-layout {
@@ -363,7 +363,7 @@
 
       <span class="nav-section-title" style="margin-top:auto">Actions</span>
       <a href="index.html">🌐 Public Website</a>
-      <a href="#" id="logoutBtn" style="color:#E74C3C">🚪 Sign Out</a>
+      <a href="#" id="logoutBtn" style="color:#e74c3c">🚪 Sign Out</a>
     </aside>
 
     <!-- Main Workspace Content -->
@@ -384,17 +384,17 @@
             <span class="notif-badge-count" id="notifBadge" style="display:none">0</span>
           </button>
           <a href="client-profile.html" class="btn btn-outline btn-sm">Edit Profile</a>
-          <button class="btn btn-green btn-sm" id="waSupportBtn">Support on WhatsApp ↗</button>
+          <button class="btn btn-brand btn-sm" id="waSupportBtn">Support on WhatsApp ↗</button>
         </div>
       </div>
 
-      <div class="card" id="verificationBanner" style="display:none;border-left:4px solid #F0C34B;margin-bottom:16px">
+      <div class="card" id="verificationBanner" style="display:none;border-left:4px solid #e8b52d;margin-bottom:16px">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
           <div>
             <strong>Verify your account</strong>
             <div class="small muted" style="margin-top:3px">Confirm your phone or email with a 6-digit code so Elpis Property knows this account is real.</div>
           </div>
-          <a class="btn btn-green btn-sm" href="client-verify.html">Verify now</a>
+          <a class="btn btn-brand btn-sm" href="client-verify.html">Verify now</a>
         </div>
       </div>
 
@@ -447,7 +447,7 @@
           <a href="client-virtual-account.html">Manage account →</a>
         </div>
         <div id="paymentAccountContainer">
-          <p style="color:var(--muted);font-size:13px">Loading payment account...</p>
+          <p style="color:var(--brand-muted);font-size:13px">Loading payment account...</p>
         </div>
       </div>
 
@@ -457,10 +457,13 @@
         <div class="dash-box">
           <div class="dash-box-title">
             <span>My Property Allocation</span>
-            <a href="client-property.html">View Property Details →</a>
+            <span style="display:flex;gap:14px;flex-wrap:wrap">
+              <a href="client-property.html#add-property">+ Add another property</a>
+              <a href="client-property.html">View all properties →</a>
+            </span>
           </div>
           <div id="propertyContainer">
-            <p style="color:var(--muted);font-size:13px">Loading property record...</p>
+            <p style="color:var(--brand-muted);font-size:13px">Loading property record...</p>
           </div>
         </div>
 
@@ -471,7 +474,7 @@
             <a href="client-payments.html">Payment History →</a>
           </div>
           <div id="nextPaymentContainer">
-            <p style="color:var(--muted);font-size:13px">Checking schedule...</p>
+            <p style="color:var(--brand-muted);font-size:13px">Checking schedule...</p>
           </div>
 
           <div style="margin-top:24px">
@@ -479,8 +482,8 @@
               <span>Recent In-App Notifications</span>
               <a href="client-notifications.html">View all →</a>
             </div>
-            <a href="client-notifications.html" id="notificationsContainer" style="display:block;border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;text-decoration:none;color:inherit">
-              <p style="padding:14px;color:var(--muted);font-size:13px">No recent notifications.</p>
+            <a href="client-notifications.html" id="notificationsContainer" style="display:block;border:1px solid var(--brand-line);border-radius:var(--radius-sm);overflow:hidden;text-decoration:none;color:inherit">
+              <p style="padding:14px;color:var(--brand-muted);font-size:13px">No recent notifications.</p>
             </a>
           </div>
         </div>
@@ -494,24 +497,24 @@
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px 24px;padding:4px 0">
           <div>
-            <span style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700">Phone Number</span>
-            <div id="profilePhone" style="font-size:13px;font-weight:600;color:var(--charcoal);margin-top:3px">—</div>
+            <span style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--brand-muted);font-weight:700">Phone Number</span>
+            <div id="profilePhone" style="font-size:13px;font-weight:600;color:var(--brand-text);margin-top:3px">—</div>
           </div>
           <div>
-            <span style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700">Email Address</span>
-            <div id="profileEmail" style="font-size:13px;font-weight:600;color:var(--charcoal);margin-top:3px;word-break:break-word">—</div>
+            <span style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--brand-muted);font-weight:700">Email Address</span>
+            <div id="profileEmail" style="font-size:13px;font-weight:600;color:var(--brand-text);margin-top:3px;word-break:break-word">—</div>
           </div>
           <div>
-            <span style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700">Residential Address</span>
-            <div id="profileAddress" style="font-size:13px;font-weight:600;color:var(--charcoal);margin-top:3px">—</div>
+            <span style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--brand-muted);font-weight:700">Residential Address</span>
+            <div id="profileAddress" style="font-size:13px;font-weight:600;color:var(--brand-text);margin-top:3px">—</div>
           </div>
           <div>
-            <span style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700">Branch</span>
-            <div id="profileBranch" style="font-size:13px;font-weight:600;color:var(--charcoal);margin-top:3px">—</div>
+            <span style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--brand-muted);font-weight:700">Branch</span>
+            <div id="profileBranch" style="font-size:13px;font-weight:600;color:var(--brand-text);margin-top:3px">—</div>
           </div>
           <div>
-            <span style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700">Next of Kin</span>
-            <div id="profileNok" style="font-size:13px;font-weight:600;color:var(--charcoal);margin-top:3px">—</div>
+            <span style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--brand-muted);font-weight:700">Next of Kin</span>
+            <div id="profileNok" style="font-size:13px;font-weight:600;color:var(--brand-text);margin-top:3px">—</div>
           </div>
         </div>
       </div>
@@ -537,20 +540,20 @@
           box.innerHTML = `
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;padding:4px 0">
               <div>
-                <span style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700">Account name</span>
-                <div style="font-size:14px;font-weight:800;color:var(--ink);margin-top:3px">${esc(data.account_name)}</div>
+                <span style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--brand-muted);font-weight:700">Account name</span>
+                <div style="font-size:14px;font-weight:800;color:var(--brand-text);margin-top:3px">${esc(data.account_name)}</div>
               </div>
               <div>
-                <span style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700">Account number</span>
-                <div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:800;color:var(--green-dark);margin-top:3px">${esc(data.account_number)}</div>
+                <span style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--brand-muted);font-weight:700">Account number</span>
+                <div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:800;color:var(--brand-primary-dark);margin-top:3px">${esc(data.account_number)}</div>
               </div>
               <div>
-                <span style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700">Bank</span>
-                <div style="font-size:14px;font-weight:700;color:var(--ink);margin-top:3px">${esc(data.bank_name || 'Wema Bank')}</div>
+                <span style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--brand-muted);font-weight:700">Bank</span>
+                <div style="font-size:14px;font-weight:700;color:var(--brand-text);margin-top:3px">${esc(data.bank_name || 'Wema Bank')}</div>
               </div>
             </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)">
-              <p style="font-size:12px;color:var(--muted);margin:0">Use this dedicated account for all payments. It accepts any amount and any number of transfers.</p>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--brand-line)">
+              <p style="font-size:12px;color:var(--brand-muted);margin:0">Use this dedicated account for all payments. It accepts any amount and any number of transfers.</p>
               <button class="btn btn-outline btn-sm" type="button" id="copyPaymentAccountBtn">Copy account number</button>
             </div>`;
           const copyBtn = document.getElementById('copyPaymentAccountBtn');
@@ -561,21 +564,21 @@
           });
         } else if (data.static_wallet && data.static_wallet.status === 'otp_pending') {
           box.innerHTML = `
-            <div style="background:#FFFBEB;border:1px solid #FDE68A;border-left:4px solid #D97706;border-radius:var(--radius-sm);padding:16px">
-              <strong style="color:#92400E">Your dedicated account is awaiting OTP activation.</strong>
-              <p style="font-size:12px;color:var(--muted);margin:6px 0 10px">Enter the OTP sent to the phone linked to your BVN to activate the account.</p>
-              <a class="btn btn-green btn-sm" href="client-virtual-account.html">Complete activation →</a>
+            <div style="background:#f7f6f2;border:1px solid #f4d06a;border-left:4px solid #9a6b00;border-radius:var(--radius-sm);padding:16px">
+              <strong style="color:#9a6b00">Your dedicated account is awaiting OTP activation.</strong>
+              <p style="font-size:12px;color:var(--brand-muted);margin:6px 0 10px">Enter the OTP sent to the phone linked to your BVN to activate the account.</p>
+              <a class="btn btn-brand btn-sm" href="client-virtual-account.html">Complete activation →</a>
             </div>`;
         } else {
           box.innerHTML = `
-            <div style="background:var(--soft);border:1px solid var(--line);border-radius:var(--radius-sm);padding:16px">
-              <strong style="color:var(--ink)">No active payment account yet.</strong>
-              <p style="font-size:12px;color:var(--muted);margin:6px 0 10px">Add your BVN in My Virtual Account to create your permanent dedicated account for payments.</p>
-              <a class="btn btn-green btn-sm" href="client-virtual-account.html">Set up payment account →</a>
+            <div style="background:var(--brand-background);border:1px solid var(--brand-line);border-radius:var(--radius-sm);padding:16px">
+              <strong style="color:var(--brand-text)">No active payment account yet.</strong>
+              <p style="font-size:12px;color:var(--brand-muted);margin:6px 0 10px">Add your BVN in My Virtual Account to create your permanent dedicated account for payments.</p>
+              <a class="btn btn-brand btn-sm" href="client-virtual-account.html">Set up payment account →</a>
             </div>`;
         }
       } catch (error) {
-        box.innerHTML = `<p style="font-size:12px;color:var(--muted)">Payment account details are temporarily unavailable. <a href="client-virtual-account.html">Open My Virtual Account</a>.</p>`;
+        box.innerHTML = `<p style="font-size:12px;color:var(--brand-muted)">Payment account details are temporarily unavailable. <a href="client-virtual-account.html">Open My Virtual Account</a>.</p>`;
       }
     }
     document.addEventListener('DOMContentLoaded', async () => {
@@ -640,16 +643,16 @@
                 </div>
               </div>
               <div style="margin-top:10px;padding:0 2px">
-                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px">
-                  <span>Paid: <strong style="color:var(--green)">${Elpis.money(item.verified_ngn)}</strong></span>
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--brand-muted);margin-bottom:5px">
+                  <span>Paid: <strong style="color:var(--brand-primary)">${Elpis.money(item.verified_ngn)}</strong></span>
                   <span>Remaining: <strong>${Elpis.money(item.outstanding_ngn)}</strong></span>
                 </div>
                 <div class="progress-bar-track" style="height:8px">
                   <div class="progress-bar-fill" style="width:${progressValue}%"></div>
                 </div>
-                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px">
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--brand-muted);margin-top:4px">
                   <span>${item.verified_payments_count || 0} verified payment(s)</span>
-                  <strong style="color:var(--green)">${progressValue}%</strong>
+                  <strong style="color:var(--brand-primary)">${progressValue}%</strong>
                 </div>
               </div>
             `;
@@ -697,7 +700,7 @@
           notifBox.innerHTML = notifs.map(n => `
             <div class="notif-item ${n.is_read ? '' : 'unread'}">
               <span class="notif-title">${esc(n.title)}</span>
-              <p style="font-size:12px;color:var(--muted);line-height:1.4">${esc(n.message)}</p>
+              <p style="font-size:12px;color:var(--brand-muted);line-height:1.4">${esc(n.message)}</p>
               <span class="notif-time">${(n.created_at || '').slice(0, 16)}</span>
             </div>
           `).join('');

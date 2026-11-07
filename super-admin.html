@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#C6A45C" />
+  <meta name="theme-color" content="#071747" />
   <title>System Administration | Elpis Property Limited</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,9 +28,9 @@
       <div class="dash-top">
         <div>
           <h1>System Administration</h1>
-          <p style="color:var(--muted);font-size:13px">Roles, permissions and immutable audit history.</p>
+          <p style="color:var(--brand-muted);font-size:13px">Roles, permissions and immutable audit history.</p>
         </div>
-        <span class="badge badge-green" id="adminRoleBadge">Super Admin</span>
+        <span class="badge badge-success" id="adminRoleBadge">Super Admin</span>
       </div>
 
       <div class="kpi-grid" style="margin-bottom:20px">
@@ -55,7 +55,7 @@
             <option value="rejected">Rejected</option>
           </select>
           <select id="adminClientBranch"><option value="">All branches</option></select>
-          <button class="btn btn-green btn-sm" type="button" id="adminClientApply">Filter</button>
+          <button class="btn btn-brand btn-sm" type="button" id="adminClientApply">Filter</button>
           <button class="btn btn-ghost btn-sm" type="button" id="adminClientReset">Reset</button>
         </div>
         <div class="table-responsive">
@@ -79,7 +79,7 @@
         </div>
         <div id="permissionGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:16px"></div>
         <div style="display:flex;gap:10px;align-items:center;margin-top:16px">
-          <button class="btn btn-green" type="button" id="savePermissionsBtn">Save permissions</button>
+          <button class="btn btn-brand" type="button" id="savePermissionsBtn">Save permissions</button>
           <span id="permissionMsg" class="small muted"></span>
         </div>
       </div>
@@ -125,7 +125,7 @@
           <label class="tag" style="display:flex;align-items:center;gap:8px;padding:8px 10px"><input type="checkbox" id="settingHideTest"> Hide archived test data from reports</label>
         </div>
         <div style="display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap">
-          <button class="btn btn-green" type="button" id="saveSiteSettingsBtn">Save settings</button>
+          <button class="btn btn-brand" type="button" id="saveSiteSettingsBtn">Save settings</button>
           <button class="btn btn-danger" type="button" id="archiveTestDataBtn">Archive all test data</button>
           <span class="small muted" id="siteSettingsMsg"></span>
         </div>
@@ -151,7 +151,7 @@
           <div class="small muted" style="margin-top:5px">PDF only, maximum 10MB. The uploaded document is linked on the signup page for download.</div>
         </div>
         <div style="display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap">
-          <button class="btn btn-green" type="button" id="saveTermsBtn">Publish new terms version</button>
+          <button class="btn btn-brand" type="button" id="saveTermsBtn">Publish new terms version</button>
           <span id="termsMsg" class="small muted"></span>
         </div>
         <div class="table-responsive mt-16">

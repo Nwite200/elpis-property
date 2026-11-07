@@ -5,7 +5,7 @@ async function fetchJson(path, opts = {}) {
   return { ok: res.ok, status: res.status, data: await res.json().catch(() => ({})) };
 }
 function badge(status) {
-  const cls = status === "Active Buyer" || status === "Completed" ? "badge-green" : status === "Prospect" || status === "Interested" ? "badge-gray" : "badge-amber";
+  const cls = status === "Active Buyer" || status === "Completed" ? "badge-success" : status === "Prospect" || status === "Interested" ? "badge-gray" : "badge-amber";
   return `<span class="badge ${cls}">${status}</span>`;
 }
 async function loadBranches() {
@@ -38,10 +38,10 @@ function renderKpis(clients) {
 function render(clients) {
   const tbody = document.getElementById("clientTableBody");
   tbody.innerHTML = "";
-  if (!clients.length) { tbody.innerHTML = "<tr><td colspan='7' style='text-align:center;color:var(--muted)'>No clients found.</td></tr>"; return; }
+  if (!clients.length) { tbody.innerHTML = "<tr><td colspan='7' style='text-align:center;color:var(--brand-muted)'>No clients found.</td></tr>"; return; }
   clients.forEach(c => {
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td><strong>${c.client_reference}</strong></td><td>${c.full_name}${c.is_internal_test ? ' <span class="badge badge-red">TEST</span>' : ''}</td><td>${c.phone_number}</td><td>${badge(c.status)}</td><td>${c.branch_name || "-"}</td><td>${c.original_marketer_name || c.created_by_name || "-"}</td><td><a class="details-link" href="client-detail.html?id=${c.id}" style="color:var(--green-dark)">View</a></td>`;
+    tr.innerHTML = `<td><strong>${c.client_reference}</strong></td><td>${c.full_name}${c.is_internal_test ? ' <span class="badge badge-red">TEST</span>' : ''}</td><td>${c.phone_number}</td><td>${badge(c.status)}</td><td>${c.branch_name || "-"}</td><td>${c.original_marketer_name || c.created_by_name || "-"}</td><td><a class="details-link" href="client-detail.html?id=${c.id}" style="color:var(--brand-primary-dark)">View</a></td>`;
     tbody.appendChild(tr);
   });
 }

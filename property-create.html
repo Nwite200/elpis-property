@@ -19,7 +19,7 @@
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
-  <meta name="theme-color" content="#C6A45C" />
+  <meta name="theme-color" content="#071747" />
 </head>
 <body>
   <div class="dash">
@@ -58,16 +58,16 @@
           <label style="display:flex;align-items:center;gap:8px;font-size:13px">
             <input type="checkbox" id="is_featured"> Featured property
           </label>
-          <div id="adminFlags" style="display:none;border:1px solid var(--line);border-radius:8px;padding:12px">
+          <div id="adminFlags" style="display:none;border:1px solid var(--brand-line);border-radius:8px;padding:12px">
             <strong style="font-size:12px">Management-only flags</strong>
             <label style="display:flex;align-items:center;gap:8px;font-size:12px;margin-top:8px"><input type="checkbox" id="is_demo"> Demo property</label>
             <label style="display:flex;align-items:center;gap:8px;font-size:12px;margin-top:6px"><input type="checkbox" id="is_internal_test"> Internal test property (staff/test clients only)</label>
           </div>
-          <div id="plansSection" style="border:1px solid var(--line);border-radius:8px;padding:12px;overflow:auto">
+          <div id="plansSection" style="border:1px solid var(--brand-line);border-radius:8px;padding:12px;overflow:auto">
             <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">
               <div>
                 <strong style="font-size:13px">Payment plans</strong>
-                <p style="font-size:11px;color:var(--muted);margin:4px 0 0">Enable at least one plan before publishing. For part payment and easy-buy plans, deposit + instalment × count must equal the plan total.</p>
+                <p style="font-size:11px;color:var(--brand-muted);margin:4px 0 0">Enable at least one plan before publishing. For part payment and easy-buy plans, deposit + instalment × count must equal the plan total.</p>
               </div>
               <button class="btn btn-outline btn-sm" type="button" id="syncPlanTotalsBtn">Use sale price</button>
             </div>
@@ -80,7 +80,7 @@
             <div id="planEditorMsg" style="font-size:12px;margin-top:8px"></div>
           </div>
           <div class="route-note" style="font-size:11px">Properties are created as drafts. Add at least one enabled payment plan here or on the property page, then publish or submit for approval.</div>
-          <button class="btn btn-green" type="submit">Create Property</button>
+          <button class="btn btn-brand" type="submit">Create Property</button>
           <div id="formMsg" style="color:#c0392b;font-size:13px"></div>
         </form>
       </div>

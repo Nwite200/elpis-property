@@ -19,7 +19,7 @@
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
-  <meta name="theme-color" content="#C6A45C" />
+  <meta name="theme-color" content="#071747" />
 </head>
 <body data-page="commissions">
   <div class="dash">
@@ -30,7 +30,7 @@
         <p>Configurable commission plans, verified-payment accrual, approval workflow, commission payments and traceable adjustments.</p>
         <div class="role-hero-meta" id="heroMeta"></div>
         <div class="hero-actions">
-          <button class="btn btn-green" type="button" id="newPlanBtn">+ New commission plan</button>
+          <button class="btn btn-brand" type="button" id="newPlanBtn">+ New commission plan</button>
           <button class="btn btn-outline-white" type="button" id="generateBtn">Generate commissions</button>
           <a class="btn btn-outline-white" href="reports.html">Financial reports</a>
         </div>
@@ -53,7 +53,7 @@
             <input type="date" id="entryTo" title="To">
             <select id="entryBranchFilter"><option value="">All branches</option></select>
             <select id="entryMarketerFilter"><option value="">All marketers</option></select>
-            <button class="btn btn-green btn-sm" type="button" id="applyEntryFilters">Filter</button>
+            <button class="btn btn-brand btn-sm" type="button" id="applyEntryFilters">Filter</button>
             <button class="btn btn-ghost btn-sm" type="button" id="resetEntryFilters">Reset</button>
           </div>
           <div class="table-responsive"><table class="table">
@@ -105,7 +105,7 @@
         <div id="planRules"></div>
         <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">
           <button class="btn btn-ghost" type="button" data-close-modal="planModal">Cancel</button>
-          <button class="btn btn-green" type="submit">Save plan</button>
+          <button class="btn btn-brand" type="submit">Save plan</button>
         </div>
       </form>
     </div>
@@ -125,7 +125,7 @@
         <div class="route-note mb-16">Generation is idempotent. Duplicate plan/transaction combinations are skipped. Pending, failed and DEMO payments never generate commissions.</div>
         <div style="display:flex;justify-content:flex-end;gap:8px">
           <button class="btn btn-ghost" type="button" data-close-modal="generateModal">Cancel</button>
-          <button class="btn btn-green" type="submit">Generate</button>
+          <button class="btn btn-brand" type="submit">Generate</button>
         </div>
       </form>
     </div>
