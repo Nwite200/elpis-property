@@ -1178,6 +1178,11 @@ button, input, select, textarea {
   gap: 22px;
 }
 
+.branches-grid--single {
+  grid-template-columns: minmax(0, 540px);
+  justify-content: center;
+}
+
 .branch-card {
   background-color: #FFFFFF;
   border: 1px solid var(--line);
@@ -4921,5 +4926,37 @@ body.page-home .wa-float:hover .wa-float-label {
   .property-card img,
   .btn-arrow {
     transition: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Official supplied Elpis logo in the public header and footer
+   -------------------------------------------------------------------------- */
+.site-header .brand-img {
+  width: auto;
+  height: 56px;
+  max-height: 56px;
+  padding: 5px 8px;
+  background: #FFFFFF;
+  border-radius: 8px;
+  box-shadow: 0 5px 20px rgba(20, 44, 39, 0.08);
+}
+
+body.page-home .footer-logo.footer-logo-official {
+  width: 180px;
+  height: auto;
+  padding: 10px;
+  background: #F5F2EC;
+  border: 1px solid rgba(197, 161, 107, 0.35);
+  border-radius: 10px;
+}
+
+@media (max-width: 700px) {
+  .site-header .brand-img {
+    height: 46px;
+    max-height: 46px;
+  }
+  body.page-home .footer-logo.footer-logo-official {
+    width: 150px;
   }
 }

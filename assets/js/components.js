@@ -76,7 +76,7 @@ Elpis.renderHeader = function (activePage) {
         <span>Verified property ownership &amp; investment across Nigeria</span>
       </div>
       <div class="topline-right">
-        <span class="topline-note">Six branches. One standard of trust.</span>
+        <span class="topline-note">Property advisory and client support</span>
         <span class="topline-sep">/</span>
         <a href="${c.phone ? "tel:" + c.phone : "#contact"}" class="topline-contact">${c.phone || "Speak with an advisor"} ${Elpis.icon("arrowUp")}</a>
       </div>
@@ -86,11 +86,7 @@ Elpis.renderHeader = function (activePage) {
   <header class="site-header" id="siteHeader">
     <div class="container nav-wrapper">
       <a class="brand" href="${homePrefix}#home" aria-label="${c.companyName} Home">
-        <span class="brand-mark-wrap"><img src="assets/images/elpis-mark.svg" alt="" class="brand-mark" width="52" height="52"></span>
-        <span class="brand-words">
-          <span class="brand-name">ELPIS</span>
-          <span class="brand-sub">PROPERTY LIMITED</span>
-        </span>
+        <img src="assets/images/elpis-legacy-logo.png" alt="${c.companyName}" class="brand-img">
       </a>
 
       <nav class="nav-links" id="navLinks" aria-label="Primary navigation">
@@ -137,7 +133,7 @@ Elpis.renderFooter = function () {
       <div class="footer-grid">
         <div class="footer-col footer-col-brand">
           <a href="index.html#home" class="footer-brand-link">
-            <img class="footer-logo" src="assets/images/elpis-logo-dark.svg" alt="${c.companyName}">
+            <img class="footer-logo footer-logo-official" src="assets/images/elpis-legacy-logo.png" alt="${c.companyName}">
           </a>
           <p class="footer-bio">
             A Nigerian real-estate house built around verified titles, transparent pricing and enduring client relationships.
@@ -162,12 +158,7 @@ Elpis.renderFooter = function () {
         <div class="footer-col">
           <h4 class="footer-heading">Our Branches</h4>
           <ul class="footer-links-list">
-            <li><a href="index.html#branches">Head Office — Benin City</a></li>
-            <li><a href="index.html#branches">Ikeja — Lagos</a></li>
-            <li><a href="index.html#branches">Ajah — Lagos</a></li>
-            <li><a href="index.html#branches">Asaba — Delta</a></li>
-            <li><a href="index.html#branches">Ihama — Benin City</a></li>
-            <li><a href="index.html#branches">Obakhavbaye — Benin City</a></li>
+            <li><a href="index.html#branches">Head Office — details to be confirmed</a></li>
           </ul>
         </div>
 
@@ -178,9 +169,9 @@ Elpis.renderFooter = function () {
               <span class="footer-contact-icon">${Elpis.icon("phone")}</span>
               <span><small>Telephone</small><strong>${c.phone || "Contact the team"}</strong></span>
             </a>
-            <a class="footer-contact-row" href="${Elpis.whatsappLink() || "#contact"}" target="_blank" rel="noopener">
+            <a class="footer-contact-row" href="${c.whatsappNumber ? Elpis.whatsappLink() : "#contact"}" ${c.whatsappNumber ? 'target="_blank" rel="noopener"' : ""}>
               <span class="footer-contact-icon">${Elpis.icon("chat")}</span>
-              <span><small>WhatsApp</small><strong>${waDisplay || "Message an advisor"}</strong></span>
+              <span><small>WhatsApp</small><strong>${waDisplay || "Not yet configured"}</strong></span>
             </a>
             <a class="footer-contact-row" href="${c.email ? "mailto:" + c.email : "#contact"}">
               <span class="footer-contact-icon">${Elpis.icon("mail")}</span>
@@ -188,7 +179,7 @@ Elpis.renderFooter = function () {
             </a>
             <div class="footer-contact-row">
               <span class="footer-contact-icon">${Elpis.icon("pin")}</span>
-              <span><small>Headquarters</small><strong>${c.address || "Benin City, Edo State"}</strong></span>
+              <span><small>Headquarters</small><strong>${c.address || "Address to be confirmed"}</strong></span>
             </div>
           </div>
           <div class="footer-social-strip">
@@ -196,7 +187,7 @@ Elpis.renderFooter = function () {
             <a href="${c.social?.instagram || "#"}" target="_blank" rel="noopener" aria-label="Instagram">IG</a>
             <a href="${c.social?.twitter || "#"}" target="_blank" rel="noopener" aria-label="Twitter">X</a>
             <a href="${c.social?.linkedin || "#"}" target="_blank" rel="noopener" aria-label="LinkedIn">IN</a>
-            <a href="#" class="footer-wa-pill" id="footerWaBtn">WhatsApp ${Elpis.icon("arrowUp")}</a>
+            ${c.whatsappNumber ? `<a href="#" class="footer-wa-pill" id="footerWaBtn">WhatsApp ${Elpis.icon("arrowUp")}</a>` : ""}
           </div>
         </div>
       </div>

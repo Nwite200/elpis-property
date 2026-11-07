@@ -13,13 +13,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     const el = document.getElementById(id);
     if (el) el.textContent = value;
   };
-  setText("contactPhone", c.phone || "Contact phone not configured");
+  setText("contactPhone", c.phone || "To be confirmed");
   setText("contactEmail", c.email || "Contact email not configured");
-  setText("contactAddress", c.address || "Head office address not configured");
+  setText("contactAddress", c.address || "Head office address to be confirmed");
   const waDigits = String(c.whatsappNumber || "").replace(/\D/g, "");
+  const waConfigured = waDigits.length >= 10;
   setText("contactWhatsapp", waDigits.startsWith("234") && waDigits.length === 13
     ? `0${waDigits.slice(3, 6)} ${waDigits.slice(6, 9)} ${waDigits.slice(9)}`
-    : (c.whatsappNumber || "WhatsApp contact not configured"));
+    : (c.whatsappNumber || "Not yet configured"));
+
+  const phoneLink = document.getElementById("contactPhoneLink");
+  if (phoneLink) phoneLink.setAttribute("href", c.phone ? `tel:${String(c.phone).replace(/[^0-9+]/g, "")}` : "#contact");
+
+  if (!waConfigured) {
+    document.querySelectorAll(".wa-link, .contact-whatsapp-box, .wa-float").forEach((el) => {
+      el.style.display = "none";
+    });
+  }
 
   const waBtn = document.getElementById("waBtn");
   if (waBtn) {
@@ -33,6 +43,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const branchesGrid = document.getElementById("branchesGrid");
   if (branchesGrid) {
     const branches = Array.isArray(c.branches) && c.branches.length ? c.branches : [];
+    branchesGrid.classList.toggle("branches-grid--single", branches.length <= 1);
     if (!branches.length) {
       branchesGrid.innerHTML = '<div class="branch-card"><div class="branch-badge">Configuration required</div><h3 class="branch-title">Branch offices</h3><p class="branch-address">Branch contact details are not configured yet.</p></div>';
     } else {
@@ -43,11 +54,13 @@ document.addEventListener("DOMContentLoaded", async () => {
           <span class="branch-badge">${b.type || (b.isHeadOffice ? "Headquarters" : "Branch")}</span>
         </div>
         <h3 class="branch-title">${b.name || "Branch"}</h3>
-        <p class="branch-location">${[b.city, b.state].filter(Boolean).join(", ") || "Nigeria"}</p>
-        <p class="branch-address">${b.address || "Contact Elpis for the verified address."}</p>
+        <p class="branch-location">${[b.city, b.state].filter(Boolean).join(", ") || "Location to be confirmed"}</p>
+        <p class="branch-address">${b.address || "Verified address and contact details will be published here."}</p>
         <div class="branch-footer">
           ${b.phone ? `<a class="branch-action branch-phone" href="tel:${String(b.phone).replace(/[^0-9+]/g, "")}">${Elpis.icon("phone")} ${b.phone}</a>` : ""}
-          <a class="branch-action wa-link" href="#" data-message="Hello Elpis Property, I would like to visit or speak with an agent at the ${b.name} office.">Contact office <span>→</span></a>
+          ${waConfigured
+            ? `<a class="branch-action wa-link" href="#" data-message="Hello Elpis Property, I would like to visit or speak with an agent at the ${b.name} office.">Contact office <span>→</span></a>`
+            : `<a class="branch-action" href="#contact">Register interest <span>→</span></a>`}
         </div>
       </article>
     `).join("");
@@ -65,7 +78,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           id: String(p.id),
           slug: p.slug || (p.reference ? p.reference.toLowerCase() : String(p.id)),
           name: p.title || p.name,
-          location: p.city ? `${p.city}, ${p.state || "Lagos"}` : (p.state || "Lagos"),
+          location: p.city ? `${p.city}, ${p.state || "Nigeria"}` : (p.state || "Nigeria"),
           branch: p.branch_name || "Head Office",
           category: p.category_name || "Residential",
           price: Number(p.sale_price || p.price || 0),

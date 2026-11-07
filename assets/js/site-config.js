@@ -1,21 +1,16 @@
 // Elpis Property Limited public-site configuration.
-// Replace branch addresses and contact details when Elpis supplies new verified details.
+// Replace branch addresses and contact details when Elpis supplies verified details.
 window.ELPIS_CONFIG = {
   companyName: "Elpis Property Limited",
   tagline: "Your future begins with the right property",
-  whatsappNumber: "2349168630710",
-  phone: "0805 289 9920",
+  whatsappNumber: "",
+  phone: "",
   email: "hr@elpisproperty.org",
-  address: "102, Ihama Road, GRA, Benin City",
+  address: "",
   showDemoProperties: true,
   social: { facebook: "", instagram: "", twitter: "", linkedin: "" },
   branches: [
-    { name: "Head Office", city: "Benin City", state: "Edo State", type: "Corporate Headquarters", address: "102, Ihama Road, GRA, Benin City", phone: "0805 289 9920", isHeadOffice: true },
-    { name: "Ikeja", city: "Ikeja", state: "Lagos State", type: "Mainland Branch", address: "Plot 40, Adegbola Street, Anifowose, Ikeja", phone: "0805 289 9920", isHeadOffice: false },
-    { name: "Ajah", city: "Ajah", state: "Lagos State", type: "Island & Lekki Corridor", address: "Fladek Plaza, Ado Road, Ajah", phone: "0805 289 9920", isHeadOffice: false },
-    { name: "Asaba", city: "Asaba", state: "Delta State", type: "Delta Regional Office", address: "Plot 2, Ikukaiwe Street, Asaba", phone: "0807 389 1911", isHeadOffice: false },
-    { name: "Ihama", city: "Benin City", state: "Edo State", type: "GRA Branch", address: "102, Ihama Road, GRA, Benin City", phone: "0807 389 3946", isHeadOffice: false },
-    { name: "Obakhavbaye", city: "Benin City", state: "Edo State", type: "Commercial Office", address: "13, Obakhavbaye Street, off Oba Market Road, Benin City", phone: "0805 289 9920", isHeadOffice: false }
+    { name: "Head Office", city: "", state: "", type: "Corporate Headquarters", address: "", phone: "", isHeadOffice: true }
   ]
 };
 
