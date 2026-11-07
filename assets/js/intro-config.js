@@ -5,33 +5,33 @@ window.ELPIS_INTRO_CONFIG = {
   INTRO_STYLE: "hype", // "hype" | "classic"
   LOGO_SRC: "assets/images/elpis-property-logo-original.png",
   BRAND_NAME: "ELPIS PROPERTY LIMITED",
-  TAGLINE: "Your Future Begins With the Right Property.",
+  TAGLINE: "Spaces. Assets. Possibilities.",
 
   COLORS: {
-    accent: "#C6A45C",
-    accentBright: "#E2C98B",
-    charcoal: "#17243A",
-    dark: "#0B1424",
-    soft: "#F5F3EE",
+    accent: "#C5A16B",
+    accentBright: "#E9D8B9",
+    charcoal: "#142C27",
+    dark: "#0D211D",
+    soft: "#F5F2EC",
     white: "#FFFFFF"
   },
 
   FULL: {
     hype: {
-      total: 3000,
-      streak: { start: 0, duration: 300 },
-      logo: { start: 300, duration: 500 },
-      glitch: { start: 300, duration: 110 },
-      impact: 800,
-      shake: { start: 800, duration: 120 },
-      ring: { start: 800, duration: 650 },
-      speed: { start: 800, end: 1600 },
-      sweep: { start: 800, duration: 1500 },
-      lines: { start: 800, duration: 1000 },
-      tagline: { start: 1600, duration: 300 },
-      hold: { start: 1600, end: 2300 },
-      exit: { start: 2300, duration: 700 },
-      failsafe: 3800
+      total: 15000,
+      streak: { start: 0, duration: 1100 },
+      logo: { start: 900, duration: 1300 },
+      glitch: { start: 1500, duration: 160 },
+      impact: 2500,
+      shake: { start: 2500, duration: 180 },
+      ring: { start: 2500, duration: 1800 },
+      speed: { start: 2500, end: 6000 },
+      sweep: { start: 2600, duration: 3800 },
+      lines: { start: 1900, duration: 4600 },
+      tagline: { start: 5200, duration: 900 },
+      hold: { start: 6200, end: 13200 },
+      exit: { start: 13200, duration: 1800 },
+      failsafe: 16000
     },
     classic: {
       total: 2700,
@@ -44,20 +44,20 @@ window.ELPIS_INTRO_CONFIG = {
 
   SHORT: {
     hype: {
-      total: 1000,
-      streak: { start: 0, duration: 100 },
-      logo: { start: 100, duration: 170 },
-      glitch: { start: 100, duration: 70 },
-      impact: 270,
-      shake: { start: 270, duration: 90 },
-      ring: { start: 270, duration: 430 },
-      speed: { start: 270, end: 540 },
-      sweep: { start: 270, duration: 500 },
-      lines: { start: 270, duration: 400 },
+      total: 1200,
+      streak: { start: 0, duration: 180 },
+      logo: { start: 120, duration: 240 },
+      glitch: { start: 120, duration: 70 },
+      impact: 360,
+      shake: { start: 360, duration: 70 },
+      ring: { start: 360, duration: 420 },
+      speed: { start: 360, end: 760 },
+      sweep: { start: 360, duration: 520 },
+      lines: { start: 300, duration: 480 },
       tagline: { start: 0, duration: 0 },
-      hold: { start: 540, end: 760 },
-      exit: { start: 760, duration: 240 },
-      failsafe: 1800
+      hold: { start: 760, end: 930 },
+      exit: { start: 930, duration: 270 },
+      failsafe: 1700
     },
     classic: {
       total: 1350,
