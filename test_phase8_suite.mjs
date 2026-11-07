@@ -765,7 +765,7 @@ await test('single global logo intro supports hype/classic, full/short replay an
   assert(config.includes('total: 15000') && config.includes('total: 1200'), 'full/short hype durations missing');
   assert(config.includes('fadeIn: 600') && config.includes('hold: 1500') && config.includes('fadeOut: 600'), 'classic full timings missing');
   assert(config.includes('failsafe: 16000') && config.includes('failsafe: 1700'), 'hype failsafe timings missing');
-  assert(config.includes('LOGO_SRC: "assets/images/elpis-legacy-logo.png"'), 'actual site logo path missing');
+  assert(config.includes('LOGO_SRC: "assets/images/elpis-property-logo-original.png"'), 'actual site logo path missing');
   assert(motionJs.includes("addEventListener(\"pageshow\""), 'Back/Forward pageshow replay missing');
   assert(motionJs.includes("addEventListener(\"popstate\""), 'Back/Forward popstate replay missing');
   assert(motionJs.includes("event.key !== \"Escape\"") && motionJs.includes("event.key !== \"Enter\""), 'Escape/Enter skip missing');

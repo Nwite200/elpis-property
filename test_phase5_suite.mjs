@@ -194,7 +194,6 @@ db.prepare(`INSERT INTO receipts (payment_id, client_id, receipt_ref, amount, am
 // ---------------------------------------------------------------------------
 const r2 = new Map();
 const queuedMessages = [];
-const logoBytes = new Uint8Array(readFileSync('assets/images/elpis-legacy-logo.jpg'));
 
 function makeEnv(overrides = {}) {
   return {
@@ -251,11 +250,7 @@ function makeEnv(overrides = {}) {
       async send(msg) { queuedMessages.push(msg); return true; }
     },
     ASSETS: {
-      async fetch(input) {
-        const url = typeof input === 'string' ? input : (input.url || String(input));
-        if (url.includes('elpis-legacy-logo.jpg')) {
-          return new Response(logoBytes, { status: 200, headers: { 'Content-Type': 'image/jpeg' } });
-        }
+      async fetch() {
         return new Response('Not found', { status: 404 });
       }
     },
@@ -533,7 +528,7 @@ await test('receipt PDF is generated, stored in R2 and contains the official log
   assert(text.includes('OFFICIAL RECEIPT'), 'receipt title present');
   assert(text.includes('RCP-elpis-001'), 'receipt number present');
   assert(text.includes('BLC-MW2ER37J'), 'client reference present');
-  assert(text.includes('/DCTDecode'), 'official logo image embedded');
+  assert(text.includes('ELPIS') && text.includes('PROPERTY LIMITED'), 'Elpis vector wordmark embedded');
   const key = `receipts/BLC-MW2ER37J/RCP-elpis-001.pdf`;
   assert(r2.has(key), 'PDF stored in R2');
   const dbKey = db.prepare('SELECT r2_key FROM receipts WHERE id=?').get(adaReceipt.id).r2_key;

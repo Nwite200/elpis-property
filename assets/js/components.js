@@ -86,7 +86,7 @@ Elpis.renderHeader = function (activePage) {
   <header class="site-header" id="siteHeader">
     <div class="container nav-wrapper">
       <a class="brand" href="${homePrefix}#home" aria-label="${c.companyName} Home">
-        <img src="assets/images/elpis-legacy-logo.png" alt="${c.companyName}" class="brand-img">
+        <img src="assets/images/elpis-property-logo-original.png" alt="${c.companyName}" class="brand-img">
       </a>
 
       <nav class="nav-links" id="navLinks" aria-label="Primary navigation">
@@ -133,13 +133,13 @@ Elpis.renderFooter = function () {
       <div class="footer-grid">
         <div class="footer-col footer-col-brand">
           <a href="index.html#home" class="footer-brand-link">
-            <img class="footer-logo footer-logo-official" src="assets/images/elpis-legacy-logo.png" alt="${c.companyName}">
+            <img class="footer-logo footer-logo-official" src="assets/images/elpis-property-logo-original.png" alt="${c.companyName}">
           </a>
           <p class="footer-bio">
             A Nigerian real-estate house built around verified titles, transparent pricing and enduring client relationships.
           </p>
           <div class="footer-trust-badge">
-            <img src="assets/images/elpis-legacy-logo.png" alt="" class="footer-seal" width="26" height="26">
+            <img src="assets/images/elpis-property-logo-original.png" alt="" class="footer-seal" width="26" height="26">
             <span>Registered &amp; verified property advisory</span>
           </div>
         </div>

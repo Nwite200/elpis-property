@@ -3,7 +3,7 @@
 // No other code change is required to switch styles.
 window.ELPIS_INTRO_CONFIG = {
   INTRO_STYLE: "hype", // "hype" | "classic"
-  LOGO_SRC: "assets/images/elpis-legacy-logo.png",
+  LOGO_SRC: "assets/images/elpis-property-logo-original.png",
   BRAND_NAME: "ELPIS PROPERTY LIMITED",
   TAGLINE: "Spaces. Assets. Possibilities.",
 

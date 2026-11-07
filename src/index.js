@@ -3479,7 +3479,9 @@ function buildReceiptPdf({ receiptRef, clientName, clientRef, propertyTitle, pro
     commands.push(`BT /F2 68 Tf 0.950 0.880 0.880 rg 120 360 Td ${pdfText("DEMO")} Tj ET`);
   }
   commands.push(`q 1 1 1 rg 34 746 140 92 re f Q`);
-  if (logoBytes) commands.push(`q 126 0 0 84 40 750 cm /Im0 Do Q`);
+  // Vector wordmark keeps generated PDFs self-contained and avoids treating PNG data as JPEG.
+  commands.push(`BT /F2 20 Tf 0.000 0.560 0.110 rg 58 792 Td ${pdfText("ELPIS")} Tj ET`);
+  commands.push(`BT /F2 7 Tf 0.420 0.450 0.420 rg 58 776 Td ${pdfText("PROPERTY LIMITED")} Tj ET`);
   commands.push(`BT /F2 19 Tf 1 1 1 rg 360 808 Td ${pdfText("OFFICIAL RECEIPT")} Tj ET`);
   commands.push(`BT /F1 9 Tf 1 1 1 rg 360 792 Td ${pdfText("Elpis Property Limited")} Tj ET`);
   commands.push(`BT /F1 9 Tf 1 1 1 rg 360 778 Td ${pdfText("Real Estate & Property Investment")} Tj ET`);
@@ -3523,7 +3525,7 @@ function buildReceiptPdf({ receiptRef, clientName, clientRef, propertyTitle, pro
   const objects = [];
   objects.push(latin1("<< /Type /Catalog /Pages 2 0 R >>"));
   objects.push(latin1("<< /Type /Pages /Kids [3 0 R] /Count 1 >>"));
-  const imageResource = logoBytes ? " /XObject << /Im0 7 0 R >>" : "";
+  const imageResource = "";
   objects.push(latin1(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R /F2 6 0 R >>${imageResource} >> /Contents 4 0 R >>`));
 
   const contentHeader = latin1(`<< /Length ${content.length} >>\nstream\n`);
@@ -3531,10 +3533,7 @@ function buildReceiptPdf({ receiptRef, clientName, clientRef, propertyTitle, pro
   objects.push(latin1("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>"));
   objects.push(latin1("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>"));
 
-  if (logoBytes) {
-    const imageHeader = latin1(`<< /Type /XObject /Subtype /Image /Width 600 /Height 400 /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${logoBytes.length} >>\nstream\n`);
-    objects.push(concatBytes([imageHeader, logoBytes, latin1("\nendstream")]));
-  }
+
 
   return assemblePdf(objects);
 }
@@ -3546,7 +3545,9 @@ function buildCommissionReceiptPdf({ receiptRef, paymentRef, recipientName, plan
   const commands = [];
   commands.push(`q ${green} rg 0 742 595 100 re f Q`);
   commands.push(`q 1 1 1 rg 34 746 140 92 re f Q`);
-  if (logoBytes) commands.push(`q 126 0 0 84 40 750 cm /Im0 Do Q`);
+  // Vector wordmark keeps generated PDFs self-contained and avoids treating PNG data as JPEG.
+  commands.push(`BT /F2 20 Tf 0.000 0.560 0.110 rg 58 792 Td ${pdfText("ELPIS")} Tj ET`);
+  commands.push(`BT /F2 7 Tf 0.420 0.450 0.420 rg 58 776 Td ${pdfText("PROPERTY LIMITED")} Tj ET`);
   commands.push(`BT /F2 19 Tf 1 1 1 rg 360 808 Td ${pdfText("COMMISSION RECEIPT")} Tj ET`);
   commands.push(`BT /F1 9 Tf 1 1 1 rg 360 792 Td ${pdfText("Elpis Property Limited")} Tj ET`);
   commands.push(`BT /F1 9 Tf 1 1 1 rg 360 778 Td ${pdfText("Commission Payment Record")} Tj ET`);
@@ -3574,14 +3575,12 @@ function buildCommissionReceiptPdf({ receiptRef, paymentRef, recipientName, plan
   const objects = [];
   objects.push(latin1("<< /Type /Catalog /Pages 2 0 R >>"));
   objects.push(latin1("<< /Type /Pages /Kids [3 0 R] /Count 1 >>"));
-  const imageResource = logoBytes ? " /XObject << /Im0 7 0 R >>" : "";
+  const imageResource = "";
   objects.push(latin1(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R /F2 6 0 R >>${imageResource} >> /Contents 4 0 R >>`));
   objects.push(concatBytes([latin1(`<< /Length ${content.length} >>\nstream\n`), content, latin1("\nendstream")]));
   objects.push(latin1("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>"));
   objects.push(latin1("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>"));
-  if (logoBytes) {
-    objects.push(concatBytes([latin1(`<< /Type /XObject /Subtype /Image /Width 600 /Height 400 /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${logoBytes.length} >>\nstream\n`), logoBytes, latin1("\nendstream")]));
-  }
+
   return assemblePdf(objects);
 }
 
@@ -3592,7 +3591,9 @@ function buildFinancialReportPdf({ title, reportRef, generatedAt, generatedBy, f
   const commands = [];
   commands.push(`q ${green} rg 0 742 595 100 re f Q`);
   commands.push(`q 1 1 1 rg 34 746 140 92 re f Q`);
-  if (logoBytes) commands.push(`q 126 0 0 84 40 750 cm /Im0 Do Q`);
+  // Vector wordmark keeps generated PDFs self-contained and avoids treating PNG data as JPEG.
+  commands.push(`BT /F2 20 Tf 0.000 0.560 0.110 rg 58 792 Td ${pdfText("ELPIS")} Tj ET`);
+  commands.push(`BT /F2 7 Tf 0.420 0.450 0.420 rg 58 776 Td ${pdfText("PROPERTY LIMITED")} Tj ET`);
   commands.push(`BT /F2 18 Tf 1 1 1 rg 350 808 Td ${pdfText(title)} Tj ET`);
   commands.push(`BT /F1 9 Tf 1 1 1 rg 350 792 Td ${pdfText("Elpis Property Limited")} Tj ET`);
   commands.push(`BT /F1 9 Tf 1 1 1 rg 350 778 Td ${pdfText("Financial Report")} Tj ET`);
@@ -3621,27 +3622,18 @@ function buildFinancialReportPdf({ title, reportRef, generatedAt, generatedBy, f
   const objects = [];
   objects.push(latin1("<< /Type /Catalog /Pages 2 0 R >>"));
   objects.push(latin1("<< /Type /Pages /Kids [3 0 R] /Count 1 >>"));
-  const imageResource = logoBytes ? " /XObject << /Im0 7 0 R >>" : "";
+  const imageResource = "";
   objects.push(latin1(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R /F2 6 0 R >>${imageResource} >> /Contents 4 0 R >>`));
   objects.push(concatBytes([latin1(`<< /Length ${content.length} >>\nstream\n`), content, latin1("\nendstream")]));
   objects.push(latin1("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>"));
   objects.push(latin1("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>"));
-  if (logoBytes) {
-    objects.push(concatBytes([latin1(`<< /Type /XObject /Subtype /Image /Width 600 /Height 400 /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${logoBytes.length} >>\nstream\n`), logoBytes, latin1("\nendstream")]));
-  }
+
   return assemblePdf(objects);
 }
 
-async function getReceiptLogoBytes(env) {
-  try {
-    if (!env.ASSETS || typeof env.ASSETS.fetch !== "function") return null;
-    const res = await env.ASSETS.fetch(new URL("/assets/images/elpis-legacy-logo.jpg", "https://elpisproperty.org"));
-    if (!res || !res.ok) return null;
-    const buf = await res.arrayBuffer();
-    return new Uint8Array(buf);
-  } catch {
-    return null;
-  }
+async function getReceiptLogoBytes(_env) {
+  // PDF headers use a vector Elpis wordmark. Do not embed the PNG as a JPEG stream.
+  return null;
 }
 
 function receiptSummary(row) {
