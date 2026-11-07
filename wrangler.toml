@@ -25,7 +25,7 @@ bucket_name = "elpis-property-staging-files"
 [[kv_namespaces]]
 binding = "CACHE"
 # LOCAL-ONLY PLACEHOLDER. Replace with the KV namespace ID created in Elpis Cloudflare before any remote deploy.
-id = "00000000000000000000000000000001"
+id = "c76c15d9dc574f9cace3398d82d30c18"
 
 [[queues.producers]]
 binding = "TASKS"
