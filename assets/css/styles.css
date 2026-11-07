@@ -3,12 +3,12 @@
    ELPIS PROPERTY LIMITED — OFFICIAL DESIGN SYSTEM & STYLESHEET
    Brand Palette:
    - Primary Gold: #C6A45C
-   - Primary Dark Green: #008F1B
-   - Charcoal / Ink: #414141
+   - Primary Gold Dark: #A9853F
+   - Navy / Ink: #17243A
    - Dark Charcoal: #2A2A2A
    - Clean White: #FFFFFF
-   - Light Grey / Soft: #F5F7F5
-   - Line Border: #E2E8E2
+   - Warm Ivory / Soft: #F5F3EE
+   - Warm Border: #E7DFCF
    ========================================================================== */
 
 :root {
@@ -722,7 +722,7 @@ button, input, select, textarea {
 }
 
 .btn-reset-filters:hover {
-  background-color: #E2E8E2;
+  background-color: #E7DFCF;
   color: var(--ink);
 }
 
@@ -1058,7 +1058,7 @@ button, input, select, textarea {
   overflow: hidden;
   box-shadow: var(--shadow-md);
   height: 520px;
-  background-color: #E2E8E2;
+  background-color: #E7DFCF;
 }
 
 .about-main-img {
@@ -1597,7 +1597,7 @@ button, input, select, textarea {
    FOOTER SECTION
    ========================================================================== */
 .site-footer {
-  background-color: #17231A;
+  background-color: #0B1424;
   color: #D3DED5;
   padding: 65px 0 24px;
 }
@@ -1910,7 +1910,7 @@ a.contact-val:hover {
   height: 480px;
   border-radius: var(--radius-md);
   overflow: hidden;
-  background-color: #E2E8E2;
+  background-color: #E7DFCF;
   box-shadow: var(--shadow-sm);
 }
 
@@ -1949,7 +1949,7 @@ a.contact-val:hover {
   overflow: hidden;
   border: 2px solid transparent;
   cursor: pointer;
-  background-color: #E2E8E2;
+  background-color: #E7DFCF;
   padding: 0;
   flex-shrink: 0;
   transition: var(--transition);
@@ -2609,7 +2609,7 @@ a.contact-val:hover {
 .role-hero {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(120deg, #17231A 0%, #1E3A27 62%, #0E5C22 100%);
+  background: linear-gradient(120deg, #0B1424 0%, #17243A 62%, #A9853F 100%);
   color: #FFFFFF;
   border-radius: var(--radius-md);
   padding: 26px 28px;
@@ -2636,7 +2636,7 @@ a.contact-val:hover {
   border-radius: 100px;
   background: rgba(255,255,255,.1);
   border: 1px solid rgba(255,255,255,.16);
-  color: #E8F9EB;
+  color: #F4EBD7;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: .5px;
@@ -2684,7 +2684,7 @@ a.contact-val:hover {
   font-size: 14px;
   flex-shrink: 0;
 }
-.progress-track { height: 8px; border-radius: 100px; background: #EDF3EE; overflow: hidden; }
+.progress-track { height: 8px; border-radius: 100px; background: #F1EBDD; overflow: hidden; }
 .progress-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg, var(--green), #39D353); }
 .chart-card { min-height: 300px; }
 .bar-chart {
@@ -2707,7 +2707,7 @@ a.contact-val:hover {
 .legend-dot.contract { background: #B7DCC0; }
 .legend-dot.verified { background: var(--green); }
 .legend-dot.leads { background: #F0C34B; }
-.legend-dot.conversions { background: #414141; }
+.legend-dot.conversions { background: #17243A; }
 .rank-list { display: flex; flex-direction: column; gap: 8px; }
 .rank-row { display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid var(--line); border-radius: 8px; }
 .rank-badge {
