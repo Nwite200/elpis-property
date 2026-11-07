@@ -14,5 +14,13 @@ wrangler.toml
 *.txt
 *.py
 test_*.mjs
+test_phase5_suite.mjs
 seed_*.py
+seed_phase5.py
 wipe_test_data.py
+
+# Keep the root copy out of the public bundle; the served copy lives in assets/images.
+/elpis-legacy-logo.png
+
+# Accidental nested clone of this repository.
+/elpis-property

@@ -1,7 +1,7 @@
-// Elpis Property Limited — Sample Property Data (DEMONSTRATION CONTENT).
+// Elpis Property Limited — sample property data (demonstration content).
 // Structured for seamless future API and administrative backend integration.
 
-window.BLIS_BRANCHES = [
+window.ELPIS_BRANCHES = [
   {
     name: "Head Office",
     city: "Benin City",
@@ -58,7 +58,7 @@ window.BLIS_BRANCHES = [
   }
 ];
 
-window.BLIS_PROPERTIES = [
+window.ELPIS_PROPERTIES = [
   {
     id: "prop-001",
     name: "Greenfield Estate Phase 1",
@@ -383,3 +383,7 @@ window.BLIS_PROPERTIES = [
     isDemo: true
   }
 ];
+
+// Compatibility aliases for older integrations.
+window.BLIS_BRANCHES = window.ELPIS_BRANCHES;
+window.BLIS_PROPERTIES = window.ELPIS_PROPERTIES;

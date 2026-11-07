@@ -13,8 +13,8 @@
     "minimal-ui"
   ],
   "orientation": "any",
-  "background_color": "#F5F3EE",
-  "theme_color": "#C6A45C",
+  "background_color": "#F5F2EC",
+  "theme_color": "#142C27",
   "categories": [
     "business",
     "finance",
@@ -23,8 +23,26 @@
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "assets/images/elpis-property-logo-original.png",
-      "sizes": "any",
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "assets/icons/apple-touch-icon.png",
+      "sizes": "180x180",
       "type": "image/png",
       "purpose": "any"
     }
@@ -36,8 +54,8 @@
       "url": "/dashboard",
       "icons": [
         {
-          "src": "assets/images/elpis-property-logo-original.png",
-          "sizes": "any"
+          "src": "assets/icons/icon-192.png",
+          "sizes": "192x192"
         }
       ]
     },
@@ -47,8 +65,8 @@
       "url": "/client-login",
       "icons": [
         {
-          "src": "assets/images/elpis-property-logo-original.png",
-          "sizes": "any"
+          "src": "assets/icons/icon-192.png",
+          "sizes": "192x192"
         }
       ]
     },
@@ -58,8 +76,8 @@
       "url": "/#properties",
       "icons": [
         {
-          "src": "assets/images/elpis-property-logo-original.png",
-          "sizes": "any"
+          "src": "assets/icons/icon-192.png",
+          "sizes": "192x192"
         }
       ]
     }

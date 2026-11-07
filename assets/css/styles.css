@@ -1,40 +1,43 @@
 /* ==========================================================================
    ELPIS PROPERTY LIMITED — OFFICIAL DESIGN SYSTEM & STYLESHEET
-   Brand Palette:
-   - Primary Gold: #C6A45C
-   - Primary Dark Green: #008F1B
-   - Charcoal / Ink: #414141
-   - Dark Charcoal: #2A2A2A
-   - Clean White: #FFFFFF
-   - Light Grey / Soft: #F5F7F5
-   - Line Border: #E2E8E2
+   Brand palette:
+   - Deep Forest: #142C27
+   - Champagne Gold: #C5A16B
+   - Warm Ivory: #F5F2EC
+   - Graphite: #242927
+   - White: #FFFFFF
+   Typography: Cormorant Garamond (display) + DM Sans (body)
    ========================================================================== */
 
 :root {
-  --green: #C6A45C;
-  --green-dark: #A9853F;
-  --green-light: #F4EBD7;
-  --green-glow: rgba(198, 164, 92, 0.18);
-  --charcoal: #17243A;
-  --charcoal-dark: #0B1424;
-  --ink: #17243A;
-  --muted: #6B7280;
-  --muted-light: #9CA3AF;
+  --green: #142C27;
+  --green-dark: #0B1F1B;
+  --green-light: #EFE7D8;
+  --green-glow: rgba(197, 161, 107, 0.20);
+  --gold: #C5A16B;
+  --gold-bright: #E4D3B4;
+  --gold-deep: #9A7440;
+  --charcoal: #242927;
+  --charcoal-dark: #141A18;
+  --ink: #242927;
+  --muted: #6F756F;
+  --muted-light: #9CA29C;
   --paper: #FFFFFF;
-  --soft: #F5F3EE;
-  --sidebar: #0B1424;
-  --soft-alt: #F1EBDD;
-  --line: #E7DFCF;
-  --line-dark: #37473B;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 8px 24px rgba(25, 55, 32, 0.08);
-  --shadow-lg: 0 18px 45px rgba(25, 55, 32, 0.12);
-  --transition: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  --soft: #F5F2EC;
+  --ivory: #F5F2EC;
+  --sidebar: #0D211D;
+  --soft-alt: #ECE6DA;
+  --line: #E4DCCD;
+  --line-dark: #30463F;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 2px 10px rgba(20, 44, 39, 0.04);
+  --shadow-md: 0 14px 36px rgba(20, 44, 39, 0.08);
+  --shadow-lg: 0 26px 70px rgba(20, 44, 39, 0.14);
+  --transition: 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   --font-body: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-display: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
 }
 
 /* Base Resets & Global Typography */

@@ -1,106 +1,99 @@
-// Elpis Property Limited — Main Landing Page Logic
-document.addEventListener('DOMContentLoaded', async () => {
-  if (window.Elpis_CONFIG_READY) await window.Elpis_CONFIG_READY;
-  // Render persistent site header and footer
-  const headerSlot = document.getElementById('header-slot');
-  const footerSlot = document.getElementById('footer-slot');
-  if (headerSlot) headerSlot.innerHTML = Elpis.renderHeader('home');
+// Elpis Property Limited — main landing page logic.
+document.addEventListener("DOMContentLoaded", async () => {
+  if (window.ELPIS_CONFIG_READY) await window.ELPIS_CONFIG_READY;
+
+  const headerSlot = document.getElementById("header-slot");
+  const footerSlot = document.getElementById("footer-slot");
+  if (headerSlot) headerSlot.innerHTML = Elpis.renderHeader("home");
   if (footerSlot) footerSlot.innerHTML = Elpis.renderFooter();
   Elpis.initNav();
 
-  // Populate configurable contact placeholders
   const c = Elpis.config();
-  const phoneEl = document.getElementById('contactPhone');
-  const emailEl = document.getElementById('contactEmail');
-  const addrEl = document.getElementById('contactAddress');
-  const waEl = document.getElementById('contactWhatsapp');
-  if (phoneEl) phoneEl.textContent = c.phone || 'Contact phone not configured';
-  if (emailEl) emailEl.textContent = c.email || 'Contact email not configured';
-  if (addrEl) addrEl.textContent = c.address || 'Head office address not configured';
-  if (waEl) {
-    const waDigits = String(c.whatsappNumber || '').replace(/\D/g, '');
-    waEl.textContent = waDigits.startsWith('234') && waDigits.length === 13
-      ? `0${waDigits.slice(3, 6)} ${waDigits.slice(6, 9)} ${waDigits.slice(9)}`
-      : (c.whatsappNumber || 'WhatsApp contact not configured');
-  }
+  const setText = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  };
+  setText("contactPhone", c.phone || "Contact phone not configured");
+  setText("contactEmail", c.email || "Contact email not configured");
+  setText("contactAddress", c.address || "Head office address not configured");
+  const waDigits = String(c.whatsappNumber || "").replace(/\D/g, "");
+  setText("contactWhatsapp", waDigits.startsWith("234") && waDigits.length === 13
+    ? `0${waDigits.slice(3, 6)} ${waDigits.slice(6, 9)} ${waDigits.slice(9)}`
+    : (c.whatsappNumber || "WhatsApp contact not configured"));
 
-  // Dedicated WhatsApp action button in Contact section
-  const waBtn = document.getElementById('waBtn');
+  const waBtn = document.getElementById("waBtn");
   if (waBtn) {
-    waBtn.addEventListener('click', (e) => {
+    waBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      Elpis.enquireWhatsApp('Hello Elpis Property Limited, I would like to speak with a property consultant regarding available opportunities.');
+      Elpis.enquireWhatsApp("Hello Elpis Property Limited, I would like to speak with a property consultant regarding available opportunities.");
     });
   }
 
-  // Render 6 Branches Section
-  const branchesGrid = document.getElementById('branchesGrid');
+  // Branches
+  const branchesGrid = document.getElementById("branchesGrid");
   if (branchesGrid) {
-    const branches = (c.branches && c.branches.length) ? c.branches : [];
+    const branches = Array.isArray(c.branches) && c.branches.length ? c.branches : [];
     if (!branches.length) {
-      branchesGrid.innerHTML = '<div class="branch-card"><div class="branch-badge">Configuration required</div><h3 class="branch-title">Branch offices</h3><p class="branch-address">Branch contact details are not configured yet. Add them in System Administration.</p></div>';
+      branchesGrid.innerHTML = '<div class="branch-card"><div class="branch-badge">Configuration required</div><h3 class="branch-title">Branch offices</h3><p class="branch-address">Branch contact details are not configured yet.</p></div>';
     } else {
-      branchesGrid.innerHTML = branches.map(b => `
-      <div class="branch-card fade-in ${b.isHeadOffice ? 'branch-head-office' : ''}">
-        <div class="branch-badge">${b.type}</div>
-        <div class="branch-icon">⌖</div>
-        <h3 class="branch-title">${b.name}</h3>
-        <p class="branch-location">${b.city}, ${b.state}</p>
-        <p class="branch-address">${b.address}</p>
-        <div class="branch-footer">
-          ${b.phone ? `<a class="branch-action branch-phone" href="tel:${String(b.phone).replace(/[^0-9+]/g, '')}">📞 ${b.phone}</a>` : ''}
-          <a class="branch-action wa-link" href="#" data-message="Hello Elpis Property, I would like to visit or speak with an agent at the ${b.name} office.">Contact Office →</a>
+      branchesGrid.innerHTML = branches.map((b, index) => `
+      <article class="branch-card fade-in ${b.isHeadOffice ? "branch-head-office" : ""}" style="--branch-index:${index}">
+        <div class="branch-card-top">
+          <span class="branch-index">${String(index + 1).padStart(2, "0")}</span>
+          <span class="branch-badge">${b.type || (b.isHeadOffice ? "Headquarters" : "Branch")}</span>
         </div>
-      </div>
-    `).join('');
+        <h3 class="branch-title">${b.name || "Branch"}</h3>
+        <p class="branch-location">${[b.city, b.state].filter(Boolean).join(", ") || "Nigeria"}</p>
+        <p class="branch-address">${b.address || "Contact Elpis for the verified address."}</p>
+        <div class="branch-footer">
+          ${b.phone ? `<a class="branch-action branch-phone" href="tel:${String(b.phone).replace(/[^0-9+]/g, "")}">${Elpis.icon("phone")} ${b.phone}</a>` : ""}
+          <a class="branch-action wa-link" href="#" data-message="Hello Elpis Property, I would like to visit or speak with an agent at the ${b.name} office.">Contact office <span>→</span></a>
+        </div>
+      </article>
+    `).join("");
     }
   }
 
-  // Load properties (structured to fetch from /api/properties if online, or fall back to sample data)
+  // Properties
   let allProperties = [];
   try {
-    const res = await fetch('/api/properties?limit=50');
+    const res = await fetch("/api/properties?limit=50");
     if (res.ok) {
       const data = await res.json();
       if (data && data.properties && data.properties.length > 0) {
-        allProperties = data.properties.map(p => ({
+        allProperties = data.properties.map((p) => ({
           id: String(p.id),
           slug: p.slug || (p.reference ? p.reference.toLowerCase() : String(p.id)),
           name: p.title || p.name,
-          location: p.city ? `${p.city}, ${p.state || 'Lagos'}` : (p.state || 'Lagos'),
-          branch: p.branch_name || 'Head Office',
-          category: p.category_name || 'Residential',
+          location: p.city ? `${p.city}, ${p.state || "Lagos"}` : (p.state || "Lagos"),
+          branch: p.branch_name || "Head Office",
+          category: p.category_name || "Residential",
           price: Number(p.sale_price || p.price || 0),
           units: p.available_units || 1,
           totalUnits: p.total_units || 10,
           bedrooms: p.bedrooms || 0,
           bathrooms: p.bathrooms || 0,
-          size: p.size || '350 sqm',
-          description: p.description || '',
-          features: p.features ? (typeof p.features === 'string' ? JSON.parse(p.features) : p.features) : [],
-          status: p.status === 'published' ? 'Available' : (p.status || 'Available'),
+          size: p.size || p.land_size || "350 sqm",
+          description: p.description || "",
+          features: p.features ? (typeof p.features === "string" ? JSON.parse(p.features) : p.features) : [],
+          status: p.status === "published" ? "Available" : (p.status || "Available"),
           featured: Boolean(p.is_featured),
           images: p.images && p.images.length ? p.images : [
-            'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80'
+            "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80"
           ],
           isDemo: false
         }));
       }
     }
   } catch (err) {
-    // API not accessible; seamlessly fallback to static sample data
+    // API not accessible; fall back to curated demonstration data.
   }
 
-  // Blend live D1 records with the curated demonstration catalogue and cap the
-  // homepage at ten listings. Land opportunities are always represented.
-  // Curated demo listings are only used when no live property is available.
-  // Once a real listing exists, demonstration content is never merged into the
-  // public catalogue.
   const showDemo = !window.ELPIS_CONFIG || window.ELPIS_CONFIG.showDemoProperties === true;
   const staticProperties = allProperties.length === 0 && showDemo
-    ? Elpis.properties().map(p => ({ ...p, isDemo: true }))
+    ? Elpis.properties().map((p) => ({ ...p, isDemo: true }))
     : [];
-  const seen = new Set(allProperties.map(p => `${String(p.name).toLowerCase()}|${String(p.location).toLowerCase()}`));
+  const seen = new Set(allProperties.map((p) => `${String(p.name).toLowerCase()}|${String(p.location).toLowerCase()}`));
   for (const item of staticProperties) {
     const key = `${String(item.name).toLowerCase()}|${String(item.location).toLowerCase()}`;
     if (!seen.has(key)) {
@@ -109,78 +102,74 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
   allProperties = allProperties.slice(0, 10);
-  if (!allProperties.some(p => String(p.category).toLowerCase() === 'land')) {
-    const land = staticProperties.find(p => String(p.category).toLowerCase() === 'land');
-    if (land && !allProperties.some(p => p.name === land.name)) {
+  if (!allProperties.some((p) => String(p.category).toLowerCase() === "land")) {
+    const land = staticProperties.find((p) => String(p.category).toLowerCase() === "land");
+    if (land && !allProperties.some((p) => p.name === land.name)) {
       allProperties[allProperties.length - 1] = land;
     }
   }
 
-  // Populate dynamic filter options
-  const grid = document.getElementById('propertyGrid');
-  const resultsCounter = document.getElementById('resultsCounter');
-  const searchInput = document.getElementById('searchInput');
-  const locFilter = document.getElementById('locationFilter');
-  const catFilter = document.getElementById('categoryFilter');
-  const priceFilter = document.getElementById('priceFilter');
-  const sortSelect = document.getElementById('sortSelect');
-  const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+  const grid = document.getElementById("propertyGrid");
+  const resultsCounter = document.getElementById("resultsCounter");
+  const searchInput = document.getElementById("searchInput");
+  const locFilter = document.getElementById("locationFilter");
+  const catFilter = document.getElementById("categoryFilter");
+  const priceFilter = document.getElementById("priceFilter");
+  const sortSelect = document.getElementById("sortSelect");
+  const resetFiltersBtn = document.getElementById("resetFiltersBtn");
 
-  // Extract unique locations and categories
-  const locations = [...new Set(allProperties.map(p => p.branch || p.location.split(',')[0].trim()))].sort();
-  const categories = [...new Set(allProperties.map(p => p.category))].sort();
+  const locations = [...new Set(allProperties.map((p) => p.branch || p.location.split(",")[0].trim()))].sort();
+  const categories = [...new Set(allProperties.map((p) => p.category))].sort();
 
   if (locFilter) {
-    locations.forEach(loc => {
-      const opt = document.createElement('option');
+    locations.forEach((loc) => {
+      const opt = document.createElement("option");
       opt.value = loc;
-      opt.textContent = `${loc} Branch`;
+      opt.textContent = loc;
       locFilter.appendChild(opt);
     });
   }
 
   if (catFilter) {
-    categories.forEach(cat => {
-      const opt = document.createElement('option');
+    categories.forEach((cat) => {
+      const opt = document.createElement("option");
       opt.value = cat;
       opt.textContent = cat;
       catFilter.appendChild(opt);
     });
   }
 
-  function renderProperties() {
-    const q = (searchInput?.value || '').trim().toLowerCase();
-    const loc = locFilter?.value || '';
-    const cat = catFilter?.value || '';
-    const priceRange = priceFilter?.value || '';
-    const sort = sortSelect?.value || '';
+  const specIcon = (name) => Elpis.icon(name);
 
-    let items = allProperties.filter(p => {
-      const textMatch = !q || (p.name + ' ' + p.location + ' ' + p.branch + ' ' + (p.description || '')).toLowerCase().includes(q);
+  function renderProperties() {
+    const q = (searchInput?.value || "").trim().toLowerCase();
+    const loc = locFilter?.value || "";
+    const cat = catFilter?.value || "";
+    const priceRange = priceFilter?.value || "";
+    const sort = sortSelect?.value || "";
+
+    let items = allProperties.filter((p) => {
+      const textMatch = !q || (p.name + " " + p.location + " " + p.branch + " " + (p.description || "")).toLowerCase().includes(q);
       const locMatch = !loc || p.branch === loc || p.location.toLowerCase().includes(loc.toLowerCase());
       const catMatch = !cat || p.category.toLowerCase() === cat.toLowerCase();
 
       let priceMatch = true;
       if (priceRange) {
-        const [min, max] = priceRange.split('-').map(Number);
+        const [min, max] = priceRange.split("-").map(Number);
         if (max) {
           priceMatch = p.price >= min && p.price <= max;
         } else {
           priceMatch = p.price >= min;
         }
       }
-
       return textMatch && locMatch && catMatch && priceMatch;
     });
 
-    if (sort === 'price-asc') {
-      items.sort((a, b) => a.price - b.price);
-    } else if (sort === 'price-desc') {
-      items.sort((a, b) => b.price - a.price);
-    }
+    if (sort === "price-asc") items.sort((a, b) => a.price - b.price);
+    else if (sort === "price-desc") items.sort((a, b) => b.price - a.price);
 
     if (resultsCounter) {
-      resultsCounter.textContent = `Showing ${items.length} of ${allProperties.length} ${items.length === 1 ? 'property' : 'properties'}`;
+      resultsCounter.textContent = `Showing ${items.length} of ${allProperties.length} ${items.length === 1 ? "property" : "properties"}`;
     }
 
     if (!grid) return;
@@ -190,44 +179,51 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="empty-state">
           <div class="empty-icon">⌂</div>
           <h3>No properties match your search</h3>
-          <p>Try modifying your search term, clearing location filters, or broadening the price range.</p>
-          <button class="btn btn-outline" id="clearFiltersBtn" style="margin-top:14px">Reset All Filters</button>
+          <p>Try another search term, clear the location filter or broaden the price range.</p>
+          <button class="btn btn-outline" id="clearFiltersBtn" style="margin-top:14px">Reset all filters</button>
         </div>
       `;
-      const clrBtn = document.getElementById('clearFiltersBtn');
-      if (clrBtn) {
-        clrBtn.addEventListener('click', resetAllFilters);
-      }
+      const clrBtn = document.getElementById("clearFiltersBtn");
+      if (clrBtn) clrBtn.addEventListener("click", resetAllFilters);
       return;
     }
 
-    grid.innerHTML = items.map(p => {
-      const coverImg = (p.images && p.images[0]) || 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80';
-      const featureTags = (p.features || []).slice(0, 3).map(f => `<span class="feat-tag">${f}</span>`).join('');
-      const moreCount = (p.features && p.features.length > 3) ? `<span class="feat-tag feat-more">+${p.features.length - 3} more</span>` : '';
-      const statusClass = p.status ? p.status.toLowerCase().replace(/\s+/g, '-') : 'available';
+    grid.innerHTML = items.map((p, index) => {
+      const coverImg = (p.images && (typeof p.images[0] === "string" ? p.images[0] : p.images[0]?.url)) || "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80";
+      const featureTags = (p.features || []).slice(0, 2).map((f) => `<span class="feat-tag">${f}</span>`).join("");
+      const moreCount = (p.features && p.features.length > 2) ? `<span class="feat-tag feat-more">+${p.features.length - 2}</span>` : "";
+      const statusClass = p.status ? p.status.toLowerCase().replace(/\s+/g, "-") : "available";
+      const specLine = [
+        p.bedrooms ? `<span>${specIcon("home")} ${p.bedrooms} bed</span>` : "",
+        p.bathrooms ? `<span>${specIcon("key")} ${p.bathrooms} bath</span>` : "",
+        p.size ? `<span>${specIcon("land")} ${p.size}</span>` : ""
+      ].filter(Boolean).join("");
 
       return `
-        <article class="property-card fade-in">
+        <article class="property-card fade-in" style="--card-index:${index}">
           <div class="property-image-wrap">
             <img src="${coverImg}" alt="${p.name}" loading="lazy" class="property-img" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80'">
             <div class="card-badges-top">
-              <span class="status-badge status-${statusClass}">${p.status || 'Available'}</span>
-              ${p.featured ? '<span class="status-badge badge-featured">Featured</span>' : ''}
-              ${p.isDemo ? '<span class="status-badge badge-gray" title="Demonstration listing">Sample</span>' : ''}
+              <span class="status-badge status-${statusClass}">${p.status || "Available"}</span>
+              ${p.featured ? '<span class="status-badge badge-featured">Featured</span>' : ""}
+              ${p.isDemo ? '<span class="status-badge badge-gray" title="Demonstration listing">Sample</span>' : ""}
             </div>
             <div class="card-badges-bottom">
               <span class="category-pill">${p.category}</span>
+              <span class="property-ref">EP · ${String(p.id).replace(/[^0-9A-Za-z]/g, "").slice(-4).toUpperCase()}</span>
             </div>
+            <div class="card-hover-line"></div>
           </div>
 
           <div class="property-card-body">
             <div class="prop-location">
-              <span class="loc-pin">⌖</span> ${p.location} · <strong class="prop-branch">${p.branch} Branch</strong>
+              ${specIcon("pin")} ${p.location} <span class="prop-location-sep">/</span> ${p.branch}
             </div>
 
-            <h3 class="prop-title"><a href="property.html?id=${p.id}">${p.name}</a></h3>
-            <p class="prop-desc">${p.description ? p.description.slice(0, 115) + '...' : ''}</p>
+            <h3 class="prop-title"><a href="property.html?id=${encodeURIComponent(p.id)}">${p.name}</a></h3>
+            <p class="prop-desc">${p.description ? p.description.slice(0, 112) + "…" : ""}</p>
+
+            <div class="prop-spec-row">${specLine}</div>
 
             <div class="prop-features-list">
               ${featureTags}
@@ -236,31 +232,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             <div class="prop-pricing-row">
               <div class="price-box">
-                <span class="price-lbl">Outright Price</span>
+                <span class="price-lbl">From</span>
                 <span class="price-amt">${Elpis.money(p.price)}</span>
               </div>
               <div class="units-box">
-                <span class="units-val">${p.units} Available</span>
-                <span class="units-lbl">of ${p.totalUnits || 10} Units</span>
+                <span class="units-val">${p.units} available</span>
+                <span class="units-lbl">of ${p.totalUnits || 10} units</span>
               </div>
             </div>
 
             <div class="prop-actions-row">
-              <a href="property.html?id=${p.id}" class="btn btn-card-details">View Details</a>
+              <a href="property.html?id=${encodeURIComponent(p.id)}" class="btn btn-card-details">View details <span>→</span></a>
               <a href="#" class="btn btn-card-enquire wa-link" data-message="Hello Elpis Property Limited, I am interested in ${p.name} located at ${p.location}, listed at ${Elpis.money(p.price)}. Please provide more details.">
-                Enquire Now
+                Enquire
               </a>
             </div>
           </div>
         </article>
       `;
-    }).join('');
+    }).join("");
 
-    // Re-bind WhatsApp action triggers for newly created elements
-    grid.querySelectorAll('.wa-link').forEach(a => {
-      a.addEventListener('click', (e) => {
+    grid.querySelectorAll(".wa-link").forEach((a) => {
+      a.addEventListener("click", (e) => {
         e.preventDefault();
-        const msg = a.getAttribute('data-message') || 'Hello Elpis Property Limited, I would like to make an enquiry.';
+        const msg = a.getAttribute("data-message") || "Hello Elpis Property Limited, I would like to make an enquiry.";
         Elpis.enquireWhatsApp(msg);
       });
     });
@@ -269,79 +264,106 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function resetAllFilters() {
-    if (searchInput) searchInput.value = '';
-    if (locFilter) locFilter.value = '';
-    if (catFilter) catFilter.value = '';
-    if (priceFilter) priceFilter.value = '';
-    if (sortSelect) sortSelect.value = '';
+    if (searchInput) searchInput.value = "";
+    if (locFilter) locFilter.value = "";
+    if (catFilter) catFilter.value = "";
+    if (priceFilter) priceFilter.value = "";
+    if (sortSelect) sortSelect.value = "";
     renderProperties();
   }
 
-  // Bind filter input events
-  if (searchInput) searchInput.addEventListener('input', renderProperties);
-  if (locFilter) locFilter.addEventListener('change', renderProperties);
-  if (catFilter) catFilter.addEventListener('change', renderProperties);
-  if (priceFilter) priceFilter.addEventListener('change', renderProperties);
-  if (sortSelect) sortSelect.addEventListener('change', renderProperties);
-  if (resetFiltersBtn) resetFiltersBtn.addEventListener('click', resetAllFilters);
+  if (searchInput) searchInput.addEventListener("input", renderProperties);
+  if (locFilter) locFilter.addEventListener("change", renderProperties);
+  if (catFilter) catFilter.addEventListener("change", renderProperties);
+  if (priceFilter) priceFilter.addEventListener("change", renderProperties);
+  if (sortSelect) sortSelect.addEventListener("change", renderProperties);
+  if (resetFiltersBtn) resetFiltersBtn.addEventListener("click", resetAllFilters);
 
-  // Initial property render
   renderProperties();
 
-  // Contact Form Submission Handler — creates a real lead through the worker.
-  const contactForm = document.getElementById('contactForm');
-  const formSuccess = document.getElementById('formSuccess');
+  // Hero search
+  const heroSearchBtn = document.getElementById("heroSearchBtn");
+  if (heroSearchBtn) {
+    heroSearchBtn.addEventListener("click", () => {
+      const heroLoc = document.getElementById("heroLocation");
+      const heroCat = document.getElementById("heroCategory");
+      const heroPrice = document.getElementById("heroPrice");
+      if (locFilter) locFilter.value = heroLoc?.value || "";
+      if (catFilter) catFilter.value = heroCat?.value || "";
+      if (priceFilter) priceFilter.value = heroPrice?.value || "";
+      renderProperties();
+      document.getElementById("properties")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
+  // Collection tiles
+  document.querySelectorAll("[data-filter-category]").forEach((tile) => {
+    tile.addEventListener("click", () => {
+      if (catFilter) catFilter.value = tile.getAttribute("data-filter-category") || "";
+      if (searchInput) searchInput.value = "";
+      if (locFilter) locFilter.value = "";
+      if (priceFilter) priceFilter.value = "";
+      renderProperties();
+      window.setTimeout(() => {
+        document.getElementById("properties")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 40);
+    });
+  });
+
+  // Contact form
+  const contactForm = document.getElementById("contactForm");
+  const formSuccess = document.getElementById("formSuccess");
   if (contactForm) {
-    contactForm.addEventListener('submit', async (e) => {
+    contactForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const submitBtn = contactForm.querySelector('button[type="submit"]');
-      const originalLabel = submitBtn ? submitBtn.textContent : '';
+      const originalLabel = submitBtn ? submitBtn.innerHTML : "";
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Submitting Enquiry...';
+        submitBtn.textContent = "Submitting enquiry…";
       }
       try {
-        const res = await fetch('/api/public/enquiries', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const res = await fetch("/api/public/enquiries", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            full_name: document.getElementById('contactFullName').value.trim(),
-            phone_number: document.getElementById('contactPhoneInput').value.trim(),
-            email_address: document.getElementById('contactEmailInput').value.trim(),
-            branch_name: document.getElementById('contactBranchSelect').value,
-            message: document.getElementById('contactMessage').value.trim(),
-            source: 'Homepage contact form'
+            full_name: document.getElementById("contactFullName").value.trim(),
+            phone_number: document.getElementById("contactPhoneInput").value.trim(),
+            email_address: document.getElementById("contactEmailInput").value.trim(),
+            branch_name: document.getElementById("contactBranchSelect").value,
+            message: document.getElementById("contactMessage").value.trim(),
+            source: "Homepage contact form"
           })
         });
         const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.error || 'Unable to submit your enquiry.');
-        contactForm.style.display = 'none';
-        if (formSuccess) formSuccess.style.display = 'block';
+        if (!res.ok) throw new Error(data.error || "Unable to submit your enquiry.");
+        contactForm.style.display = "none";
+        if (formSuccess) formSuccess.style.display = "block";
       } catch (error) {
-        alert(error.message || 'Unable to submit your enquiry. Please try again.');
+        alert(error.message || "Unable to submit your enquiry. Please try again.");
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.textContent = originalLabel;
+          submitBtn.innerHTML = originalLabel;
         }
       }
     });
   }
 
-  // Smooth scroll for in-page anchors
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-      const targetId = this.getAttribute('href');
-      if (targetId === '#' || targetId === '#home') {
+  // Smooth in-page anchors
+  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+    anchor.addEventListener("click", function (e) {
+      const targetId = this.getAttribute("href");
+      if (targetId === "#" || targetId === "#home") {
         e.preventDefault();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: "smooth" });
         return;
       }
       const targetEl = document.querySelector(targetId);
       if (targetEl) {
         e.preventDefault();
-        const headerHeight = document.getElementById('siteHeader')?.offsetHeight || 72;
+        const headerHeight = document.getElementById("siteHeader")?.offsetHeight || 76;
         const targetPos = targetEl.getBoundingClientRect().top + window.scrollY - headerHeight;
-        window.scrollTo({ top: targetPos, behavior: 'smooth' });
+        window.scrollTo({ top: targetPos, behavior: "smooth" });
       }
     });
   });

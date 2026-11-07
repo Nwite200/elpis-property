@@ -3635,7 +3635,7 @@ function buildFinancialReportPdf({ title, reportRef, generatedAt, generatedBy, f
 async function getReceiptLogoBytes(env) {
   try {
     if (!env.ASSETS || typeof env.ASSETS.fetch !== "function") return null;
-    const res = await env.ASSETS.fetch(new URL("/assets/images/elpis-property-logo-original.png", "https://elpisproperty.org"));
+    const res = await env.ASSETS.fetch(new URL("/assets/images/elpis-legacy-logo.jpg", "https://elpisproperty.org"));
     if (!res || !res.ok) return null;
     const buf = await res.arrayBuffer();
     return new Uint8Array(buf);

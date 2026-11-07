@@ -3,3 +3,8 @@ node_modules
 .dev.vars
 *.log
 .DS_Store
+
+# Accidental nested clone of this repository
+/elpis-property/
+# Duplicate of assets/images/elpis-legacy-logo.png
+/elpis-legacy-logo.png
