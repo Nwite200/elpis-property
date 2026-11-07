@@ -39,4 +39,4 @@ CREATE INDEX IF NOT EXISTS idx_client_otp_active ON client_verification_otps(cli
 
 INSERT OR IGNORE INTO sms_templates (template_key, name, body, language) VALUES
   ('client_verification_otp', 'Client verification code',
-   'Your Bliss Legacy verification code is {code}. It expires in 10 minutes. Do not share it.', 'en');
+   'Your Elpis Property verification code is {code}. It expires in 10 minutes. Do not share it.', 'en');
