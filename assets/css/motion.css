@@ -285,3 +285,6 @@
 @media (prefers-reduced-motion: reduce) {
   .elpis-intro.style-hype::after { display:none; }
 }
+
+/* Ensure the cinematic intro tagline keeps the Elpis champagne treatment. */
+.elpis-intro.style-hype .elpis-intro__tagline { color:#E9D8B9; text-shadow:0 2px 14px rgba(0,0,0,.32); }
