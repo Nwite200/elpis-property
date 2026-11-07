@@ -9,12 +9,7 @@ window.ELPIS_CONFIG = {
   address: "",
   social: { facebook: "", instagram: "", twitter: "", linkedin: "" },
   branches: [
-    { name: "Head Office", city: "", state: "", type: "Corporate Headquarters", address: "Contact Elpis Property Limited for the verified address", phone: "", isHeadOffice: true },
-    { name: "Ikeja Branch", city: "Ikeja", state: "Lagos State", type: "Mainland Branch", address: "Contact Elpis Property Limited for the verified address", phone: "", isHeadOffice: false },
-    { name: "Ajah Branch", city: "Ajah", state: "Lagos State", type: "Island & Lekki Corridor Branch", address: "Contact Elpis Property Limited for the verified address", phone: "", isHeadOffice: false },
-    { name: "Asaba Branch", city: "Asaba", state: "Delta State", type: "Delta State Regional Office", address: "Contact Elpis Property Limited for the verified address", phone: "", isHeadOffice: false },
-    { name: "Ihama Branch", city: "Ihama", state: "Edo State", type: "Regional Branch", address: "Contact Elpis Property Limited for the verified address", phone: "", isHeadOffice: false },
-    { name: "Obakhavba Branch", city: "Obakhavba", state: "Edo State", type: "Regional Branch", address: "Contact Elpis Property Limited for the verified address", phone: "", isHeadOffice: false }
+    { name: "Head Office", city: "", state: "", type: "Corporate Headquarters", address: "", phone: "", isHeadOffice: true }
   ]
 };
 
