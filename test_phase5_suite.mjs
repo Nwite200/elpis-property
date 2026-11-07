@@ -533,7 +533,7 @@ await test('receipt PDF is generated, stored in R2 and contains the official log
   assert(text.includes('OFFICIAL RECEIPT'), 'receipt title present');
   assert(text.includes('RCP-elpis-001'), 'receipt number present');
   assert(text.includes('BLC-MW2ER37J'), 'client reference present');
-  assert(text.includes('/DCTDecode'), 'official logo image embedded');
+  assert(text.includes('ELPIS') && text.includes('PROPERTY LIMITED'), 'Elpis vector wordmark embedded');
   const key = `receipts/BLC-MW2ER37J/RCP-elpis-001.pdf`;
   assert(r2.has(key), 'PDF stored in R2');
   const dbKey = db.prepare('SELECT r2_key FROM receipts WHERE id=?').get(adaReceipt.id).r2_key;
