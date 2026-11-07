@@ -127,12 +127,7 @@ Elpis.renderFooter = function() {
         <div class="footer-col">
           <h4 class="footer-heading">Our Branches</h4>
           <ul class="footer-links-list">
-            <li><a href="index.html#branches">Head Office (Benin City)</a></li>
-            <li><a href="index.html#branches">Ikeja Branch (Lagos)</a></li>
-            <li><a href="index.html#branches">Ajah Branch (Lagos)</a></li>
-            <li><a href="index.html#branches">Asaba Branch (Delta)</a></li>
-            <li><a href="index.html#branches">Ihama Branch (Benin City)</a></li>
-            <li><a href="index.html#branches">Obakhavbaye Branch (Benin City)</a></li>
+            <li><a href="index.html#branches">Head Office (details to be confirmed)</a></li>
           </ul>
         </div>
 
