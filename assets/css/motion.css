@@ -15,7 +15,7 @@
 
 .elpis-intro.style-hype {
   background:
-    radial-gradient(circle at 50% 44%, #17243A 0%, #0B1424 55%, #070D18 100%);
+    radial-gradient(circle at 50% 44%, #142C27 0%, #0D211D 55%, #070D18 100%);
 }
 
 .elpis-intro.style-classic,
@@ -88,10 +88,10 @@
   z-index: 4;
   width: 190px;
   height: 190px;
-  border: 2px solid rgba(92,255,120,0.8);
+  border: 2px solid rgba(197,161,107,0.9);
   border-radius: 50%;
   opacity: 0;
-  box-shadow: 0 0 34px rgba(0,181,34,0.24);
+  box-shadow: 0 0 34px rgba(197,161,107,0.28);
 }
 
 .elpis-intro__flash {
@@ -139,7 +139,7 @@
   font-size: clamp(20px, 4.4vw, 38px);
   font-weight: 800;
   letter-spacing: 0.08em;
-  color: #00b522;
+  color: #C5A16B;
   text-align: center;
 }
 
@@ -164,7 +164,7 @@
 }
 
 .style-hype .elpis-intro__tagline {
-  color: rgba(65, 65, 65, 0.86);
+  color: rgba(245,242,236,0.9);
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
@@ -246,4 +246,42 @@
     transform: none !important;
     filter: none !important;
   }
+}
+
+
+/* 15-second Elpis signature motion-film treatment */
+.elpis-intro.style-hype {
+  background:
+    radial-gradient(ellipse at 50% 44%, rgba(42,81,68,.98) 0%, #142C27 42%, #0D211D 78%, #07130F 100%);
+}
+.elpis-intro__halo {
+  background: radial-gradient(circle, rgba(255,255,255,.16) 0%, rgba(197,161,107,.20) 36%, rgba(197,161,107,.08) 58%, transparent 74%);
+  filter: blur(30px);
+}
+.elpis-intro__ring {
+  border-color: rgba(233,216,185,.86);
+  box-shadow: 0 0 42px rgba(197,161,107,.32), inset 0 0 24px rgba(197,161,107,.12);
+}
+.elpis-intro__tagline {
+  color: #E9D8B9;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  font-size: clamp(11px,1.3vw,15px);
+}
+.elpis-intro.style-hype::after {
+  content: "TAP ANYWHERE TO SKIP";
+  position: absolute;
+  bottom: max(26px, env(safe-area-inset-bottom));
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: rgba(245,242,236,.48);
+  font: 600 9px/1 var(--font-body, sans-serif);
+  letter-spacing: .2em;
+}
+.elpis-intro__logo {
+  filter: drop-shadow(0 20px 48px rgba(0,0,0,.34)) drop-shadow(0 0 22px rgba(197,161,107,.16));
+}
+@media (prefers-reduced-motion: reduce) {
+  .elpis-intro.style-hype::after { display:none; }
 }
