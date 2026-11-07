@@ -14,6 +14,7 @@ wrangler.toml
 *.txt
 *.py
 test_*.mjs
+test_phase5_suite.mjs
 seed_*.py
 seed_phase5.py
 wipe_test_data.py
