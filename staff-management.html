@@ -38,6 +38,7 @@
       <div class="tabs">
         <button class="tab-btn active" type="button" data-tab="staff">Staff directory</button>
         <button class="tab-btn" type="button" data-tab="teams">Teams</button>
+        <button class="tab-btn" type="button" data-tab="branches">Branches</button>
       </div>
 
       <section id="staffTab">
@@ -79,6 +80,21 @@
           <div class="table-responsive"><table class="table">
             <thead><tr><th>Team</th><th>Branch</th><th>Team lead</th><th>Members</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody id="teamBody"></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <section id="branchesTab" style="display:none">
+        <div class="card">
+          <div class="card-head">
+            <h3>Branch directory</h3>
+            <span class="small muted" id="branchCount"></span>
+            <button class="btn btn-brand btn-sm" type="button" id="newBranchBtn">+ Add branch</button>
+          </div>
+          <p class="small muted">Branches are used for staff, client and property assignment. Branches marked public also appear on the website.</p>
+          <div class="table-responsive"><table class="table">
+            <thead><tr><th>Branch</th><th>Location</th><th>Phone</th><th>Visibility</th><th>Head office</th><th>Actions</th></tr></thead>
+            <tbody id="branchBody"><tr><td colspan="6">Loading…</td></tr></tbody>
           </table></div>
         </div>
       </section>
@@ -129,6 +145,29 @@
         <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
           <button class="btn btn-ghost" type="button" data-close-modal="teamModal">Cancel</button>
           <button class="btn btn-brand" type="submit" id="teamSubmitBtn">Save team</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="branchModal">
+    <div class="modal-box">
+      <div class="modal-header"><h3 id="branchModalTitle">Add branch</h3><button class="icon-btn" type="button" data-close-modal="branchModal">✕</button></div>
+      <form id="branchForm">
+        <input type="hidden" id="branchId">
+        <div class="form-grid">
+          <div class="field-group"><label class="field-label" for="branchName">Branch name</label><input class="field-input" id="branchName" required></div>
+          <div class="field-group"><label class="field-label" for="branchType">Type</label><input class="field-input" id="branchType" placeholder="Head Office, Branch, Regional Office"></div>
+          <div class="field-group"><label class="field-label" for="branchCity">City</label><input class="field-input" id="branchCity"></div>
+          <div class="field-group"><label class="field-label" for="branchState">State</label><input class="field-input" id="branchState"></div>
+          <div class="field-group"><label class="field-label" for="branchPhone">Phone</label><input class="field-input" id="branchPhone"></div>
+          <div class="field-group full"><label class="field-label" for="branchAddress">Address</label><textarea class="field-input" id="branchAddress" rows="2"></textarea></div>
+          <div class="field-group full"><label class="tag" style="display:flex;align-items:center;gap:8px;padding:10px"><input type="checkbox" id="branchPublic" checked> Show this branch on the public website</label></div>
+          <div class="field-group full"><label class="tag" style="display:flex;align-items:center;gap:8px;padding:10px"><input type="checkbox" id="branchHeadOffice"> This is the head office</label></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
+          <button class="btn btn-ghost" type="button" data-close-modal="branchModal">Cancel</button>
+          <button class="btn btn-brand" type="submit" id="branchSubmitBtn">Save branch</button>
         </div>
       </form>
     </div>

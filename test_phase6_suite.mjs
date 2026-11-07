@@ -871,6 +871,28 @@ await test('brand system uses the official navy, gold and ivory tokens without g
   assert(intro.includes('#e8b52d') && intro.includes('#071747'), 'intro must use the official palette');
 });
 
+await test('MD can add and publish branches while branch managers cannot', async () => {
+  const original = db.prepare("SELECT setting_value FROM app_settings WHERE setting_key='site_config'").get();
+  const name = 'Phase 6 Test Branch';
+  const create = await request('/api/branches', {
+    method: 'POST', headers: { Cookie: mdCookie },
+    body: { name, city: 'Test City', state: 'Test State', phone: '08050000000', branch_type: 'Branch', is_public: true }
+  });
+  assert(create.status === 200 && create.data.id, `MD branch creation expected 200, got ${create.status}`);
+  const createdId = create.data.id;
+  const list = await request('/api/branches');
+  const created = list.data.branches.find(row => Number(row.id) === Number(createdId));
+  assert(created && created.name === name && Number(created.is_public) === 1, 'created branch missing from directory');
+  const config = await request('/api/site-config');
+  assert(config.data.config.branches.some(row => row.name === name), 'public branch was not synced to site config');
+  const forbidden = await request('/api/branches', {
+    method: 'POST', headers: { Cookie: bm1Cookie }, body: { name: 'Forbidden Branch' }
+  });
+  assert(forbidden.status === 403, `Branch Manager branch creation expected 403, got ${forbidden.status}`);
+  db.prepare('DELETE FROM branches WHERE id=?').run(createdId);
+  if (original) db.prepare("UPDATE app_settings SET setting_value=? WHERE setting_key='site_config'").run(original.setting_value);
+});
+
 console.log('\n========================================================');
 console.log(`   RESULT: ${passed} PASSED | ${failed} FAILED`);
 if (failures.length) {

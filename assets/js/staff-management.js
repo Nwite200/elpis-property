@@ -45,6 +45,78 @@
       teamBranch.disabled = true;
       staffFilter.style.display = "none";
     }
+    renderBranches();
+  }
+
+  function canManageBranches() {
+    return me && ["Managing Director", "Super Admin"].includes(me.actual_role || me.role);
+  }
+
+  function renderBranches() {
+    const canManage = canManageBranches();
+    el("branchCount").textContent = `${branches.length} branch${branches.length === 1 ? "" : "es"}`;
+    el("newBranchBtn").style.display = canManage ? "" : "none";
+    el("branchBody").innerHTML = branches.length ? branches.map(branch => `
+      <tr>
+        <td><strong>${S.escape(branch.name)}</strong><div class="small muted">${S.escape(branch.branch_type || "Branch")}</div></td>
+        <td>${S.escape([branch.city, branch.state].filter(Boolean).join(", ") || "-")}</td>
+        <td>${S.escape(branch.phone || "-")}</td>
+        <td>${Number(branch.is_public) ? '<span class="badge badge-success">Public</span>' : '<span class="badge badge-gray">Internal</span>'}</td>
+        <td>${Number(branch.is_head_office) ? '<span class="badge badge-amber">Head office</span>' : "-"}</td>
+        <td>${canManage ? `<button class="btn btn-ghost btn-xs" type="button" data-action="edit-branch" data-id="${branch.id}">Edit</button>` : "-"}</td>
+      </tr>`).join("") : '<tr><td colspan="6"><div class="empty-state">No branches yet.</div></td></tr>';
+    el("branchBody").querySelectorAll("[data-action='edit-branch']").forEach(button => {
+      button.addEventListener("click", () => openBranchModal(Number(button.getAttribute("data-id"))));
+    });
+  }
+
+  function openBranchModal(id) {
+    if (!canManageBranches()) return;
+    const branch = id ? branches.find(item => Number(item.id) === Number(id)) : null;
+    el("branchId").value = branch ? branch.id : "";
+    el("branchModalTitle").textContent = branch ? "Edit branch" : "Add branch";
+    el("branchName").value = branch ? (branch.name || "") : "";
+    el("branchType").value = branch ? (branch.branch_type || "") : "Branch";
+    el("branchCity").value = branch ? (branch.city || "") : "";
+    el("branchState").value = branch ? (branch.state || "") : "";
+    el("branchPhone").value = branch ? (branch.phone || "") : "";
+    el("branchAddress").value = branch ? (branch.address || "") : "";
+    el("branchPublic").checked = branch ? Boolean(Number(branch.is_public)) : true;
+    el("branchHeadOffice").checked = branch ? Boolean(Number(branch.is_head_office)) : false;
+    S.openModal("branchModal");
+  }
+
+  async function submitBranch(event) {
+    event.preventDefault();
+    const id = el("branchId").value;
+    const body = {
+      name: el("branchName").value.trim(),
+      branch_type: el("branchType").value.trim(),
+      city: el("branchCity").value.trim(),
+      state: el("branchState").value.trim(),
+      phone: el("branchPhone").value.trim(),
+      address: el("branchAddress").value.trim(),
+      is_public: el("branchPublic").checked,
+      is_head_office: el("branchHeadOffice").checked
+    };
+    const button = el("branchSubmitBtn");
+    button.disabled = true;
+    button.textContent = "Saving…";
+    try {
+      await S.fetchJson(id ? `/api/branches/${id}` : "/api/branches", {
+        method: id ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      S.closeModal("branchModal");
+      S.toast(id ? "Branch updated." : "Branch added.");
+      await loadBranches();
+    } catch (error) {
+      S.toast(error.message || "Unable to save branch", true);
+    } finally {
+      button.disabled = false;
+      button.textContent = "Save branch";
+    }
   }
 
   async function loadTeams() {
@@ -358,6 +430,7 @@
         const tab = button.getAttribute("data-tab");
         el("staffTab").style.display = tab === "staff" ? "" : "none";
         el("teamsTab").style.display = tab === "teams" ? "" : "none";
+        el("branchesTab").style.display = tab === "branches" ? "" : "none";
       });
     });
   }
@@ -381,10 +454,12 @@
     fillSelect(el("staffRole"), roleOptions().map(role => ({ role })), "role", "role");
     el("newStaffBtn").addEventListener("click", () => openStaffModal(null));
     el("newTeamBtn").addEventListener("click", () => openTeamModal(null));
+    el("newBranchBtn").addEventListener("click", () => openBranchModal(null));
     el("applyStaffFilters").addEventListener("click", loadStaff);
     el("staffSearch").addEventListener("keydown", event => { if (event.key === "Enter") loadStaff(); });
     el("staffForm").addEventListener("submit", submitStaff);
     el("teamForm").addEventListener("submit", submitTeam);
+    el("branchForm").addEventListener("submit", submitBranch);
     el("teamBranch").addEventListener("change", () => {
       const branchId = el("teamBranch").value;
       fillSelect(el("teamLead"), teamLeadOptions(branchId), "id", "full_name", "Unassigned");

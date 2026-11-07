@@ -1180,6 +1180,30 @@ async function getSiteConfig(env) {
   }
 }
 
+function publicBranchRow(row) {
+  return {
+    id: row.id,
+    name: row.name,
+    city: row.city || "",
+    state: row.state || "",
+    type: row.branch_type || (row.is_head_office ? "Head Office" : "Branch"),
+    address: row.address || "",
+    phone: row.phone || "",
+    isHeadOffice: Boolean(row.is_head_office)
+  };
+}
+
+async function syncPublicBranches(env, actorId) {
+  const { results } = await env.DB.prepare(`
+    SELECT id, name, city, state, address, phone, branch_type, is_head_office
+    FROM branches WHERE is_public=1
+    ORDER BY is_head_office DESC, name
+  `).all();
+  const config = await getSiteConfig(env);
+  config.branches = results.map(publicBranchRow);
+  await setAppSetting(env, "site_config", JSON.stringify(config), actorId);
+}
+
 async function propertyEnabledPlanCount(env, propertyId) {
   const row = await env.DB.prepare(
     "SELECT COUNT(*) AS c FROM property_payment_plans WHERE property_id=? AND is_enabled=1"
@@ -6017,8 +6041,75 @@ async function handleFetch(request, env) {
     }
 
     if (path === "/api/branches" && request.method === "GET") {
-      const { results } = await env.DB.prepare("SELECT id, name FROM branches ORDER BY id").all();
+      const { results } = await env.DB.prepare(`
+        SELECT id, name, city, state, address, phone, branch_type, is_head_office, is_public
+        FROM branches ORDER BY is_head_office DESC, name
+      `).all();
       return json({ branches: results });
+    }
+
+    if (path === "/api/branches" && request.method === "POST") {
+      if (!csrfOk(request)) return json({ error: "CSRF check failed" }, 403);
+      const actor = await getSessionUser(env, request);
+      if (!actor) return json({ error: "Unauthenticated" }, 401);
+      const actualRole = actor.actual_role_name || actor.role_name;
+      if (!["Managing Director", "Super Admin"].includes(actualRole)) return json({ error: "Forbidden" }, 403);
+      const body = await request.json().catch(() => ({}));
+      const name = String(body.name || "").trim();
+      if (!name) return json({ error: "Branch name is required" }, 400);
+      const existing = await env.DB.prepare("SELECT id FROM branches WHERE LOWER(name)=LOWER(?)").bind(name).first();
+      if (existing) return json({ error: "A branch with this name already exists" }, 409);
+      const headOffice = isTruthy(body.is_head_office) ? 1 : 0;
+      const isPublic = body.is_public === undefined ? 1 : (isTruthy(body.is_public) ? 1 : 0);
+      if (headOffice) await env.DB.prepare("UPDATE branches SET is_head_office=0").run();
+      const res = await env.DB.prepare(`
+        INSERT INTO branches (name, city, state, address, phone, branch_type, is_head_office, is_public)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        name, String(body.city || "").trim(), String(body.state || "").trim(),
+        String(body.address || "").trim(), String(body.phone || "").trim(),
+        String(body.branch_type || (headOffice ? "Head Office" : "Branch")).trim(),
+        headOffice, isPublic
+      ).run();
+      const branchId = Number(res.meta.last_row_id);
+      if (isPublic) await syncPublicBranches(env, actor.id);
+      await audit(env, actor.id, "branch.create", "branch", String(branchId), { name, is_public: isPublic }, branchId);
+      return json({ ok: true, id: branchId });
+    }
+
+    const branchMatch = path.match(/^\/api\/branches\/(\d+)$/);
+    if (branchMatch && request.method === "PUT") {
+      if (!csrfOk(request)) return json({ error: "CSRF check failed" }, 403);
+      const actor = await getSessionUser(env, request);
+      if (!actor) return json({ error: "Unauthenticated" }, 401);
+      const actualRole = actor.actual_role_name || actor.role_name;
+      if (!["Managing Director", "Super Admin"].includes(actualRole)) return json({ error: "Forbidden" }, 403);
+      const branchId = Number(branchMatch[1]);
+      const branch = await env.DB.prepare("SELECT * FROM branches WHERE id=?").bind(branchId).first();
+      if (!branch) return json({ error: "Branch not found" }, 404);
+      const body = await request.json().catch(() => ({}));
+      const name = body.name === undefined ? branch.name : String(body.name || "").trim();
+      if (!name) return json({ error: "Branch name is required" }, 400);
+      const duplicate = await env.DB.prepare("SELECT id FROM branches WHERE LOWER(name)=LOWER(?) AND id<>?").bind(name, branchId).first();
+      if (duplicate) return json({ error: "A branch with this name already exists" }, 409);
+      const headOffice = body.is_head_office === undefined ? Number(branch.is_head_office || 0) : (isTruthy(body.is_head_office) ? 1 : 0);
+      const isPublic = body.is_public === undefined ? Number(branch.is_public || 0) : (isTruthy(body.is_public) ? 1 : 0);
+      if (headOffice) await env.DB.prepare("UPDATE branches SET is_head_office=0 WHERE id<>?").bind(branchId).run();
+      await env.DB.prepare(`
+        UPDATE branches SET name=?, city=?, state=?, address=?, phone=?, branch_type=?, is_head_office=?, is_public=?
+        WHERE id=?
+      `).bind(
+        name,
+        body.city === undefined ? branch.city : String(body.city || "").trim(),
+        body.state === undefined ? branch.state : String(body.state || "").trim(),
+        body.address === undefined ? branch.address : String(body.address || "").trim(),
+        body.phone === undefined ? branch.phone : String(body.phone || "").trim(),
+        body.branch_type === undefined ? branch.branch_type : String(body.branch_type || "").trim(),
+        headOffice, isPublic, branchId
+      ).run();
+      await syncPublicBranches(env, actor.id);
+      await audit(env, actor.id, "branch.update", "branch", String(branchId), { name, is_public: isPublic }, branchId);
+      return json({ ok: true, id: branchId });
     }
 
     // Phase 2/6 team management (branch-scoped)
