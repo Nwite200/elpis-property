@@ -150,8 +150,8 @@ for (const [clientId, propertyId, price] of [
 }
 
 const teamAlphaId = Number(db.prepare('INSERT INTO teams (name, branch_id, team_lead_user_id, is_active) VALUES (?, ?, ?, 1)').run('Phase 7 Team Alpha', 1, tl1Id).lastInsertRowid);
-const teamBranch 2Id = Number(db.prepare('INSERT INTO teams (name, branch_id, team_lead_user_id, is_active) VALUES (?, ?, ?, 1)').run('Phase 7 Team Branch 2', 2, tl2Id).lastInsertRowid);
-for (const [team, user] of [[teamAlphaId, tl1Id], [teamAlphaId, mkt1Id], [teamAlphaId, mkt2Id], [teamBranch 2Id, tl2Id], [teamBranch 2Id, mkt3Id]]) {
+const teamBranch2Id = Number(db.prepare('INSERT INTO teams (name, branch_id, team_lead_user_id, is_active) VALUES (?, ?, ?, 1)').run('Phase 7 Team Branch 2', 2, tl2Id).lastInsertRowid);
+for (const [team, user] of [[teamAlphaId, tl1Id], [teamAlphaId, mkt1Id], [teamAlphaId, mkt2Id], [teamBranch2Id, tl2Id], [teamBranch2Id, mkt3Id]]) {
   db.prepare('INSERT OR IGNORE INTO team_members (team_id, user_id) VALUES (?, ?)').run(team, user);
 }
 for (const [uid, phone, title] of [[mdId,'08070000000','Managing Director'],[bm1Id,'08070000001','Branch Manager'],[bm2Id,'08070000002','Branch Manager'],[tl1Id,'08070000003','Team Lead'],[tl2Id,'08070000004','Team Lead'],[mkt1Id,'08070000005','Marketer'],[mkt2Id,'08070000006','Marketer'],[mkt3Id,'08070000007','Marketer'],[finId,'08070000008','Finance Officer']]) {
