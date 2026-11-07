@@ -966,25 +966,22 @@ await test('client sign-up session cookie, login, logout and expiry are enforced
   assert((await request('/api/me', { headers: { Cookie: freshCookie } })).status === 401, 'expired client session still valid');
 });
 
-await test('official logo is used across pages, login screens and receipt assets', async () => {
-  const rootLogo = readFileSync('elpis-legacy-logo.png');
-  const assetLogo = readFileSync('assets/images/elpis-legacy-logo.png');
-  assert(rootLogo.equals(assetLogo), 'assets logo must match the official root logo');
-  const jpg = readFileSync('assets/images/elpis-legacy-logo.jpg');
-  assert(jpg.length > 10000 && jpg[0] === 0xff && jpg[1] === 0xd8, 'official JPEG logo for PDFs is missing/invalid');
+await test('official Elpis branding is used across pages, login screens and generated PDF assets', async () => {
+  const logoPath = 'assets/images/elpis-property-logo-original.png';
+  const logo = readFileSync(logoPath);
+  assert(logo.length > 1000 && logo[0] === 0x89 && logo[1] === 0x50, 'official Elpis PNG logo is missing or invalid');
   const pages = readdirSync('.').filter(f => f.endsWith('.html'));
   for (const page of pages) {
-    const text = readFileSync(page, 'utf8');
-    const injectsLogo = text.includes('elpis-legacy-logo') || text.includes('assets/js/staff-shell.js') || text.includes('assets/js/components.js');
+    const pageText = readFileSync(page, 'utf8');
+    const injectsLogo = pageText.includes('elpis-property-logo-original.png') || pageText.includes('assets/js/staff-shell.js') || pageText.includes('assets/js/components.js') || pageText.includes('elpis-legacy-logo');
     assert(injectsLogo, `${page} does not include the official logo or shared logo shell`);
   }
   const ignore = readFileSync('.assetsignore', 'utf8');
-  assert(ignore.includes('/elpis-legacy-logo.png'), '.assetsignore must exclude only the root logo, not assets/images/logo');
-  assert(!/^elpis-legacy-logo\.png$/m.test(ignore), '.assetsignore must not exclude the served assets logo');
+  assert(!/^assets\\/images\\//m.test(ignore), 'served logo assets must not be excluded');
   assert(readFileSync('client-login.html', 'utf8').includes('signup.html'), 'client login missing sign-up link');
   assert(readFileSync('login.html', 'utf8').includes('signup.html'), 'staff portal login missing sign-up link');
-  assert(readFileSync('signup.html', 'utf8').includes('assets/images/elpis-legacy-logo.png'), 'sign-up page missing official logo');
-  assert(readFileSync('src/index.js', 'utf8').includes('assets/images/elpis-legacy-logo.jpg'), 'receipt/report PDFs must use official logo asset');
+  assert(readFileSync('signup.html', 'utf8').includes(logoPath), 'sign-up page missing official logo');
+  assert(readFileSync('src/index.js', 'utf8').includes('PROPERTY LIMITED'), 'receipt/report PDFs must render the Elpis wordmark');
 });
 
 console.log('\n========================================================');
