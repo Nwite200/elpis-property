@@ -1,6 +1,6 @@
 // Elpis Property Limited — shared staff shell, API helpers and formatting.
 (function () {
-  const elpisStaff = window.elpisStaff = window.elpisStaff || {};
+  const elpisStaff = window.elpisStaff = window.ElpisStaff = window.elpisStaff || window.ElpisStaff || {};
 
   elpisStaff.roles = {
     "Super Admin": "SA",

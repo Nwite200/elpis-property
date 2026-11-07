@@ -194,7 +194,7 @@ db.prepare(`INSERT INTO receipts (payment_id, client_id, receipt_ref, amount, am
 // ---------------------------------------------------------------------------
 const r2 = new Map();
 const queuedMessages = [];
-const logoBytes = new Uint8Array(readFileSync('assets/images/elpis-property-logo-original.png'));
+const logoBytes = new Uint8Array(readFileSync('assets/images/elpis-legacy-logo.jpg'));
 
 function makeEnv(overrides = {}) {
   return {
@@ -253,8 +253,8 @@ function makeEnv(overrides = {}) {
     ASSETS: {
       async fetch(input) {
         const url = typeof input === 'string' ? input : (input.url || String(input));
-        if (url.includes('elpis-property-logo-original')) {
-          return new Response(logoBytes, { status: 200, headers: { 'Content-Type': 'image/png' } });
+        if (url.includes('elpis-legacy-logo.jpg')) {
+          return new Response(logoBytes, { status: 200, headers: { 'Content-Type': 'image/jpeg' } });
         }
         return new Response('Not found', { status: 404 });
       }

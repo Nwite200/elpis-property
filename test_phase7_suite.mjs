@@ -458,7 +458,7 @@ await test('client dashboard and authorised staff see every allocated property w
   assert(ids.includes('009') && ids.includes('010'), 'landing catalogue is missing the latest listings');
   assert(landCount >= 3, 'landing catalogue must include land opportunities');
   assert(mainJs.includes('allProperties.slice(0, 10)'), 'landing page must cap merged listings at ten');
-  assert(mainJs.includes("String(p.category).toLowerCase() === 'land'"), 'landing page must preserve a land listing');
+  assert(/String\(p\.category\)\.toLowerCase\(\) === ['"]land['"]/.test(mainJs), 'landing page must preserve a land listing');
   assert(mainJs.includes('isDemo ?'), 'demo listings should be labelled on the landing page');
 });
 

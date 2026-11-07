@@ -7,7 +7,7 @@
 
   var CFG = window.ELPIS_INTRO_CONFIG || {};
   var STYLE = CFG.INTRO_STYLE === "classic" ? "classic" : "hype";
-  var LOGO_SRC = CFG.LOGO_SRC || "assets/images/elpis-property-logo-original.png";
+  var LOGO_SRC = CFG.LOGO_SRC || "assets/images/elpis-legacy-logo.png";
   var BRAND_NAME = CFG.BRAND_NAME || "Elpis Property Limited";
   var TAGLINE = CFG.TAGLINE || "Your Future Begins With the Right Property.";
   var NAV_MARKER = "elpis_internal_navigation";

@@ -149,10 +149,10 @@ db.prepare(`INSERT INTO clients (client_reference, full_name, phone_number, emai
   assigned_branch_id, created_by, original_marketer_id, team_lead_id, agreed_purchase_price, interested_property_id)
   VALUES ('BLC-P8-OTHER','Other Phase 8 Client','08088000002','other.p8@example.com','Active Buyer','New Sale',?,?,?,?,10000000,?)`)
   .run(ikeja, mkt2Id, mkt2Id, tlId, propPublished);
-const teamBranch 1Id = Number(db.prepare("INSERT INTO teams (name, branch_id, team_lead_user_id, is_active) VALUES (?,?,?,1)")
+const teamBranch1Id = Number(db.prepare("INSERT INTO teams (name, branch_id, team_lead_user_id, is_active) VALUES (?,?,?,1)")
   .run('Phase 8 Branch 1 Team', ikeja, tlId).lastInsertRowid);
 for (const userId of [tlId, mkt1Id, mkt2Id]) {
-  db.prepare("INSERT INTO team_members (team_id, user_id) VALUES (?,?)").run(teamBranch 1Id, userId);
+  db.prepare("INSERT INTO team_members (team_id, user_id) VALUES (?,?)").run(teamBranch1Id, userId);
 }
 db.prepare("UPDATE users SET manager_id=? WHERE id IN (?,?,?)").run(mdId, bm1Id, bm2Id, pmId);
 db.prepare("UPDATE users SET manager_id=? WHERE id=?").run(bm1Id, tlId);
@@ -762,9 +762,9 @@ await test('single global logo intro supports hype/classic, full/short replay an
   assert(!motionJs.includes('elpis_intro_played'), 'once-per-session intro logic must be removed');
   assert(config.includes('INTRO_STYLE: "hype"'), 'default intro style must be hype');
   assert(config.includes('"classic"') && motionJs.includes('INTRO_STYLE === "classic"'), 'classic switch missing');
-  assert(config.includes('total: 3000') && config.includes('total: 1000'), 'full/short hype durations missing');
+  assert(config.includes('total: 15000') && config.includes('total: 1200'), 'full/short hype durations missing');
   assert(config.includes('fadeIn: 600') && config.includes('hold: 1500') && config.includes('fadeOut: 600'), 'classic full timings missing');
-  assert(config.includes('failsafe: 3800') && config.includes('failsafe: 1800'), 'hype failsafe timings missing');
+  assert(config.includes('failsafe: 16000') && config.includes('failsafe: 1700'), 'hype failsafe timings missing');
   assert(config.includes('LOGO_SRC: "assets/images/elpis-legacy-logo.png"'), 'actual site logo path missing');
   assert(motionJs.includes("addEventListener(\"pageshow\""), 'Back/Forward pageshow replay missing');
   assert(motionJs.includes("addEventListener(\"popstate\""), 'Back/Forward popstate replay missing');
@@ -1853,7 +1853,7 @@ await test('all local migrations apply cleanly to a fresh SQLite database', asyn
   const clean = new DatabaseSync(cleanPath);
   clean.exec('PRAGMA foreign_keys = ON;');
   const files = readdirSync('migrations').filter(f => /^\d+_.*\.sql$/.test(f)).sort();
-  assert(files.length === 22, `expected 22 migrations, found ${files.length}`);
+  assert(files.length === 29, `expected 29 migrations, found ${files.length}`);
   for (const file of files) {
     clean.exec(readFileSync(join('migrations', file), 'utf8'));
   }
