@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // Render 6 Branches Section
+  // Render Elpis-configured branch locations
   const branchesGrid = document.getElementById('branchesGrid');
   if (branchesGrid) {
     const branches = (c.branches && c.branches.length) ? c.branches : [];

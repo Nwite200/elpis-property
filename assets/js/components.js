@@ -35,7 +35,7 @@ Elpis.whatsappLink = function(msg) {
 Elpis.enquireWhatsApp = function(msg) {
   const url = Elpis.whatsappLink(msg);
   if (!url) {
-    alert("WhatsApp contact has not been configured yet. Please use the phone or email shown on the site.");
+    alert("WhatsApp contact has not been configured yet. Please use the official email address shown on the site.");
     return;
   }
   window.open(url, "_blank", "noopener,noreferrer");
@@ -53,7 +53,7 @@ Elpis.renderHeader = function(activePage) {
         <span>Verified Property Ownership & Investment in Nigeria</span>
       </div>
       <div class="topline-right">
-        <span>Serving Clients Across 6 Branches Nationwide</span>
+        <span>Property Advisory and Client Support</span>
         <span class="topline-sep">•</span>
         <a href="${c.phone ? 'tel:' + c.phone : '#contact'}" class="topline-contact">${c.phone || 'Phone not configured'}</a>
       </div>
