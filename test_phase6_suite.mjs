@@ -192,9 +192,9 @@ insertPayment(demoId, 'TX-P6-DEMO-01', 300000000, 'verified', { isDemo: true });
 
 const teamAlphaId = Number(db.prepare('INSERT INTO teams (name, branch_id, team_lead_user_id, is_active) VALUES (?, ?, ?, 1)')
   .run('Team Alpha', 1, tl1Id).lastInsertRowid);
-const teamBranch 2Id = Number(db.prepare('INSERT INTO teams (name, branch_id, team_lead_user_id, is_active) VALUES (?, ?, ?, 1)')
+const teamBranch2Id = Number(db.prepare('INSERT INTO teams (name, branch_id, team_lead_user_id, is_active) VALUES (?, ?, ?, 1)')
   .run('Team Branch 2', 2, tl2Id).lastInsertRowid);
-for (const [team, user] of [[teamAlphaId, tl1Id], [teamAlphaId, mkt1Id], [teamAlphaId, mkt2Id], [teamBranch 2Id, tl2Id], [teamBranch 2Id, mkt3Id]]) {
+for (const [team, user] of [[teamAlphaId, tl1Id], [teamAlphaId, mkt1Id], [teamAlphaId, mkt2Id], [teamBranch2Id, tl2Id], [teamBranch2Id, mkt3Id]]) {
   db.prepare('INSERT OR IGNORE INTO team_members (team_id, user_id) VALUES (?, ?)').run(team, user);
 }
 for (const [uid, phone, title] of [
@@ -588,11 +588,11 @@ await test('team management is branch-scoped and member assignment is validated'
   assert(updated.status === 200, `team update expected 200, got ${updated.status}: ${JSON.stringify(updated.data)}`);
   const detail = await request(`/api/teams/${teamId}`, { headers: { Cookie: bm1Cookie } });
   assert(detail.status === 200 && detail.data.members.length === 3, 'team members not persisted');
-  const cross = await request(`/api/teams/${teamBranch 2Id}`, { method: 'PUT', headers: { Cookie: bm1Cookie }, body: { name: 'Hijack' } });
+  const cross = await request(`/api/teams/${teamBranch2Id}`, { method: 'PUT', headers: { Cookie: bm1Cookie }, body: { name: 'Hijack' } });
   assert(cross.status === 403, 'BM cross-branch team update expected 403');
   const tlDetail = await request(`/api/teams/${teamAlphaId}`, { headers: { Cookie: tl1Cookie } });
   assert(tlDetail.status === 200, 'TL own team detail expected 200');
-  const tlCross = await request(`/api/teams/${teamBranch 2Id}`, { headers: { Cookie: tl1Cookie } });
+  const tlCross = await request(`/api/teams/${teamBranch2Id}`, { headers: { Cookie: tl1Cookie } });
   assert(tlCross.status === 403, 'TL cross-team detail expected 403');
   const assignStaff = await request(`/api/staff/${mkt2Id}/teams`, {
     method: 'PUT', headers: { Cookie: bm1Cookie }, body: { team_ids: [teamAlphaId, teamId] }
