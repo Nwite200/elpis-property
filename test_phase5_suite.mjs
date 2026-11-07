@@ -109,11 +109,11 @@ function upsertClient(ref, data) {
 // Deterministic seed
 // ---------------------------------------------------------------------------
 const mdId = upsertUser('md@elpisproperty.test', 'Managing Director', 1, null);
-const bmId = upsertUser('bm.ikeja@elpisproperty.test', 'Ikeja Branch Manager', 2, 1);
-const bm2Id = upsertUser('bm.ajah@elpisproperty.test', 'Ajah Branch Manager', 2, 2);
-const tlId = upsertUser('tl.ikeja@elpisproperty.test', 'Ikeja Team Lead', 3, 1);
-const mktId = upsertUser('mkt.ikeja@elpisproperty.test', 'Ikeja Marketer', 4, 1);
-const mkt2Id = upsertUser('mkt.ajah@elpisproperty.test', 'Ajah Marketer', 4, 2);
+const bmId = upsertUser('bm.ikeja@elpisproperty.test', 'Branch 1 Branch Manager', 2, 1);
+const bm2Id = upsertUser('bm.ajah@elpisproperty.test', 'Branch 2 Branch Manager', 2, 2);
+const tlId = upsertUser('tl.ikeja@elpisproperty.test', 'Branch 1 Team Lead', 3, 1);
+const mktId = upsertUser('mkt.ikeja@elpisproperty.test', 'Branch 1 Marketer', 4, 1);
+const mkt2Id = upsertUser('mkt.ajah@elpisproperty.test', 'Branch 2 Marketer', 4, 2);
 const finId = upsertUser('finance@elpisproperty.test', 'Head Finance Officer', 5, 1);
 const adaUserId = upsertUser('ada@example.com', 'Ada Nwosu', 6, 1);
 const musaUserId = upsertUser('musa@example.com', 'Musa Dike', 6, 1);
@@ -124,16 +124,16 @@ const prop = db.prepare("SELECT id FROM properties WHERE reference='BLP-TEST-001
 let propId;
 if (prop) {
   propId = prop.id;
-  db.prepare("UPDATE properties SET title='Luxury Ikeja Apartment', sale_price=888888888, city='Ikeja', state='Lagos', status='Reserved', is_published=1, branch_id=1 WHERE id=?").run(propId);
+  db.prepare("UPDATE properties SET title='Luxury Branch 1 Apartment', sale_price=888888888, city='Branch 1', state='Lagos', status='Reserved', is_published=1, branch_id=1 WHERE id=?").run(propId);
 } else {
   const r = db.prepare(`INSERT INTO properties (reference, title, description, sale_price, state, city, address, branch_id, status, is_published, created_by)
-    VALUES ('BLP-TEST-001','Luxury Ikeja Apartment','A test property for Phase 5 verification.',888888888,'Lagos','Ikeja','1 Test Close',1,'Reserved',1,?)`).run(mdId);
+    VALUES ('BLP-TEST-001','Luxury Branch 1 Apartment','A test property for Phase 5 verification.',888888888,'Lagos','Branch 1','1 Test Close',1,'Reserved',1,?)`).run(mdId);
   propId = Number(r.lastInsertRowid);
 }
 
 const adaId = upsertClient('BLC-MW2ER37J', {
   full_name: 'Ada Nwosu', phone_number: '08011112222', email_address: 'ada@example.com',
-  address: '14 Victoria Island, Lagos', state: 'Lagos', city: 'Ikeja',
+  address: '14 Victoria Island, Lagos', state: 'Lagos', city: 'Branch 1',
   next_of_kin: 'Emeka Nwosu (Brother)', branchId: 1, createdBy: mktId, marketerId: mktId,
   teamLeadId: tlId, agreedPrice: 12000000, propertyId: propId, userId: adaUserId
 });
@@ -622,8 +622,8 @@ await test('transaction search filters by status, branch, property, marketer and
   assert(res.status === 200, 'filtered query expected 200');
   assert(res.data.transactions.length === 1, `expected 1 filtered live transaction, got ${res.data.transactions.length}`);
   assert(res.data.transactions[0].transaction_ref === 'TX-VERIFIED-ADA-01', 'correct transaction returned');
-  assert(res.data.transactions[0].marketer_name === 'Ikeja Marketer', 'marketer joined');
-  assert(res.data.transactions[0].property_title === 'Luxury Ikeja Apartment', 'property joined');
+  assert(res.data.transactions[0].marketer_name === 'Branch 1 Marketer', 'marketer joined');
+  assert(res.data.transactions[0].property_title === 'Luxury Branch 1 Apartment', 'property joined');
 });
 
 console.log('\n--- 9. Payment verification, receipts & adjustments ---');
@@ -868,11 +868,11 @@ console.log('\n--- 14. RBAC boundaries ---');
 await test('branch manager sees only own-branch clients and transactions', async () => {
   const clients = await request('/api/clients?limit=100', { headers: { Cookie: bmCookie } });
   assert(clients.status === 200, 'BM clients 200');
-  assert(clients.data.clients.every(c => c.assigned_branch_id === 1), 'only Ikeja clients');
+  assert(clients.data.clients.every(c => c.assigned_branch_id === 1), 'only Branch 1 clients');
   const ajah = await request('/api/clients?limit=100', { headers: { Cookie: bm2Cookie } });
-  assert(ajah.data.clients.every(c => c.assigned_branch_id === 2), 'only Ajah clients');
+  assert(ajah.data.clients.every(c => c.assigned_branch_id === 2), 'only Branch 2 clients');
   const txs = await request('/api/finance/transactions?limit=100', { headers: { Cookie: bm2Cookie } });
-  assert(txs.data.transactions.every(t => t.branch_name === 'Ajah'), 'only Ajah transactions');
+  assert(txs.data.transactions.every(t => t.branch_name === 'Branch 2'), 'only Branch 2 transactions');
 });
 
 await test('team lead and marketer are scoped to their authorised clients', async () => {
@@ -922,7 +922,7 @@ await test('staff RBAC on client creation and properties still enforced', async 
 const auditUserId = upsertUser('audit@example.com', 'Audit Finance Client', 6, 1);
 const auditClientId = upsertClient('BLC-AUDIT-001', {
   full_name: 'Audit Finance Client', phone_number: '08070001111', email_address: 'audit@example.com',
-  address: '1 Audit Close, Ikeja', state: 'Lagos', city: 'Ikeja', branchId: 1, createdBy: mktId,
+  address: '1 Audit Close, Branch 1', state: 'Lagos', city: 'Branch 1', branchId: 1, createdBy: mktId,
   marketerId: mktId, teamLeadId: tlId, agreedPrice: 10000000, propertyId: propId, userId: auditUserId
 });
 const auditCookie = await login('audit@example.com');
@@ -930,7 +930,7 @@ const auditCookie = await login('audit@example.com');
 const finClientUserId = upsertUser('finclient@example.com', 'Finance Audit Client', 6, 1);
 const finClientId = upsertClient('BLC-AUDIT-FIN-001', {
   full_name: 'Finance Audit Client', phone_number: '08070002222', email_address: 'finclient@example.com',
-  address: '2 Audit Close, Ikeja', state: 'Lagos', city: 'Ikeja', branchId: 1, createdBy: mktId,
+  address: '2 Audit Close, Branch 1', state: 'Lagos', city: 'Branch 1', branchId: 1, createdBy: mktId,
   marketerId: mktId, teamLeadId: tlId, agreedPrice: 10000000, propertyId: propId, userId: finClientUserId
 });
 const finClientCookie = await login('finclient@example.com');
@@ -938,7 +938,7 @@ const finClientCookie = await login('finclient@example.com');
 const koboUserId = upsertUser('kobo@example.com', 'Kobo Audit Client', 6, 1);
 const koboClientId = upsertClient('BLC-AUDIT-KOBO-001', {
   full_name: 'Kobo Audit Client', phone_number: '08070003333', email_address: 'kobo@example.com',
-  address: '3 Audit Close, Ikeja', state: 'Lagos', city: 'Ikeja', branchId: 1, createdBy: mktId,
+  address: '3 Audit Close, Branch 1', state: 'Lagos', city: 'Branch 1', branchId: 1, createdBy: mktId,
   marketerId: mktId, teamLeadId: tlId, agreedPrice: 10000000, propertyId: propId, userId: koboUserId
 });
 const koboCookie = await login('kobo@example.com');
@@ -954,7 +954,7 @@ await test('team and property-category creation remain branch-scoped and server-
   });
   assert(crossTeam.status === 403, `BM cross-branch team expected 403, got ${crossTeam.status}`);
   const ownTeam = await request('/api/teams', {
-    method: 'POST', headers: { Cookie: bmCookie }, body: { name: 'Audit Ikeja Team', branch_id: 1 }
+    method: 'POST', headers: { Cookie: bmCookie }, body: { name: 'Audit Branch 1 Team', branch_id: 1 }
   });
   assert(ownTeam.status === 200, `BM own-branch team expected 200, got ${ownTeam.status}`);
   const bmCategory = await request('/api/property-categories', {
@@ -980,14 +980,14 @@ await test('property CRUD is server-side RBAC protected and branch-scoped', asyn
   assert(marketer.status === 403, `marketer property create expected 403, got ${marketer.status}`);
   const cross = await request('/api/properties', {
     method: 'POST', headers: { Cookie: bmCookie },
-    body: { title: 'Cross Branch Property', sale_price: 1000, branch_name: 'Ajah' }
+    body: { title: 'Cross Branch Property', sale_price: 1000, branch_name: 'Branch 2' }
   });
   assert(cross.status === 403, `BM cross-branch create expected 403, got ${cross.status}`);
   const created = await request('/api/properties', {
     method: 'POST', headers: { Cookie: bmCookie },
     body: {
       title: 'Audit Phase 3 Property', description: 'Phase 3 regression fixture', sale_price: 25000000,
-      state: 'Lagos', city: 'Ikeja', address: '1 Audit Close'
+      state: 'Lagos', city: 'Branch 1', address: '1 Audit Close'
     }
   });
   assert(created.status === 200, `BM own-branch create expected 200, got ${created.status}: ${JSON.stringify(created.data)}`);
@@ -1122,11 +1122,11 @@ await test('client details, protected updates, status history and notes are serv
   });
   assert(priceByMarketer.status === 403, 'marketer cannot change contract price');
   const update = await request(`/api/clients/${phase4ClientId}`, {
-    method: 'PUT', headers: { Cookie: bmCookie }, body: { agreed_purchase_price: 7600000, city: 'Ikeja' }
+    method: 'PUT', headers: { Cookie: bmCookie }, body: { agreed_purchase_price: 7600000, city: 'Branch 1' }
   });
   assert(update.status === 200, `BM own-branch update expected 200, got ${update.status}`);
   const row = db.prepare('SELECT agreed_purchase_price, city FROM clients WHERE id=?').get(phase4ClientId);
-  assert(row.agreed_purchase_price === 7600000 && row.city === 'Ikeja', 'BM update persisted');
+  assert(row.agreed_purchase_price === 7600000 && row.city === 'Branch 1', 'BM update persisted');
   const status = await request(`/api/clients/${phase4ClientId}/status`, {
     method: 'POST', headers: { Cookie: mktCookie }, body: { status: 'Interested' }
   });

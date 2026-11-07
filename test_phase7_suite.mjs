@@ -75,13 +75,13 @@ function upsertClient(ref, data) {
 }
 
 const mdId = upsertUser('md@elpisproperty.test', 'Managing Director', 1, null);
-const bm1Id = upsertUser('bm.ikeja@elpisproperty.test', 'Ikeja Branch Manager', 2, 1);
-const bm2Id = upsertUser('bm.ajah@elpisproperty.test', 'Ajah Branch Manager', 2, 2);
-const tl1Id = upsertUser('tl.ikeja@elpisproperty.test', 'Ikeja Team Lead', 3, 1);
-const tl2Id = upsertUser('tl.ajah@elpisproperty.test', 'Ajah Team Lead', 3, 2);
-const mkt1Id = upsertUser('mkt.ikeja@elpisproperty.test', 'Ikeja Marketer One', 4, 1);
-const mkt2Id = upsertUser('mkt.ikeja2@elpisproperty.test', 'Ikeja Marketer Two', 4, 1);
-const mkt3Id = upsertUser('mkt.ajah@elpisproperty.test', 'Ajah Marketer', 4, 2);
+const bm1Id = upsertUser('bm.ikeja@elpisproperty.test', 'Branch 1 Branch Manager', 2, 1);
+const bm2Id = upsertUser('bm.ajah@elpisproperty.test', 'Branch 2 Branch Manager', 2, 2);
+const tl1Id = upsertUser('tl.ikeja@elpisproperty.test', 'Branch 1 Team Lead', 3, 1);
+const tl2Id = upsertUser('tl.ajah@elpisproperty.test', 'Branch 2 Team Lead', 3, 2);
+const mkt1Id = upsertUser('mkt.ikeja@elpisproperty.test', 'Branch 1 Marketer One', 4, 1);
+const mkt2Id = upsertUser('mkt.ikeja2@elpisproperty.test', 'Branch 1 Marketer Two', 4, 1);
+const mkt3Id = upsertUser('mkt.ajah@elpisproperty.test', 'Branch 2 Marketer', 4, 2);
 const finId = upsertUser('finance@elpisproperty.test', 'Head Finance Officer', 5, 1);
 // Phase 12: commission access must be granted explicitly. This test grants it
 // to the finance user while verifying that staff/team leads remain excluded.
@@ -131,9 +131,9 @@ db.exec(`
 `);
 
 const prop1 = Number(db.prepare(`INSERT INTO properties (reference,title,description,category_id,sale_price,state,city,address,branch_id,status,is_published,created_by)
-  VALUES ('BLP-P7-IKEJA','Phase 7 Ikeja Property','Commission test inventory',1,10000000,'Lagos','Ikeja','7 Phase Close',1,'Available',1,?)`).run(mdId).lastInsertRowid);
+  VALUES ('BLP-P7-IKEJA','Phase 7 Branch 1 Property','Commission test inventory',1,10000000,'Lagos','Branch 1','7 Phase Close',1,'Available',1,?)`).run(mdId).lastInsertRowid);
 const prop2 = Number(db.prepare(`INSERT INTO properties (reference,title,description,category_id,sale_price,state,city,address,branch_id,status,is_published,created_by)
-  VALUES ('BLP-P7-AJAH','Phase 7 Ajah Property','Commission test inventory',2,8000000,'Lagos','Ajah','8 Phase Close',2,'Reserved',1,?)`).run(mdId).lastInsertRowid);
+  VALUES ('BLP-P7-AJAH','Phase 7 Branch 2 Property','Commission test inventory',2,8000000,'Lagos','Branch 2','8 Phase Close',2,'Reserved',1,?)`).run(mdId).lastInsertRowid);
 
 const adaId = upsertClient('BLC-P7-ADA', { full_name: 'Ada Nwosu', phone_number: '08071000001', email: 'ada@example.com', status: 'Active Buyer', saleType: 'New Sale', branchId: 1, createdBy: mkt1Id, marketerId: mkt1Id, teamLeadId: tl1Id, agreedPrice: 10000000, propertyId: prop1, userId: adaUserId });
 const musaId = upsertClient('BLC-P7-MUSA', { full_name: 'Musa Dike', phone_number: '08071000002', email: 'musa@example.com', status: 'Interested', saleType: 'Resale', branchId: 1, createdBy: mkt2Id, marketerId: mkt2Id, teamLeadId: tl1Id, agreedPrice: 8000000, propertyId: prop1, userId: musaUserId });
@@ -150,8 +150,8 @@ for (const [clientId, propertyId, price] of [
 }
 
 const teamAlphaId = Number(db.prepare('INSERT INTO teams (name, branch_id, team_lead_user_id, is_active) VALUES (?, ?, ?, 1)').run('Phase 7 Team Alpha', 1, tl1Id).lastInsertRowid);
-const teamAjahId = Number(db.prepare('INSERT INTO teams (name, branch_id, team_lead_user_id, is_active) VALUES (?, ?, ?, 1)').run('Phase 7 Team Ajah', 2, tl2Id).lastInsertRowid);
-for (const [team, user] of [[teamAlphaId, tl1Id], [teamAlphaId, mkt1Id], [teamAlphaId, mkt2Id], [teamAjahId, tl2Id], [teamAjahId, mkt3Id]]) {
+const teamBranch 2Id = Number(db.prepare('INSERT INTO teams (name, branch_id, team_lead_user_id, is_active) VALUES (?, ?, ?, 1)').run('Phase 7 Team Branch 2', 2, tl2Id).lastInsertRowid);
+for (const [team, user] of [[teamAlphaId, tl1Id], [teamAlphaId, mkt1Id], [teamAlphaId, mkt2Id], [teamBranch 2Id, tl2Id], [teamBranch 2Id, mkt3Id]]) {
   db.prepare('INSERT OR IGNORE INTO team_members (team_id, user_id) VALUES (?, ?)').run(team, user);
 }
 for (const [uid, phone, title] of [[mdId,'08070000000','Managing Director'],[bm1Id,'08070000001','Branch Manager'],[bm2Id,'08070000002','Branch Manager'],[tl1Id,'08070000003','Team Lead'],[tl2Id,'08070000004','Team Lead'],[mkt1Id,'08070000005','Marketer'],[mkt2Id,'08070000006','Marketer'],[mkt3Id,'08070000007','Marketer'],[finId,'08070000008','Finance Officer']]) {
@@ -760,7 +760,7 @@ await test('report permissions and date filters are enforced', async () => {
 
 await test('cross-branch reassignment revokes property access from the previous branch manager', async () => {
   const before = await request(`/api/clients/${crossId}`, { headers: { Cookie: bm2Cookie } });
-  assert(before.status === 200, 'Ajah manager should initially see the Ajah client');
+  assert(before.status === 200, 'Branch 2 manager should initially see the Branch 2 client');
   const transfer = await request(`/api/clients/${crossId}/assign`, {
     method: 'POST', headers: { Cookie: mdCookie },
     body: { relationship_manager_id: mkt1Id, branch_id: 1, team_lead_id: tl1Id, reason: 'Phase 7.1 cross-branch visibility audit' }
@@ -866,7 +866,7 @@ await test('public client sign-up creates a client portal account and auto-login
   const signup = await request('/api/signup', {
     method: 'POST', body: {
       full_name: 'New Portal Client', email: 'new.portal@example.com', phone_number: '08079990001',
-      residential_address: '1 Signup Test Street', state: 'Lagos', city: 'Ikeja',
+      residential_address: '1 Signup Test Street', state: 'Lagos', city: 'Branch 1',
       password: 'password123', branch_id: 1, terms_accepted: true
     }
   });
@@ -908,7 +908,7 @@ await test('public sign-up ignores privileged role/marketer/team/price and assig
   const signup = await request('/api/signup', {
     method: 'POST', body: {
       full_name: 'Privilege Injection Test', email: 'inject.portal@example.com', phone_number: '08079990100',
-      residential_address: '5 Signup Test Street', state: 'Lagos', city: 'Ikeja',
+      residential_address: '5 Signup Test Street', state: 'Lagos', city: 'Branch 1',
       password: 'password123', role_name: 'Managing Director', role_id: 1,
       branch_id: db.prepare("SELECT id FROM branches WHERE name='Head Office'").get().id,
       assigned_branch_id: 2, original_marketer_id: mkt1Id, team_lead_id: tl1Id,

@@ -92,7 +92,7 @@ const db = new DatabaseSync(LIVE_DB);
 db.exec('PRAGMA foreign_keys = ON;');
 const roleId = name => db.prepare('SELECT id FROM roles WHERE name=?').get(name).id;
 const branchId = name => db.prepare('SELECT id FROM branches WHERE name=?').get(name).id;
-const ikeja = branchId('Ikeja');
+const ikeja = branchId('Branch 1');
 const mdRole = roleId('Managing Director');
 const marketerRole = roleId('Marketer');
 
@@ -109,7 +109,7 @@ const mdId = upsert('browser.md@elpisproperty.test', 'Browser MD', mdRole, ikeja
 const marketerId = upsert('browser.marketer@elpisproperty.test', 'Browser Marketer', marketerRole, ikeja);
 const teamLeadRole = roleId('Team Lead');
 const teamLead = db.prepare("SELECT id FROM users WHERE email='tl.ikeja@elpisproperty.test'").get()
-  || { id: upsert('tl.ikeja@elpisproperty.test', 'Ikeja Team Lead', teamLeadRole, ikeja) };
+  || { id: upsert('tl.ikeja@elpisproperty.test', 'Branch 1 Team Lead', teamLeadRole, ikeja) };
 const existingMarketer = db.prepare("SELECT id FROM users WHERE email='mkt.ikeja@elpisproperty.test'").get();
 const property = db.prepare('SELECT id FROM properties ORDER BY id LIMIT 1').get();
 
@@ -150,15 +150,15 @@ try {
     }, { timeout: 20000 });
     const crumbs = await pageA.locator('#revBreadcrumbs').innerText();
     assert(/National/i.test(crumbs), `breadcrumb missing National: ${crumbs}`);
-    assert(/Ikeja/i.test(crumbs), `breadcrumb missing branch: ${crumbs}`);
-    assert(/Ikeja Team Lead/i.test(crumbs), `breadcrumb missing team lead: ${crumbs}`);
+    assert(/Branch 1/i.test(crumbs), `breadcrumb missing branch: ${crumbs}`);
+    assert(/Branch 1 Team Lead/i.test(crumbs), `breadcrumb missing team lead: ${crumbs}`);
     await pageA.locator('#revBreadcrumbs button').first().click();
     await pageA.waitForFunction(() => {
       const node = document.getElementById('revBreadcrumbs');
-      return node && /National/i.test(node.textContent) && !/Ikeja/i.test(node.textContent);
+      return node && /National/i.test(node.textContent) && !/Branch 1/i.test(node.textContent);
     }, { timeout: 15000 });
     const after = await pageA.locator('#revBreadcrumbs').innerText();
-    assert(!/Ikeja/i.test(after), `breadcrumb did not drill back to National: ${after}`);
+    assert(!/Branch 1/i.test(after), `breadcrumb did not drill back to National: ${after}`);
   });
 
   await test('hot, warm and cold lead badges use distinct documented colours', async () => {
