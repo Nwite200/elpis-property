@@ -1,4 +1,4 @@
-// elpis Legacy Limited — PWA install experience.
+// Elpis Property Limited — PWA install experience.
 // Front-end only. API, auth and financial logic are untouched.
 (function () {
   "use strict";
@@ -69,7 +69,7 @@
     installButton = document.createElement("button");
     installButton.type = "button";
     installButton.className = "elpis-install-btn";
-    installButton.setAttribute("aria-label", "Install the elpis Legacy app");
+    installButton.setAttribute("aria-label", "Install the Elpis Property app");
     installButton.innerHTML = '<span class="elpis-install-icon" aria-hidden="true">↓</span><span>Install app</span>';
     installButton.addEventListener("click", function () {
       if (deferredPrompt) {
@@ -115,12 +115,12 @@
 
     var steps = isIOS()
       ? "<ol><li>Tap the <strong>Share</strong> button in Safari.</li><li>Scroll and tap <strong>Add to Home Screen</strong>.</li><li>Tap <strong>Add</strong> to finish.</li></ol>"
-      : "<ol><li>Open the browser menu <strong>⋮</strong>.</li><li>Tap <strong>Install app</strong> or <strong>Add to Home screen</strong>.</li><li>Confirm to add elpis Legacy to your home screen.</li></ol>";
+      : "<ol><li>Open the browser menu <strong>⋮</strong>.</li><li>Tap <strong>Install app</strong> or <strong>Add to Home screen</strong>.</li><li>Confirm to add Elpis Property to your home screen.</li></ol>";
 
     sheet.innerHTML = [
       '<div class="elpis-install-card">',
       '<button type="button" class="elpis-install-close" aria-label="Close install instructions">×</button>',
-      '<h2 id="elpisInstallTitle">Install elpis Legacy</h2>',
+      '<h2 id="elpisInstallTitle">Install Elpis Property</h2>',
       '<p>Add the app to your home screen for faster access and an app-like experience.</p>',
       steps,
       '<button type="button" class="elpis-install-ok">Got it</button>',
