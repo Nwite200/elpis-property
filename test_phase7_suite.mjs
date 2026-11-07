@@ -546,7 +546,7 @@ await test('commission payments support partial payment, idempotency, double-pay
   });
   assert(receipt.status === 200, `commission receipt expected 200, got ${receipt.status}`);
   const text = pdfText(receipt.data);
-  assert(text.startsWith('%PDF-1.4') && text.includes('COMMISSION RECEIPT') && text.includes('/DCTDecode'), 'commission receipt PDF/logo invalid');
+  assert(text.startsWith('%PDF-1.4') && text.includes('COMMISSION RECEIPT') && text.includes('ELPIS') && text.includes('PROPERTY LIMITED'), 'commission receipt PDF/logo invalid');
   const otherMarketer = await request(`/api/commissions/payments/${finalPayment.data.payment_id}/receipt`, {
     headers: { Cookie: mkt2Cookie }
   });
@@ -713,7 +713,7 @@ await test('CSV and PDF commission reports are generated, permission-scoped and 
   const pdfDownload = await request(`/api/reports/${pdfJob.id}/download`, { headers: { Cookie: mdCookie } });
   assert(pdfDownload.status === 200, 'PDF download failed');
   const text = pdfText(pdfDownload.data);
-  assert(text.startsWith('%PDF-1.4') && text.includes('Commission Liability Report') && text.includes('/DCTDecode'), 'PDF report content/logo invalid');
+  assert(text.startsWith('%PDF-1.4') && text.includes('Commission Liability Report') && text.includes('ELPIS') && text.includes('PROPERTY LIMITED'), 'PDF report content/logo invalid');
   const publicPdf = await request(`/api/files/${encodeURIComponent(pdf.data.r2_key)}`);
   assert(publicPdf.status === 404, 'PDF report must not be publicly accessible');
 });
