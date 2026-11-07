@@ -1,4 +1,4 @@
-// elpis Legacy Limited — shared staff shell, API helpers and formatting.
+// Elpis Property Limited — shared staff shell, API helpers and formatting.
 (function () {
   const elpisStaff = window.elpisStaff = window.elpisStaff || {};
 
@@ -173,7 +173,7 @@
         ? "Company-wide"
         : (me.branch_name || "Branch"));
     return `
-      <div class="brand"><a href="dashboard.html"><img src="assets/images/elpis-legacy-logo.png" alt="elpis Legacy" onerror="this.src='elpis-legacy-logo.png'"></a></div>
+      <div class="brand"><a href="dashboard.html"><img src="assets/images/elpis-legacy-logo.png" alt="Elpis Property" onerror="this.src='elpis-legacy-logo.png'"></a></div>
       ${me.payment_mode === "test" ? '<div style="margin:0 8px 10px;padding:8px;border:1px solid #E0A800;background:#FFF8E1;color:#7A5200;border-radius:7px;font-size:11px;font-weight:800;text-align:center">TEST MODE — no real money</div>' : ""}
       <div style="padding:0 8px 8px;font-size:11px;color:#9FB2A3">${elpisStaff.escape(me.full_name)}<br><span style="color:#6F8575">${elpisStaff.escape(me.actual_role || role)} · ${elpisStaff.escape(scopeLabel)}</span></div>
       ${items}
