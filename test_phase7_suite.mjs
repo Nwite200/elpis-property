@@ -977,7 +977,7 @@ await test('official Elpis branding is used across pages, login screens and gene
     assert(injectsLogo, `${page} does not include the official logo or shared logo shell`);
   }
   const ignore = readFileSync('.assetsignore', 'utf8');
-  assert(!/^assets\\/images\\//m.test(ignore), 'served logo assets must not be excluded');
+  assert(!ignore.split(/\\r?\\n/).some(line => line.trim().startsWith('assets/images')), 'served logo assets must not be excluded');
   assert(readFileSync('client-login.html', 'utf8').includes('signup.html'), 'client login missing sign-up link');
   assert(readFileSync('login.html', 'utf8').includes('signup.html'), 'staff portal login missing sign-up link');
   assert(readFileSync('signup.html', 'utf8').includes(logoPath), 'sign-up page missing official logo');
