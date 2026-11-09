@@ -1,5 +1,5 @@
 import { spawn, execFileSync } from 'node:child_process';
-import { existsSync, readdirSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { randomBytes, pbkdf2Sync } from 'node:crypto';
 import { DatabaseSync } from 'node:sqlite';
 import { join } from 'node:path';
@@ -140,6 +140,25 @@ try {
   const contextB = await browser.newContext();
   const pageA = await contextA.newPage();
   const pageB = await contextB.newPage();
+
+  await test('security headers, cache headers and quick intro are active', async () => {
+    const html = await fetch(BASE + '/login');
+    assert(html.status === 200, `login page expected 200, got ${html.status}`);
+    assert(html.headers.get('content-security-policy'), 'Content-Security-Policy missing');
+    assert(html.headers.get('x-content-type-options') === 'nosniff', 'X-Content-Type-Options missing');
+    assert(html.headers.get('x-frame-options') === 'DENY', 'X-Frame-Options missing');
+    assert((html.headers.get('cache-control') || '').includes('max-age=60'), `HTML cache header missing: ${html.headers.get('cache-control')}`);
+    const css = await fetch(BASE + '/assets/css/styles.css');
+    assert(css.status === 200, `CSS expected 200, got ${css.status}`);
+    assert((css.headers.get('cache-control') || '').includes('max-age=3600'), `asset cache header missing: ${css.headers.get('cache-control')}`);
+    const api = await fetch(BASE + '/api/health');
+    assert(api.headers.get('server-timing') && api.headers.get('server-timing').includes('app;dur='), 'Server-Timing missing');
+    const intro = readFileSync('assets/js/intro-config.js', 'utf8');
+    assert(intro.includes('INTRO_MODE: "quick"') && intro.includes('total: 3800'), 'quick intro flag/timing missing');
+    assert(intro.includes('total: 15000') && intro.includes('total: 1200'), 'legacy full/short intro timings must remain for rollback');
+    const motion = readFileSync('assets/js/motion.js', 'utf8');
+    assert(motion.includes('mode === "quick"') && motion.includes('CFG.QUICK'), 'motion.js does not consume the quick mode');
+  });
 
   await test('drill-down breadcrumbs show National > Branch > Team Lead and can drill back up', async () => {
     await login(pageA, 'browser.md@elpisproperty.test');

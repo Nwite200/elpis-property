@@ -1,8 +1,10 @@
 // Elpis Property Limited — single source of truth for the logo intro.
 // Change INTRO_STYLE to "classic" for the plain elegant variant.
+// Change INTRO_MODE to "full" to restore the 15-second cinematic intro.
 // No other code change is required to switch styles.
 window.ELPIS_INTRO_CONFIG = {
   INTRO_STYLE: "hype", // "hype" | "classic"
+  INTRO_MODE: "quick", // "quick" (3.8s) | "full" (15s legacy)
   LOGO_SRC: "assets/images/elpis-property-logo-original.png",
   BRAND_NAME: "ELPIS PROPERTY LIMITED",
   TAGLINE: "Spaces. Assets. Possibilities.",
@@ -14,6 +16,32 @@ window.ELPIS_INTRO_CONFIG = {
     dark: "#071747",
     soft: "#f7f6f2",
     white: "#ffffff"
+  },
+
+  QUICK: {
+    hype: {
+      total: 3800,
+      streak: { start: 0, duration: 260 },
+      logo: { start: 180, duration: 420 },
+      glitch: { start: 420, duration: 100 },
+      impact: 700,
+      shake: { start: 700, duration: 120 },
+      ring: { start: 700, duration: 900 },
+      speed: { start: 700, end: 1800 },
+      sweep: { start: 800, duration: 1200 },
+      lines: { start: 500, duration: 1300 },
+      tagline: { start: 1600, duration: 500 },
+      hold: { start: 2100, end: 3000 },
+      exit: { start: 3000, duration: 800 },
+      failsafe: 4800
+    },
+    classic: {
+      total: 2400,
+      fadeIn: 500,
+      hold: 1100,
+      fadeOut: 500,
+      failsafe: 3200
+    }
   },
 
   FULL: {

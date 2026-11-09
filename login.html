@@ -155,9 +155,14 @@
           return;
         }
         const me = await fetch('/api/me').then(r => r.json());
-        window.location.href = (me.role_name || me.role) === 'Customer Care'
-          ? '/customer-care.html'
-          : `/dashboard.html?role=${encodeURIComponent(me.role_name || me.role || '')}`;
+        const role = me.actual_role || me.role_name || me.role || '';
+        const landing = {
+          'Customer Care': '/customer-care.html',
+          'Sub Admin': '/sub-admin-dashboard.html',
+          'GSM': '/gsm-dashboard.html',
+          'Accountant': '/accountant-dashboard.html'
+        }[role] || `/dashboard.html?role=${encodeURIComponent(me.role_name || me.role || '')}`;
+        window.location.href = landing;
       } catch (err) {
         msg.textContent = 'Server is currently offline. Management portal will be enabled in Phase 2.';
         submitBtn.disabled = false;

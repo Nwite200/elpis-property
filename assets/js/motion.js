@@ -76,20 +76,39 @@
   }
 
   function initialMode() {
+    var quick = CFG.INTRO_MODE === "quick";
     var type = navigationType();
     if (type === "reload") {
       clearMarker();
-      return "full";
+      return quick ? "quick" : "full";
     }
     if (type === "back_forward") return "short";
     if (consumeInternalMarker()) return "short";
-    return "full";
+    return quick ? "quick" : "full";
   }
 
   function timingFor(mode) {
     if (mode === "reduced") return CFG.REDUCED || {
       total: 600, fadeIn: 250, hold: 100, fadeOut: 250, failsafe: 1100
     };
+    if (mode === "quick") {
+      return (CFG.QUICK || {})[STYLE] || {
+        total: 3800,
+        streak: { start: 0, duration: 260 },
+        logo: { start: 180, duration: 420 },
+        glitch: { start: 420, duration: 100 },
+        impact: 700,
+        shake: { start: 700, duration: 120 },
+        ring: { start: 700, duration: 900 },
+        speed: { start: 700, end: 1800 },
+        sweep: { start: 800, duration: 1200 },
+        lines: { start: 500, duration: 1300 },
+        tagline: { start: 1600, duration: 500 },
+        hold: { start: 2100, end: 3000 },
+        exit: { start: 3000, duration: 800 },
+        failsafe: 4800
+      };
+    }
     var bucket = mode === "short" ? (CFG.SHORT || {}) : (CFG.FULL || {});
     return bucket[STYLE] || (STYLE === "classic"
       ? { total: 2700, fadeIn: 600, hold: 1500, fadeOut: 600, failsafe: 3500 }
@@ -349,7 +368,7 @@
       clearRun(previous, true);
     }
 
-    var chosenMode = reduceMotion ? "reduced" : (mode === "short" ? "short" : "full");
+    var chosenMode = reduceMotion ? "reduced" : (mode === "short" ? "short" : (mode === "quick" ? "quick" : "full"));
     var t = timingFor(chosenMode);
     var token = ++runCounter;
     lastStartAt = now;

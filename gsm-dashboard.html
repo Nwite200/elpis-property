@@ -60,7 +60,7 @@
           ElpisStaff.fetchJson('/api/targets')
         ]);
         branches = b.branches || [];
-        users = (u.users || []).filter(x => x.is_active !== 0);
+        users = (u.users || []).filter(x => x.is_active !== 0 && x.role_name !== 'Client');
         roles = [...new Map(users.map(x => [x.role_name || x.role, { id: x.role_id || x.role_name, role_name: x.role_name || x.role }])).values()];
         fillTargets();
         el('targetBody').innerHTML = (t.targets || []).map(row => `<tr><td>${esc(row.target_type)}</td><td>${esc(row.branch_name || row.target_id || '-')}</td><td>${esc(row.metric)}</td><td>${esc(row.period_start)} → ${esc(row.period_end)}</td><td>${ElpisStaff.money(row.amount_kobo)}</td><td>${esc(row.notes || '')}</td></tr>`).join('') || '<tr><td colspan="6">No targets set.</td></tr>';

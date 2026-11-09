@@ -87,6 +87,7 @@
       el('loadBtn').addEventListener('click', load);
       el('exportBtn').addEventListener('click', () => {
         const params = new URLSearchParams({ from: el('from').value, to: el('to').value });
+        if (el('branch').value) params.set('branch_id', el('branch').value);
         window.location.href = '/api/accountant/export?' + params.toString();
       });
       el('printBtn').addEventListener('click', async () => {

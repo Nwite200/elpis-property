@@ -171,6 +171,63 @@ async function roleHasPermission(env, roleId, permission) {
   return Boolean(row);
 }
 
+// Owner roles keep the complete permission set. Every other staff member gets
+// permissions from their role plus any active per-user grants.
+function actualRoleOf(actor) {
+  return actor ? (actor.actual_role_name || actor.role_name) : null;
+}
+
+function isOwnerAuthority(actor) {
+  return ["Managing Director", "Super Admin"].includes(actualRoleOf(actor));
+}
+
+async function actorHasPermission(env, actor, permission) {
+  if (!actor) return false;
+  if (isOwnerAuthority(actor)) return true;
+  if (await roleHasPermission(env, actor.role_id, permission)) return true;
+  const row = await env.DB.prepare(
+    "SELECT id FROM user_permissions WHERE user_id=? AND permission_name=? AND revoked_at IS NULL LIMIT 1"
+  ).bind(actor.id, permission).first();
+  return Boolean(row);
+}
+
+async function effectivePermissions(env, userId) {
+  const user = await env.DB.prepare(`
+    SELECT u.id, u.full_name, u.role_id, r.name AS role_name
+    FROM users u JOIN roles r ON r.id=u.role_id WHERE u.id=?
+  `).bind(userId).first();
+  if (!user) return null;
+  if (["Managing Director", "Super Admin"].includes(user.role_name)) {
+    const { results } = await env.DB.prepare("SELECT name FROM permissions ORDER BY name").all();
+    return {
+      user,
+      is_owner_authority: true,
+      permissions: results.map(row => ({ permission: row.name, scope: "national", source: "owner" }))
+    };
+  }
+  const { results: roleGrants } = await env.DB.prepare(`
+    SELECT p.name AS permission_name, COALESCE(rp.scope,'national') AS scope
+    FROM role_permissions rp JOIN permissions p ON p.id=rp.permission_id
+    WHERE rp.role_id=?
+  `).bind(user.role_id).all();
+  const { results: userGrants } = await env.DB.prepare(`
+    SELECT permission_name, scope FROM user_permissions
+    WHERE user_id=? AND revoked_at IS NULL
+  `).bind(user.id).all();
+  const byPermission = new Map();
+  for (const row of roleGrants) {
+    byPermission.set(row.permission_name, { permission: row.permission_name, scope: row.scope, source: "role" });
+  }
+  for (const row of userGrants) {
+    byPermission.set(row.permission_name, { permission: row.permission_name, scope: row.scope, source: "user" });
+  }
+  return {
+    user,
+    is_owner_authority: false,
+    permissions: [...byPermission.values()].sort((a, b) => a.permission.localeCompare(b.permission))
+  };
+}
+
 async function audit(env, actorId, action, targetType, targetId, metadata, branchId) {
   let resolvedBranchId = branchId === undefined ? null : branchId;
   if (branchId === undefined && actorId) {
@@ -266,7 +323,7 @@ async function inferManagerId(env, roleName, branchId, teamId) {
     `).first();
     return md ? md.id : null;
   }
-  if (["Project Manager", "Branch Manager"].includes(roleName)) {
+  if (["Project Manager", "Branch Manager", "Sub Admin", "GSM", "Accountant"].includes(roleName)) {
     const md = await env.DB.prepare(`
       SELECT u.id FROM users u JOIN roles r ON r.id=u.role_id
       WHERE r.name='Managing Director' AND u.is_active=1 ORDER BY u.id LIMIT 1
@@ -5081,7 +5138,7 @@ async function handleFetch(request, env) {
         VALUES (?, ?, ?, ?, ?, 1)
       `).bind(normalizedEmail, hash, String(full_name).trim(), clientRole.id, resolvedBranch).run();
       const userId = userRes.meta.last_row_id;
-      const clientRef = "BLC-" + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 5).toUpperCase();
+      const clientRef = "ELP-" + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 5).toUpperCase();
       const nextOfKinLegacy = [next_of_kin_name, next_of_kin_relationship ? `(${next_of_kin_relationship})` : ""]
         .filter(Boolean).join(" ").trim() || null;
       const resolvedIdentityType = identityProvided ? requestedIdentityType : null;
@@ -5680,6 +5737,199 @@ async function handleFetch(request, env) {
       return json({ ok: true, role_id: roleId, permissions: names });
     }
 
+    // =========================================================================
+    // CONFIGURABLE PERMISSIONS (MD / Super Admin)
+    // =========================================================================
+    async function permissionAdmin() {
+      const actor = await getSessionUser(env, request);
+      if (!actor) return { error: json({ error: "Unauthenticated" }, 401) };
+      if (!isOwnerAuthority(actor)) return { error: json({ error: "Forbidden" }, 403) };
+      return { actor };
+    }
+
+    if (path === "/api/permissions/catalog" && request.method === "GET") {
+      const auth = await permissionAdmin();
+      if (auth.error) return auth.error;
+      const { results: permissions } = await env.DB.prepare("SELECT id, name FROM permissions ORDER BY name").all();
+      const { results: roles } = await env.DB.prepare("SELECT id, name FROM roles ORDER BY name").all();
+      const { results: users } = await env.DB.prepare(`
+        SELECT u.id, u.full_name, u.email, u.role_id, r.name AS role_name
+        FROM users u JOIN roles r ON r.id=u.role_id
+        WHERE u.is_active=1 ORDER BY u.full_name
+      `).all();
+      const { results: roleGrants } = await env.DB.prepare(`
+        SELECT rp.role_id, p.name AS permission_name, COALESCE(rp.scope,'national') AS scope
+        FROM role_permissions rp JOIN permissions p ON p.id=rp.permission_id
+        ORDER BY rp.role_id, p.name
+      `).all();
+      const { results: userGrants } = await env.DB.prepare(`
+        SELECT up.user_id, up.permission_name, up.scope, up.created_at
+        FROM user_permissions up
+        WHERE up.revoked_at IS NULL
+        ORDER BY up.created_at DESC
+      `).all();
+      return json({ permissions, roles, users, role_grants: roleGrants, user_grants: userGrants });
+    }
+
+    if (path === "/api/permissions/history" && request.method === "GET") {
+      const auth = await permissionAdmin();
+      if (auth.error) return auth.error;
+      const { results } = await env.DB.prepare(`
+        SELECT l.id, l.actor_user_id, u.full_name AS actor_name, l.target_type, l.target_id,
+               l.permission_name, l.action, l.scope, l.reason, l.created_at
+        FROM permission_change_log l LEFT JOIN users u ON u.id=l.actor_user_id
+        ORDER BY l.created_at DESC, l.id DESC LIMIT 200
+      `).all();
+      return json({ history: results });
+    }
+
+    if ((path === "/api/permissions/grant" || path === "/api/permissions/revoke") && request.method === "POST") {
+      if (!csrfOk(request)) return json({ error: "CSRF check failed" }, 403);
+      const auth = await permissionAdmin();
+      if (auth.error) return auth.error;
+      const action = path.endsWith("/grant") ? "grant" : "revoke";
+      const body = await request.json().catch(() => ({}));
+      const targetType = String(body.target_type || "").trim();
+      const targetId = Number(body.target_id);
+      const permissionName = String(body.permission_name || "").trim();
+      const scope = body.scope === "branch" ? "branch" : "national";
+      const reason = String(body.reason || "").trim();
+      if (!["user", "role"].includes(targetType)) return json({ error: "Target type must be user or role" }, 400);
+      if (!Number.isInteger(targetId) || targetId <= 0) return json({ error: "Target is required" }, 400);
+      if (!permissionName) return json({ error: "Permission is required" }, 400);
+      if (reason.length < 3) return json({ error: "A reason is required" }, 400);
+      const permission = await env.DB.prepare("SELECT id, name FROM permissions WHERE name=?").bind(permissionName).first();
+      if (!permission) return json({ error: "Unknown permission" }, 400);
+      if (targetType === "role") {
+        const role = await env.DB.prepare("SELECT id, name FROM roles WHERE id=?").bind(targetId).first();
+        if (!role) return json({ error: "Role not found" }, 404);
+        if (action === "grant") {
+          await env.DB.prepare(`
+            INSERT INTO role_permissions (role_id, permission_id, scope) VALUES (?, ?, ?)
+            ON CONFLICT(role_id, permission_id) DO UPDATE SET scope=excluded.scope
+          `).bind(targetId, permission.id, scope).run();
+        } else {
+          await env.DB.prepare("DELETE FROM role_permissions WHERE role_id=? AND permission_id=?")
+            .bind(targetId, permission.id).run();
+        }
+      } else {
+        const user = await env.DB.prepare("SELECT id, full_name FROM users WHERE id=?").bind(targetId).first();
+        if (!user) return json({ error: "User not found" }, 404);
+        if (action === "grant") {
+          const active = await env.DB.prepare(
+            "SELECT id FROM user_permissions WHERE user_id=? AND permission_name=? AND revoked_at IS NULL"
+          ).bind(targetId, permissionName).first();
+          if (active) {
+            await env.DB.prepare(`
+              UPDATE user_permissions SET scope=?, granted_by=?, reason=?, created_at=datetime('now')
+              WHERE id=?
+            `).bind(scope, auth.actor.id, reason, active.id).run();
+          } else {
+            await env.DB.prepare(`
+              INSERT INTO user_permissions (user_id, permission_name, scope, granted_by, reason)
+              VALUES (?, ?, ?, ?, ?)
+            `).bind(targetId, permissionName, scope, auth.actor.id, reason).run();
+          }
+        } else {
+          await env.DB.prepare(`
+            UPDATE user_permissions SET revoked_at=datetime('now'), revoked_by=?, revoke_reason=?
+            WHERE user_id=? AND permission_name=? AND revoked_at IS NULL
+          `).bind(auth.actor.id, reason, targetId, permissionName).run();
+        }
+      }
+      await env.DB.prepare(`
+        INSERT INTO permission_change_log (actor_user_id, target_type, target_id, permission_name, action, scope, reason)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `).bind(auth.actor.id, targetType, targetId, permissionName, action, scope, reason).run();
+      await audit(env, auth.actor.id, `permission.${action}`, targetType, String(targetId), {
+        permission: permissionName, scope, reason
+      });
+      return json({ ok: true, action, target_type: targetType, target_id: targetId, permission_name: permissionName, scope });
+    }
+
+    if (path === "/api/permissions/effective" && request.method === "GET") {
+      const auth = await permissionAdmin();
+      if (auth.error) return auth.error;
+      const userId = Number(url.searchParams.get("user_id"));
+      if (!Number.isInteger(userId) || userId <= 0) return json({ error: "User is required" }, 400);
+      const effective = await effectivePermissions(env, userId);
+      if (!effective) return json({ error: "User not found" }, 404);
+      return json({
+        user_id: effective.user.id,
+        full_name: effective.user.full_name,
+        role_name: effective.user.role_name,
+        is_owner_authority: effective.is_owner_authority,
+        permissions: effective.permissions
+      });
+    }
+
+    // =========================================================================
+    // OPERATIONAL TARGETS (GSM / owners)
+    // =========================================================================
+    async function targetsActor({ write }) {
+      const actor = await getSessionUser(env, request);
+      if (!actor) return { error: json({ error: "Unauthenticated" }, 401) };
+      const actual = actualRoleOf(actor);
+      const allowedRole = ["GSM", "Sub Admin", "Managing Director", "Super Admin"].includes(actual);
+      const allowedPermission = await actorHasPermission(env, actor, "targets.manage");
+      if (!allowedRole && !allowedPermission) return { error: json({ error: "Forbidden" }, 403) };
+      if (write && !allowedRole && !allowedPermission) return { error: json({ error: "Forbidden" }, 403) };
+      return { actor };
+    }
+
+    if (path === "/api/targets" && request.method === "GET") {
+      const auth = await targetsActor({ write: false });
+      if (auth.error) return auth.error;
+      const { results } = await env.DB.prepare(`
+        SELECT t.*, b.name AS branch_name, u.full_name AS staff_name, r.name AS role_name,
+               cu.full_name AS created_by_name
+        FROM targets t
+        LEFT JOIN branches b ON t.target_type='branch' AND b.id=t.target_id
+        LEFT JOIN users u ON t.target_type='staff' AND u.id=t.target_id
+        LEFT JOIN roles r ON t.target_type='role' AND r.id=t.target_id
+        LEFT JOIN users cu ON cu.id=t.created_by
+        ORDER BY t.created_at DESC, t.id DESC LIMIT 200
+      `).all();
+      return json({ targets: results });
+    }
+
+    if (path === "/api/targets" && request.method === "POST") {
+      if (!csrfOk(request)) return json({ error: "CSRF check failed" }, 403);
+      const auth = await targetsActor({ write: true });
+      if (auth.error) return auth.error;
+      const body = await request.json().catch(() => ({}));
+      const targetType = String(body.target_type || "").trim();
+      const targetId = Number(body.target_id);
+      const metric = String(body.metric || "revenue").trim();
+      const periodType = String(body.period_type || "month").trim();
+      const periodStart = String(body.period_start || "").trim();
+      const periodEnd = String(body.period_end || "").trim();
+      const amount = Number(body.amount);
+      const notes = body.notes === undefined || body.notes === null ? null : String(body.notes).trim().slice(0, 1000);
+      if (!["branch", "staff", "role"].includes(targetType)) return json({ error: "Target type must be branch, staff or role" }, 400);
+      if (!Number.isInteger(targetId) || targetId <= 0) return json({ error: "Select a target" }, 400);
+      if (!["revenue", "clients", "leads", "collections"].includes(metric)) return json({ error: "Invalid target metric" }, 400);
+      if (!["day", "week", "month", "quarter", "year", "custom"].includes(periodType)) return json({ error: "Invalid target period" }, 400);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(periodStart) || !/^\d{4}-\d{2}-\d{2}$/.test(periodEnd)) {
+        return json({ error: "Start and end dates are required" }, 400);
+      }
+      if (periodEnd < periodStart) return json({ error: "End date cannot be before the start date" }, 400);
+      if (!Number.isFinite(amount) || amount <= 0) return json({ error: "Enter a target amount greater than zero" }, 400);
+      const table = targetType === "branch" ? "branches" : (targetType === "staff" ? "users" : "roles");
+      const exists = await env.DB.prepare(`SELECT id FROM ${table} WHERE id=?`).bind(targetId).first();
+      if (!exists) return json({ error: "Target not found" }, 404);
+      const res = await env.DB.prepare(`
+        INSERT INTO targets (target_type, target_id, metric, period_type, period_start, period_end,
+          amount_kobo, notes, created_by)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(targetType, targetId, metric, periodType, periodStart, periodEnd, toKobo(amount), notes, auth.actor.id).run();
+      await audit(env, auth.actor.id, "target.create", "target", String(res.meta.last_row_id), {
+        target_type: targetType, target_id: targetId, metric, period_start: periodStart, period_end: periodEnd,
+        amount_kobo: toKobo(amount)
+      }, auth.actor.branch_id);
+      return json({ ok: true, id: res.meta.last_row_id });
+    }
+
     if (path === "/api/admin/commission-failures" && request.method === "GET") {
       const auth = await adminActor("admin.system");
       if (auth.error) return auth.error;
@@ -5972,7 +6222,8 @@ async function handleFetch(request, env) {
     if (path === "/api/users" && request.method === "GET") {
       const actor = await getSessionUser(env, request);
       if (!actor) return json({ error: "Unauthenticated" }, 401);
-      if (!["Managing Director", "Branch Manager", "Finance Officer", "Team Lead", "Marketer"].includes(actor.role_name)) {
+      if (!["Managing Director", "Branch Manager", "Finance Officer", "Team Lead", "Marketer"].includes(actor.role_name)
+          && !["Sub Admin", "GSM", "Accountant"].includes(actualRoleOf(actor))) {
         return json({ error: "Forbidden" }, 403);
       }
       let role = url.searchParams.get("role");
@@ -6975,7 +7226,7 @@ async function handleFetch(request, env) {
 
     function canManageClient(actor, client) {
       const role = actor.role_name;
-      if (role === "Managing Director") return true;
+      if (["Managing Director", "Super Admin", "Sub Admin"].includes(actualRoleOf(actor))) return true;
       if (role === "Branch Manager") return client.assigned_branch_id === actor.branch_id;
       if (role === "Team Lead") {
         return client.team_lead_id === actor.id || client.original_marketer_id === actor.id ||
@@ -7018,6 +7269,36 @@ async function handleFetch(request, env) {
       const { results } = await env.DB.prepare(sql).bind(...binds, limit, offset).all();
       const cnt = await env.DB.prepare(countSql).bind(...binds).first();
       return json({ clients: results, page, limit, total: cnt ? cnt.c : 0 });
+    }
+
+    if (path === "/api/clients/unassigned" && request.method === "GET") {
+      const actor = await getSessionUser(env, request);
+      if (!actor) return json({ error: "Unauthenticated" }, 401);
+      const actual = actualRoleOf(actor);
+      if (!["Sub Admin", "Managing Director", "Super Admin", "Branch Manager"].includes(actual) &&
+          !(await actorHasPermission(env, actor, "clients.assign"))) {
+        return json({ error: "Forbidden" }, 403);
+      }
+      const clauses = [
+        "c.is_deleted=0",
+        "c.client_reference NOT LIKE 'DEMO-%'",
+        "COALESCE(c.is_internal_test,0)=0",
+        "COALESCE(c.is_archived,0)=0",
+        "NOT EXISTS (SELECT 1 FROM client_assignments ca WHERE ca.client_id=c.id AND ca.is_primary=1)"
+      ];
+      const binds = [];
+      if (actual === "Branch Manager") {
+        clauses.push("c.assigned_branch_id=?");
+        binds.push(actor.branch_id);
+      }
+      const { results } = await env.DB.prepare(`
+        SELECT c.id, c.full_name, c.client_reference, c.phone_number, c.status,
+               c.assigned_branch_id, b.name AS branch_name, c.created_at
+        FROM clients c LEFT JOIN branches b ON b.id=c.assigned_branch_id
+        WHERE ${clauses.join(" AND ")}
+        ORDER BY c.created_at DESC, c.id DESC LIMIT 200
+      `).bind(...binds).all();
+      return json({ clients: results });
     }
 
     if (path === "/api/clients" && request.method === "POST") {
@@ -7110,7 +7391,7 @@ async function handleFetch(request, env) {
       if (referral_code && !referrer) return json({ error: "Invalid referral code" }, 400);
       const nextOfKinLegacy = [next_of_kin_name, next_of_kin_relationship ? `(${next_of_kin_relationship})` : ""]
         .filter(Boolean).join(" ").trim() || next_of_kin || null;
-      const ref = "BLC-" + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 5).toUpperCase();
+      const ref = "ELP-" + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 5).toUpperCase();
       const teamLeadId = actor.role_name === "Team Lead" ? actor.id : null;
       const agreedPrice = normalizedAgreedPrice;
       const identityMasked = identityProvided ? maskIdentityNumber(identity_number) : null;
@@ -7364,6 +7645,12 @@ async function handleFetch(request, env) {
           ...computeScheduleDefaulting(paymentPlanRow, planItems, Number(paidRow ? paidRow.paid_kobo : 0))
         };
       }
+      const { results: editHistory } = await env.DB.prepare(`
+        SELECT a.id, a.action, a.created_at, a.metadata, u.full_name AS actor_name
+        FROM audit_logs a LEFT JOIN users u ON u.id=a.actor_user_id
+        WHERE a.target_type='client' AND a.target_id=?
+        ORDER BY a.created_at DESC, a.id DESC LIMIT 100
+      `).bind(String(client.id)).all();
       return json({
         client,
         properties: portfolio.properties,
@@ -7372,6 +7659,10 @@ async function handleFetch(request, env) {
         assignments,
         assignment_history: assignmentHistory,
         history: assignmentHistory,
+        edit_history: editHistory.map(row => ({
+          ...row,
+          metadata: (() => { try { return row.metadata ? JSON.parse(row.metadata) : {}; } catch { return {}; } })()
+        })),
         status_history: statusHistory,
         notes
       });
@@ -7382,7 +7673,8 @@ async function handleFetch(request, env) {
       if (!csrfOk(request)) return json({ error: "CSRF check failed" }, 403);
       const actor = await getSessionUser(env, request);
       if (!actor) return json({ error: "Unauthenticated" }, 401);
-      if (!["Managing Director", "Branch Manager", "Team Lead", "Marketer"].includes(actor.role_name)) {
+      if (!["Managing Director", "Branch Manager", "Team Lead", "Marketer"].includes(actor.role_name)
+          && actualRoleOf(actor) !== "Sub Admin") {
         return json({ error: "Forbidden" }, 403);
       }
       const id = clientDetailMatch[1];
@@ -7390,12 +7682,18 @@ async function handleFetch(request, env) {
       if (!client) return json({ error: "Not found" }, 404);
       if (!canManageClient(actor, client)) return json({ error: "Forbidden" }, 403);
       const body = await request.json();
+      if (actualRoleOf(actor) === "Sub Admin" && !String(body?.reason || "").trim()) {
+        return json({ error: "A reason is required for client edits" }, 400);
+      }
       if (actor.role_name === "Marketer" && Object.keys(body || {}).some(key => key !== "phone_number")) {
         return json({ error: "Marketers may only correct a client phone number" }, 403);
       }
       if (!["Managing Director", "Branch Manager"].includes(actor.role_name) &&
           (body.agreed_purchase_price !== undefined || body.interested_property_id !== undefined)) {
         return json({ error: "Only a Managing Director or Branch Manager can change contract price or property ownership" }, 403);
+      }
+      if (actualRoleOf(actor) === "Sub Admin" && body.sale_type !== undefined) {
+        return json({ error: "Sub Admins cannot change sale terms" }, 403);
       }
       if (body.agreed_purchase_price !== undefined && body.agreed_purchase_price !== null && body.agreed_purchase_price !== "") {
         const price = Number(body.agreed_purchase_price);
@@ -7451,7 +7749,7 @@ async function handleFetch(request, env) {
           client.status
         );
       }
-      await audit(env, actor.id, "client.update", "client", id, { before, after }, client.assigned_branch_id);
+      await audit(env, actor.id, "client.update", "client", id, { before, after, reason: body.reason || null }, client.assigned_branch_id);
       return json({ ok: true });
     }
 
@@ -7531,36 +7829,45 @@ async function handleFetch(request, env) {
       if (!csrfOk(request)) return json({ error: "CSRF check failed" }, 403);
       const actor = await getSessionUser(env, request);
       if (!actor) return json({ error: "Unauthenticated" }, 401);
-      if (!["Managing Director", "Branch Manager"].includes(actor.role_name)) return json({ error: "Forbidden" }, 403);
+      if (!["Managing Director", "Branch Manager"].includes(actor.role_name)
+          && actualRoleOf(actor) !== "Sub Admin") return json({ error: "Forbidden" }, 403);
       const id = clientAssignMatch[1];
       const client = await env.DB.prepare("SELECT c.*, (SELECT ca.relationship_manager_id FROM client_assignments ca WHERE ca.client_id=c.id AND ca.is_primary=1 ORDER BY ca.assigned_at DESC LIMIT 1) AS current_relationship_manager_id FROM clients c WHERE c.id=? AND c.is_deleted=0").bind(id).first();
       if (!client) return json({ error: "Not found" }, 404);
       if (!canManageClient(actor, client)) return json({ error: "Forbidden" }, 403);
       const body = await request.json();
       const { relationship_manager_id, branch_id, team_lead_id, reason } = body || {};
-      if (!relationship_manager_id || !branch_id) return json({ error: "Relationship manager and branch are required" }, 400);
+      if (!branch_id) return json({ error: "Branch is required" }, 400);
+      if (actualRoleOf(actor) === "Sub Admin" && !String(reason || "").trim()) {
+        return json({ error: "A reason is required for branch or assignment changes" }, 400);
+      }
       if (actor.role_name === "Branch Manager" && Number(branch_id) !== actor.branch_id) {
         return json({ error: "Cross-branch forbidden" }, 403);
       }
-      const manager = await env.DB.prepare("SELECT id, branch_id FROM users WHERE id=? AND is_active=1").bind(relationship_manager_id).first();
-      if (!manager) return json({ error: "Relationship manager not found or inactive" }, 404);
-      if (manager.branch_id !== null && Number(manager.branch_id) !== Number(branch_id)) {
-        return json({ error: "Relationship manager does not belong to this branch" }, 400);
+      let manager = null;
+      if (relationship_manager_id) {
+        manager = await env.DB.prepare("SELECT id, branch_id FROM users WHERE id=? AND is_active=1").bind(relationship_manager_id).first();
+        if (!manager) return json({ error: "Relationship manager not found or inactive" }, 404);
+        if (manager.branch_id !== null && Number(manager.branch_id) !== Number(branch_id)) {
+          return json({ error: "Relationship manager does not belong to this branch" }, 400);
+        }
       }
       const branch = await env.DB.prepare("SELECT id FROM branches WHERE id=?").bind(branch_id).first();
       if (!branch) return json({ error: "Branch not found" }, 400);
       const current = await env.DB.prepare("SELECT * FROM client_assignments WHERE client_id=? AND is_primary=1 ORDER BY assigned_at DESC LIMIT 1").bind(id).first();
       await env.DB.prepare("UPDATE client_assignments SET is_primary=0 WHERE client_id=?").bind(id).run();
-      await env.DB.prepare("INSERT INTO client_assignments (client_id, relationship_manager_id, branch_id, team_lead_id, assigned_by, is_primary) VALUES (?, ?, ?, ?, ?, 1)")
-        .bind(id, relationship_manager_id, branch_id, team_lead_id || null, actor.id).run();
+      if (manager) {
+        await env.DB.prepare("INSERT INTO client_assignments (client_id, relationship_manager_id, branch_id, team_lead_id, assigned_by, is_primary) VALUES (?, ?, ?, ?, ?, 1)")
+          .bind(id, manager.id, branch_id, team_lead_id || null, actor.id).run();
+      }
       await env.DB.prepare("UPDATE clients SET assigned_branch_id=?, team_lead_id=?, updated_at=datetime('now') WHERE id=?")
         .bind(branch_id, team_lead_id || null, id).run();
       await env.DB.prepare(`INSERT INTO client_assignment_history (client_id, previous_manager_id, new_manager_id, previous_branch_id, new_branch_id, previous_team_lead_id, new_team_lead_id, authorized_by, reason)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-        .bind(id, current ? current.relationship_manager_id : null, relationship_manager_id,
+        .bind(id, current ? current.relationship_manager_id : null, manager ? manager.id : null,
           current ? current.branch_id : client.assigned_branch_id, branch_id,
           current ? current.team_lead_id : client.team_lead_id, team_lead_id || null, actor.id, reason || null).run();
-      await audit(env, actor.id, "client.assign", "client", id, { new_manager: relationship_manager_id, new_branch: branch_id }, branch_id);
+      await audit(env, actor.id, "client.assign", "client", id, { new_manager: manager ? manager.id : null, new_branch: branch_id, reason: reason || null }, branch_id);
       return json({ ok: true });
     }
 
@@ -8811,6 +9118,325 @@ async function handleFetch(request, env) {
     // =========================================================================
 
     // Finance KPI Overview
+    // =========================================================================
+    // READ-ONLY FINANCIAL APPROVALS (Sub Admin oversight)
+    // =========================================================================
+    if (path === "/api/financial-approvals" && request.method === "GET") {
+      const actor = await getSessionUser(env, request);
+      if (!actor) return json({ error: "Unauthenticated" }, 401);
+      const actual = actualRoleOf(actor);
+      const canView = ["Sub Admin", "Managing Director", "Super Admin", "Finance Officer", "Head Accountant"].includes(actual) ||
+        await actorHasPermission(env, actor, "finance.approvals.view");
+      if (!canView) return json({ error: "Forbidden" }, 403);
+      const canPerform = await actorHasPermission(env, actor, "finance.approvals.perform");
+      const catalogSpec = [
+        { label: "Record manual payment", method: "POST", endpoint: "/api/finance/payments", permission: "finance.payments.record" },
+        { label: "Verify payment", method: "POST", endpoint: "/api/finance/payments/:id/verify", permission: "finance.payments.verify" },
+        { label: "Reverse or refund payment", method: "POST", endpoint: "/api/finance/payments/:id/reverse", permission: "finance.payments.adjust" },
+        { label: "Run reconciliation", method: "POST", endpoint: "/api/finance/reconciliation", permission: "finance.reconciliation.run" },
+        { label: "Manage payment providers", method: "PUT", endpoint: "/api/finance/provider-config", permission: "finance.providers.manage" },
+        { label: "Generate commission entries", method: "POST", endpoint: "/api/commissions/generate", permission: "commission.entries.generate" },
+        { label: "Approve commission", method: "POST", endpoint: "/api/commissions/:id/approve", permission: "commission.entries.approve" },
+        { label: "Pay commission", method: "POST", endpoint: "/api/commissions/payments", permission: "commission.entries.pay" },
+        { label: "Adjust commission", method: "POST", endpoint: "/api/commissions/:id/adjust", permission: "commission.entries.adjust" }
+      ];
+      const catalog = [];
+      for (const row of catalogSpec) {
+        catalog.push({ ...row, can_perform: canPerform && await actorHasPermission(env, actor, row.permission) });
+      }
+      const { results: payments } = await env.DB.prepare(`
+        SELECT p.id, p.transaction_ref, p.amount_kobo, p.status, p.created_at,
+               c.full_name AS client_name, c.client_reference, b.name AS branch_name
+        FROM payments p JOIN clients c ON c.id=p.client_id
+        LEFT JOIN branches b ON b.id=c.assigned_branch_id
+        WHERE p.status='pending' AND COALESCE(p.is_demo,0)=0
+          AND COALESCE(p.is_internal_test,0)=0 AND COALESCE(p.is_archived,0)=0
+        ORDER BY p.created_at DESC LIMIT 50
+      `).all();
+      const { results: commissions } = await env.DB.prepare(`
+        SELECT ce.id, ce.commission_ref, ce.commission_kobo, ce.status, ce.created_at,
+               c.full_name AS client_name, c.client_reference, u.full_name AS recipient_name
+        FROM commission_entries ce
+        JOIN clients c ON c.id=ce.client_id
+        LEFT JOIN users u ON u.id=ce.recipient_user_id
+        WHERE ce.status IN ('Calculated','Pending Approval')
+        ORDER BY ce.created_at DESC LIMIT 50
+      `).all();
+      const { results: changeRequests } = await env.DB.prepare(`
+        SELECT r.id, r.client_id, r.change_type, r.reason, r.status, r.created_at,
+               c.full_name AS client_name, c.client_reference
+        FROM client_financial_change_requests r JOIN clients c ON c.id=r.client_id
+        WHERE r.status='pending' ORDER BY r.created_at DESC LIMIT 50
+      `).all();
+      const { results: listings } = await env.DB.prepare(`
+        SELECT p.id, p.title, p.reference, p.workflow_status, p.submitted_at,
+               b.name AS branch_name
+        FROM properties p LEFT JOIN branches b ON b.id=p.branch_id
+        WHERE p.workflow_status='pending_approval' AND COALESCE(p.is_archived,0)=0
+        ORDER BY p.submitted_at DESC LIMIT 50
+      `).all();
+      return json({
+        read_only: !canPerform,
+        catalog,
+        pending: {
+          payments,
+          commissions,
+          client_change_requests: changeRequests,
+          property_listings: listings
+        }
+      });
+    }
+
+    // =========================================================================
+    // ACCOUNTANT DASHBOARD (read-only financial records)
+    // =========================================================================
+    if (path === "/api/accountant/earnings" && request.method === "GET") {
+      const actor = await getSessionUser(env, request);
+      if (!actor) return json({ error: "Unauthenticated" }, 401);
+      if (!(await actorHasPermission(env, actor, "finance.records.view"))) {
+        return json({ error: "Forbidden" }, 403);
+      }
+      const from = dateOnly(url.searchParams.get("from")) || new Date(Date.now() - 29 * 86400000).toISOString().slice(0, 10);
+      const to = dateOnly(url.searchParams.get("to")) || todayOnly();
+      const branchId = url.searchParams.get("branch_id") ? Number(url.searchParams.get("branch_id")) : null;
+      const paymentFlags = [
+        "COALESCE(p.is_demo,0)=0",
+        "COALESCE(p.is_internal_test,0)=0",
+        "COALESCE(p.is_archived,0)=0",
+        "p.currency='NGN'"
+      ];
+      const paymentBinds = [];
+      if (branchId) { paymentFlags.push("c.assigned_branch_id=?"); paymentBinds.push(branchId); }
+      const periodPaymentWhere = [...paymentFlags, "date(COALESCE(p.verified_at,p.created_at)) BETWEEN date(?) AND date(?)"];
+      const periodPaymentBinds = [...paymentBinds, from, to];
+      const clientFlags = [
+        "c.is_deleted=0",
+        "c.client_reference NOT LIKE 'DEMO-%'",
+        "COALESCE(c.is_internal_test,0)=0",
+        "COALESCE(c.is_archived,0)=0"
+      ];
+      const clientBinds = [];
+      if (branchId) { clientFlags.push("c.assigned_branch_id=?"); clientBinds.push(branchId); }
+
+      const collectedRow = await env.DB.prepare(`
+        SELECT COALESCE(SUM(p.amount_kobo),0) AS total FROM payments p
+        JOIN clients c ON c.id=p.client_id
+        WHERE ${periodPaymentWhere.join(" AND ")} AND p.status='verified'
+      `).bind(...periodPaymentBinds).first();
+      const pendingRow = await env.DB.prepare(`
+        SELECT COALESCE(SUM(p.amount_kobo),0) AS total FROM payments p
+        JOIN clients c ON c.id=p.client_id
+        WHERE ${periodPaymentWhere.join(" AND ")} AND p.status='pending'
+      `).bind(...periodPaymentBinds).first();
+      const reversedRow = await env.DB.prepare(`
+        SELECT COALESCE(SUM(p.amount_kobo),0) AS total FROM payments p
+        JOIN clients c ON c.id=p.client_id
+        WHERE ${periodPaymentWhere.join(" AND ")} AND p.status IN ('reversed','refunded')
+      `).bind(...periodPaymentBinds).first();
+      const expectedRow = await env.DB.prepare(`
+        SELECT COALESCE(SUM(si.amount_kobo),0) AS total
+        FROM payment_schedule_items si
+        JOIN payment_schedules s ON s.id=si.schedule_id
+        JOIN clients c ON c.id=s.client_id
+        WHERE si.due_date BETWEEN date(?) AND date(?) AND si.status<>'paid'
+          AND ${clientFlags.join(" AND ")}
+      `).bind(from, to, ...clientBinds).first();
+      const collectedAllRow = await env.DB.prepare(`
+        SELECT COALESCE(SUM(p.amount_kobo),0) AS total FROM payments p
+        JOIN clients c ON c.id=p.client_id
+        WHERE ${paymentFlags.join(" AND ")} AND p.status='verified'
+      `).bind(...paymentBinds).first();
+      const agreedRow = await env.DB.prepare(`
+        SELECT COALESCE(SUM(c.agreed_purchase_price),0) AS total FROM clients c
+        WHERE ${clientFlags.join(" AND ")}
+      `).bind(...clientBinds).first();
+      const collectedKobo = Number(collectedRow?.total || 0);
+      const expectedKobo = Number(expectedRow?.total || 0);
+      const outstandingKobo = Math.max(0, toKobo(agreedRow?.total || 0) - Number(collectedAllRow?.total || 0));
+
+      const { results: branchPayments } = await env.DB.prepare(`
+        SELECT c.assigned_branch_id AS branch_id,
+          COALESCE(SUM(CASE WHEN p.status='verified' THEN p.amount_kobo ELSE 0 END),0) AS collected_kobo,
+          COALESCE(SUM(CASE WHEN p.status='pending' THEN p.amount_kobo ELSE 0 END),0) AS pending_kobo,
+          COALESCE(SUM(CASE WHEN p.status IN ('reversed','refunded') THEN p.amount_kobo ELSE 0 END),0) AS reversed_kobo
+        FROM payments p JOIN clients c ON c.id=p.client_id
+        WHERE ${periodPaymentWhere.join(" AND ")}
+        GROUP BY c.assigned_branch_id
+      `).bind(...periodPaymentBinds).all();
+      const { results: branchExpected } = await env.DB.prepare(`
+        SELECT c.assigned_branch_id AS branch_id, COALESCE(SUM(si.amount_kobo),0) AS expected_kobo
+        FROM payment_schedule_items si
+        JOIN payment_schedules s ON s.id=si.schedule_id
+        JOIN clients c ON c.id=s.client_id
+        WHERE si.due_date BETWEEN date(?) AND date(?) AND si.status<>'paid'
+          AND ${clientFlags.join(" AND ")}
+        GROUP BY c.assigned_branch_id
+      `).bind(from, to, ...clientBinds).all();
+      const branchQuery = branchId
+        ? env.DB.prepare("SELECT id, name FROM branches WHERE id=?").bind(branchId)
+        : env.DB.prepare("SELECT id, name FROM branches ORDER BY name");
+      const { results: branches } = await branchQuery.all();
+      const paymentByBranch = new Map(branchPayments.map(row => [Number(row.branch_id), row]));
+      const expectedByBranch = new Map(branchExpected.map(row => [Number(row.branch_id), Number(row.expected_kobo || 0)]));
+      const branchComparison = branches.map(branch => {
+        const paid = paymentByBranch.get(Number(branch.id)) || {};
+        const expected = expectedByBranch.get(Number(branch.id)) || 0;
+        const collected = Number(paid.collected_kobo || 0);
+        return {
+          branch_id: branch.id,
+          branch_name: branch.name,
+          collected_kobo: collected,
+          pending_kobo: Number(paid.pending_kobo || 0),
+          reversed_kobo: Number(paid.reversed_kobo || 0),
+          expected_kobo: expected,
+          difference_kobo: expected - collected
+        };
+      });
+
+      let commission = null;
+      if (await actorHasPermission(env, actor, "commission.totals.view")) {
+        const commissionBinds = [from, to];
+        let commissionBranch = "";
+        if (branchId) { commissionBranch = " AND ce.branch_id=?"; commissionBinds.push(branchId); }
+        const { results: commissionRows } = await env.DB.prepare(`
+          SELECT ce.recipient_user_id, COALESCE(u.full_name,'Unknown') AS marketer_name,
+            COALESCE(SUM(CASE WHEN ce.status IN ('Calculated','Pending Approval','Approved','Partially Paid','Paid','Reversed')
+              THEN ce.commission_kobo + ce.adjusted_kobo ELSE 0 END),0) AS earned_kobo,
+            COALESCE(SUM(ce.paid_kobo),0) AS paid_kobo
+          FROM commission_entries ce LEFT JOIN users u ON u.id=ce.recipient_user_id
+          WHERE date(ce.created_at) BETWEEN date(?) AND date(?)${commissionBranch}
+          GROUP BY ce.recipient_user_id
+          HAVING earned_kobo > 0 OR paid_kobo > 0
+          ORDER BY earned_kobo DESC
+        `).bind(...commissionBinds).all();
+        commission = {
+          rows: commissionRows.map(row => ({
+            marketer_name: row.marketer_name,
+            earned_kobo: Number(row.earned_kobo || 0),
+            paid_kobo: Number(row.paid_kobo || 0),
+            outstanding_kobo: Math.max(0, Number(row.earned_kobo || 0) - Number(row.paid_kobo || 0))
+          }))
+        };
+      }
+
+      const { results: payments } = await env.DB.prepare(`
+        SELECT p.transaction_ref, c.full_name AS client_name, c.client_reference,
+               prop.reference AS property_reference,
+               p.amount_kobo AS gross_kobo, 0 AS fees_kobo, 0 AS stamp_duty_kobo,
+               p.amount_kobo AS net_settled_kobo,
+               p.provider, p.provider_reference, p.status,
+               b.name AS branch_name, m.full_name AS marketer_name,
+               (SELECT u2.full_name FROM client_assignments ca
+                 JOIN users u2 ON u2.id=ca.relationship_manager_id
+                 WHERE ca.client_id=c.id AND ca.is_primary=1
+                 ORDER BY ca.assigned_at DESC LIMIT 1) AS assignee_name,
+               COALESCE(p.verified_at,p.created_at) AS created_at
+        FROM payments p
+        JOIN clients c ON c.id=p.client_id
+        LEFT JOIN branches b ON b.id=c.assigned_branch_id
+        LEFT JOIN users m ON m.id=c.original_marketer_id
+        LEFT JOIN properties prop ON prop.id=p.property_id
+        WHERE ${periodPaymentWhere.join(" AND ")}
+        ORDER BY COALESCE(p.verified_at,p.created_at) DESC LIMIT 5000
+      `).bind(...periodPaymentBinds).all();
+
+      return json({
+        period: { from, to },
+        summary: {
+          collected_kobo: collectedKobo,
+          pending_kobo: Number(pendingRow?.total || 0),
+          reversed_kobo: Number(reversedRow?.total || 0),
+          outstanding_kobo: outstandingKobo,
+          expected_kobo: expectedKobo,
+          settlement_difference_kobo: expectedKobo - collectedKobo
+        },
+        branch_comparison: branchComparison,
+        commission,
+        payments
+      });
+    }
+
+    if ((path === "/api/accountant/export" || path === "/api/accountant/statement") && request.method === "GET") {
+      const actor = await getSessionUser(env, request);
+      if (!actor) return json({ error: "Unauthenticated" }, 401);
+      const isExport = path.endsWith("/export");
+      const permission = isExport ? "finance.payments.export" : "finance.records.view";
+      if (!(await actorHasPermission(env, actor, permission))) {
+        return json({ error: "Forbidden" }, 403);
+      }
+      const from = dateOnly(url.searchParams.get("from")) || new Date(Date.now() - 29 * 86400000).toISOString().slice(0, 10);
+      const to = dateOnly(url.searchParams.get("to")) || todayOnly();
+      const branchParam = url.searchParams.get("branch_id");
+      if (!isExport && !branchParam) return json({ error: "Select a branch first" }, 400);
+      const branchId = branchParam ? Number(branchParam) : null;
+      const branch = branchId
+        ? await env.DB.prepare("SELECT id, name FROM branches WHERE id=?").bind(branchId).first()
+        : null;
+      if (branchId && !branch) return json({ error: "Branch not found" }, 404);
+      const where = [
+        "COALESCE(p.is_demo,0)=0",
+        "COALESCE(p.is_internal_test,0)=0",
+        "COALESCE(p.is_archived,0)=0",
+        "p.currency='NGN'",
+        "date(COALESCE(p.verified_at,p.created_at)) BETWEEN date(?) AND date(?)"
+      ];
+      const binds = [from, to];
+      if (branchId) { where.push("c.assigned_branch_id=?"); binds.push(branchId); }
+      const { results: rows } = await env.DB.prepare(`
+        SELECT p.transaction_ref, c.full_name AS client_name, c.client_reference,
+               prop.reference AS property_reference,
+               p.amount_kobo AS gross_kobo, 0 AS fees_kobo, 0 AS stamp_duty_kobo,
+               p.amount_kobo AS net_settled_kobo, p.provider, p.provider_reference, p.status,
+               b.name AS branch_name, m.full_name AS marketer_name,
+               COALESCE(p.verified_at,p.created_at) AS created_at
+        FROM payments p
+        JOIN clients c ON c.id=p.client_id
+        LEFT JOIN branches b ON b.id=c.assigned_branch_id
+        LEFT JOIN users m ON m.id=c.original_marketer_id
+        LEFT JOIN properties prop ON prop.id=p.property_id
+        WHERE ${where.join(" AND ")}
+        ORDER BY COALESCE(p.verified_at,p.created_at) DESC LIMIT 5000
+      `).bind(...binds).all();
+      if (!isExport) {
+        const collectedKobo = rows.filter(row => row.status === "verified")
+          .reduce((sum, row) => sum + Number(row.gross_kobo || 0), 0);
+        return json({
+          branch: { id: branch.id, name: branch.name },
+          period: { from, to },
+          collected_kobo: collectedKobo,
+          payments: rows.map(row => ({
+            transaction_ref: row.transaction_ref,
+            client_name: row.client_name,
+            amount_kobo: Number(row.gross_kobo || 0),
+            status: row.status,
+            created_at: row.created_at
+          }))
+        });
+      }
+      const csvEscape = value => {
+        const text = value === null || value === undefined ? "" : String(value);
+        return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+      };
+      const naira = kobo => (Number(kobo || 0) / 100).toFixed(2);
+      const lines = [
+        ["Reference", "Client", "Client Reference", "Property", "Gross (NGN)", "Fees (NGN)", "Stamp Duty (NGN)", "Net (NGN)", "Provider", "Provider Reference", "Status", "Branch", "Marketer", "Time"].map(csvEscape).join(","),
+        ...rows.map(row => [
+          row.transaction_ref, row.client_name, row.client_reference, row.property_reference || "",
+          naira(row.gross_kobo), naira(row.fees_kobo), naira(row.stamp_duty_kobo), naira(row.net_settled_kobo),
+          row.provider || "", row.provider_reference || "", row.status, row.branch_name || "",
+          row.marketer_name || "", row.created_at
+        ].map(csvEscape).join(","))
+      ];
+      return new Response(lines.join("\n"), {
+        status: 200,
+        headers: {
+          "Content-Type": "text/csv;charset=utf-8",
+          "Content-Disposition": `attachment; filename="elpis-accountant-${from}-to-${to}.csv"`,
+          "X-Content-Type-Options": "nosniff"
+        }
+      });
+    }
+
     if (path === "/api/finance/overview" && request.method === "GET") {
       const actor = await getSessionUser(env, request);
       if (!actor) return json({ error: "Unauthenticated" }, 401);
@@ -11264,9 +11890,9 @@ async function handleFetch(request, env) {
       if (!validPassword(password)) return json({ error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters` }, 400);
       const actorActualRole = actor.actual_role_name || actor.role_name;
       const allowed = actorActualRole === "Super Admin"
-        ? ["Branch Manager", "Project Manager", "Team Lead", "Marketer", "Finance Officer", "Head Accountant", "Customer Care", "Super Admin"]
+        ? ["Branch Manager", "Project Manager", "Team Lead", "Marketer", "Finance Officer", "Head Accountant", "Customer Care", "Sub Admin", "GSM", "Accountant", "Super Admin"]
         : actor.role_name === "Managing Director"
-          ? ["Branch Manager", "Project Manager", "Team Lead", "Marketer", "Finance Officer", "Head Accountant", "Customer Care"]
+          ? ["Branch Manager", "Project Manager", "Team Lead", "Marketer", "Finance Officer", "Head Accountant", "Customer Care", "Sub Admin", "GSM", "Accountant"]
           : ["Team Lead", "Marketer", "Finance Officer"];
       if (!allowed.includes(role_name)) return json({ error: "Forbidden role" }, 403);
       let resolvedBranch = branch_id || null;
@@ -12384,7 +13010,7 @@ async function handleFetch(request, env) {
         if (!Number.isFinite(price) || price < 0) return json({ error: "Agreed purchase price is invalid" }, 400);
         agreedPrice = price;
       }
-      const ref = "BLC-" + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 5).toUpperCase();
+      const ref = "ELP-" + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 5).toUpperCase();
       const clientStatus = body.client_status && ["Prospect", "Interested", "Negotiation", "Reserved", "Active Buyer"].includes(body.client_status)
         ? body.client_status : "Interested";
       const marketerId = lead.assigned_marketer_id || actor.id;
@@ -13482,17 +14108,47 @@ async function handleFetch(request, env) {
 
 export default {
   async fetch(request, env) {
+    const startedAt = Date.now();
     const response = await handleFetch(request, env);
-    if (env.ENVIRONMENT !== "production" && response.status !== 101) {
-      const headers = new Headers(response.headers);
-      headers.set("X-Robots-Tag", "noindex, nofollow");
-      return new Response(response.body, {
-        status: response.status,
-        statusText: response.statusText,
-        headers
-      });
+    const appDuration = Date.now() - startedAt;
+    // WebSocket upgrades cannot be reconstructed, so pass them through.
+    if (response.status === 101) return response;
+    const headers = new Headers(response.headers);
+    headers.set("Server-Timing", `app;dur=${appDuration};desc="worker"`);
+    headers.set("X-Content-Type-Options", "nosniff");
+    headers.set("X-Frame-Options", "DENY");
+    headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+    headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=()");
+    headers.set(
+      "Content-Security-Policy",
+      "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; " +
+      "form-action 'self'; script-src 'self' 'unsafe-inline'; " +
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+      "font-src 'self' data: https://fonts.gstatic.com; " +
+      "img-src 'self' data: blob: https:; connect-src 'self' https: wss:; " +
+      "manifest-src 'self'; worker-src 'self' blob:"
+    );
+    const url = new URL(request.url);
+    if (url.protocol === "https:") {
+      headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
     }
-    return response;
+    // Feature flag: set ASSET_CACHE_MODE=safe in wrangler.toml to roll back
+    // instantly to the previous revalidate-every-time behaviour.
+    if ((env.ASSET_CACHE_MODE || "safe") === "standard" && request.method === "GET" && response.status === 200) {
+      if (url.pathname.startsWith("/assets/")) {
+        headers.set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400");
+      } else if (!url.pathname.startsWith("/api/") && (url.pathname.endsWith(".html") || !url.pathname.includes("."))) {
+        headers.set("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
+      }
+    }
+    if (env.ENVIRONMENT !== "production") {
+      headers.set("X-Robots-Tag", "noindex, nofollow");
+    }
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers
+    });
   },
 
   // Cloudflare Queues consumer: notification delivery and SMS retries.

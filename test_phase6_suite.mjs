@@ -97,6 +97,9 @@ const mkt1Id = upsertUser('mkt.ikeja@elpisproperty.test', 'Branch 1 Marketer One
 const mkt2Id = upsertUser('mkt.ikeja2@elpisproperty.test', 'Branch 1 Marketer Two', 4, 1);
 const mkt3Id = upsertUser('mkt.ajah@elpisproperty.test', 'Branch 2 Marketer', 4, 2);
 const finId = upsertUser('finance@elpisproperty.test', 'Head Finance Officer', 5, 1);
+const subAdminId = upsertUser('subadmin@elpisproperty.test', 'Sub Admin', 11, null);
+const gsmId = upsertUser('gsm@elpisproperty.test', 'GSM', 12, null);
+const accountantId = upsertUser('accountant@elpisproperty.test', 'Accountant', 13, null);
 const adaUserId = upsertUser('ada@example.com', 'Ada Nwosu', 6, 1);
 const musaUserId = upsertUser('musa@example.com', 'Musa Dike', 6, 1);
 const demoUserId = upsertUser('demo@elpisproperty.test', 'Demo Investor', 6, 1);
@@ -321,6 +324,9 @@ const mkt1Cookie = await login('mkt.ikeja@elpisproperty.test');
 const mkt2Cookie = await login('mkt.ikeja2@elpisproperty.test');
 const mkt3Cookie = await login('mkt.ajah@elpisproperty.test');
 const finCookie = await login('finance@elpisproperty.test');
+const subAdminCookie = await login('subadmin@elpisproperty.test');
+const gsmCookie = await login('gsm@elpisproperty.test');
+const accountantCookie = await login('accountant@elpisproperty.test');
 const adaCookie = await login('ada@example.com');
 
 console.log('--- 1. Role dashboards ---');
@@ -349,7 +355,7 @@ await test('MD dashboard computes company-wide property, client, staff, lead and
   assert(s.properties.available === 1 && s.properties.reserved === 1, 'property status counts incorrect');
   assert(s.clients.total === 3, `client total expected 3, got ${s.clients.total}`);
   assert(s.clients.active === 2, 'active clients expected 2');
-  assert(s.staff.total === 9, `active staff expected 9, got ${s.staff.total}`);
+  assert(s.staff.total === 12, `active staff expected 12, got ${s.staff.total}`);
   assert(s.staff.marketers === 3 && s.staff.team_leads === 2, 'staff role counts incorrect');
   assert(s.leads.total === 3, `live leads expected 3, got ${s.leads.total}`);
   assert(s.leads.converted === 1, 'converted leads expected 1');
@@ -503,7 +509,7 @@ console.log('\n--- 3. Staff and team management ---');
 await test('staff list and creation enforce branch and role restrictions', async () => {
   const mdList = await request('/api/staff?limit=100', { headers: { Cookie: mdCookie } });
   assert(mdList.status === 200, 'MD staff list expected 200');
-  assert(mdList.data.pagination.total === 9, `MD staff total expected 9, got ${mdList.data.pagination.total}`);
+  assert(mdList.data.pagination.total === 12, `MD staff total expected 12, got ${mdList.data.pagination.total}`);
   const bmList = await request('/api/staff?limit=100', { headers: { Cookie: bm1Cookie } });
   assert(bmList.data.pagination.total === 5, `BM staff total expected 5, got ${bmList.data.pagination.total}`);
   assert(bmList.data.staff.every(s => s.branch_name === 'Branch 1'), 'BM staff list leaked another branch');
@@ -891,6 +897,191 @@ await test('MD can add and publish branches while branch managers cannot', async
   assert(forbidden.status === 403, `Branch Manager branch creation expected 403, got ${forbidden.status}`);
   db.prepare('DELETE FROM branches WHERE id=?').run(createdId);
   if (original) db.prepare("UPDATE app_settings SET setting_value=? WHERE setting_key='site_config'").run(original.setting_value);
+});
+
+console.log('\n--- 8. Five-dashboards roles, targets, permissions and accountant views ---');
+await test('Sub Admin, GSM and Accountant reach their own work areas', async () => {
+  const sub = await request('/api/financial-approvals', { headers: { Cookie: subAdminCookie } });
+  assert(sub.status === 200, `Sub Admin approvals expected 200, got ${sub.status}`);
+  assert(sub.data.read_only === true, 'Sub Admin financial approvals must be read-only');
+  assert(Array.isArray(sub.data.catalog) && sub.data.catalog.length > 0, 'approval catalogue missing');
+  assert(sub.data.catalog.every(row => row.can_perform === false), 'Sub Admin must not receive perform rights');
+
+  const gsm = await request('/api/targets', { headers: { Cookie: gsmCookie } });
+  assert(gsm.status === 200 && Array.isArray(gsm.data.targets), `GSM targets expected 200, got ${gsm.status}`);
+
+  const acc = await request('/api/accountant/earnings', { headers: { Cookie: accountantCookie } });
+  assert(acc.status === 200, `Accountant earnings expected 200, got ${acc.status}`);
+  assert(acc.data.summary && Number(acc.data.summary.collected_kobo) === 600000000, 'Accountant collected total mismatch');
+  assert(Number(acc.data.summary.pending_kobo) === 300000000, 'Accountant pending total mismatch');
+  assert(Array.isArray(acc.data.branch_comparison) && acc.data.branch_comparison.length >= 2, 'branch comparison missing');
+
+  const marketerTargets = await request('/api/targets', { headers: { Cookie: mkt1Cookie } });
+  assert(marketerTargets.status === 403, `Marketer targets expected 403, got ${marketerTargets.status}`);
+  const marketerEarnings = await request('/api/accountant/earnings', { headers: { Cookie: mkt1Cookie } });
+  assert(marketerEarnings.status === 403, `Marketer accountant earnings expected 403, got ${marketerEarnings.status}`);
+  const accountantApprovals = await request('/api/financial-approvals', { headers: { Cookie: accountantCookie } });
+  assert(accountantApprovals.status === 403, `Accountant approvals expected 403, got ${accountantApprovals.status}`);
+});
+
+await test('Accountant can print a branch statement and export the scoped CSV', async () => {
+  const statement = await request('/api/accountant/statement?branch_id=1&from=2026-01-01&to=2100-01-01', { headers: { Cookie: accountantCookie } });
+  assert(statement.status === 200, `statement expected 200, got ${statement.status}`);
+  assert(statement.data.branch && statement.data.branch.name === 'Branch 1', 'statement branch mismatch');
+  assert(Number(statement.data.collected_kobo) === 400000000, 'statement collected total mismatch');
+  assert(statement.data.payments.some(row => row.transaction_ref === 'TX-P6-ADA-01'), 'statement missing branch payment');
+  assert(!statement.data.payments.some(row => row.transaction_ref === 'TX-P6-CROSS-01'), 'statement leaked another branch');
+
+  const csv = await request('/api/accountant/export?branch_id=1&from=2026-01-01&to=2100-01-01', { headers: { Cookie: accountantCookie } });
+  assert(csv.status === 200, `CSV export expected 200, got ${csv.status}`);
+  assert((csv.headers.get('content-type') || '').includes('text/csv'), 'CSV content type missing');
+  const text = new TextDecoder().decode(csv.data);
+  assert(text.includes('Reference,Client') && text.includes('TX-P6-ADA-01'), 'CSV rows missing');
+  assert(!text.includes('TX-P6-CROSS-01'), 'CSV leaked another branch');
+  const forbidden = await request('/api/accountant/export?from=2026-01-01&to=2100-01-01', { headers: { Cookie: subAdminCookie } });
+  assert(forbidden.status === 403, `Sub Admin export expected 403, got ${forbidden.status}`);
+});
+
+await test('GSM can create targets and invalid targets are rejected', async () => {
+  const create = await request('/api/targets', {
+    method: 'POST', headers: { Cookie: gsmCookie },
+    body: {
+      target_type: 'branch', target_id: 1, metric: 'revenue', period_type: 'month',
+      period_start: '2026-01-01', period_end: '2026-01-31',
+      amount: 5000000, notes: 'Phase 6 target test'
+    }
+  });
+  assert(create.status === 200 && create.data.id, `GSM target creation expected 200, got ${create.status}`);
+  const listed = await request('/api/targets', { headers: { Cookie: gsmCookie } });
+  const created = listed.data.targets.find(row => Number(row.id) === Number(create.data.id));
+  assert(created && created.branch_name === 'Branch 1' && Number(created.amount_kobo) === 500000000, 'created target missing or wrong');
+  const bad = await request('/api/targets', {
+    method: 'POST', headers: { Cookie: gsmCookie },
+    body: { target_type: 'branch', target_id: 1, metric: 'revenue', period_type: 'month', period_start: '2026-02-01', period_end: '2026-01-01', amount: 100 }
+  });
+  assert(bad.status === 400, `invalid target expected 400, got ${bad.status}`);
+  const forbidden = await request('/api/targets', {
+    method: 'POST', headers: { Cookie: mkt1Cookie },
+    body: { target_type: 'branch', target_id: 1, metric: 'revenue', period_type: 'month', period_start: '2026-01-01', period_end: '2026-01-31', amount: 100 }
+  });
+  assert(forbidden.status === 403, `Marketer target creation expected 403, got ${forbidden.status}`);
+  db.prepare('DELETE FROM targets WHERE id=?').run(create.data.id);
+});
+
+await test('Sub Admin edits non-financial client details and re-assigns clients', async () => {
+  const detail = await request(`/api/clients/${musaId}`, { headers: { Cookie: subAdminCookie } });
+  assert(detail.status === 200, `Sub Admin client detail expected 200, got ${detail.status}`);
+  assert(Array.isArray(detail.data.edit_history), 'client edit history missing');
+  const noReason = await request(`/api/clients/${musaId}`, {
+    method: 'PUT', headers: { Cookie: subAdminCookie }, body: { full_name: 'Musa Dike' }
+  });
+  assert(noReason.status === 400, `Sub Admin edit without reason expected 400, got ${noReason.status}`);
+  const financial = await request(`/api/clients/${musaId}`, {
+    method: 'PUT', headers: { Cookie: subAdminCookie }, body: { agreed_purchase_price: 1, reason: 'Attempt financial edit' }
+  });
+  assert(financial.status === 403, `Sub Admin financial edit expected 403, got ${financial.status}`);
+  const edit = await request(`/api/clients/${musaId}`, {
+    method: 'PUT', headers: { Cookie: subAdminCookie },
+    body: { full_name: 'Musa Dike Updated', city: 'Abuja', reason: 'Phase 6 verification edit' }
+  });
+  assert(edit.status === 200, `Sub Admin client edit expected 200, got ${edit.status}`);
+  const edited = await request(`/api/clients/${musaId}`, { headers: { Cookie: subAdminCookie } });
+  assert(edited.data.client.full_name === 'Musa Dike Updated', 'client edit was not saved');
+  assert(edited.data.edit_history.some(row => row.action === 'client.update'), 'client edit was not audited');
+  const queueBefore = await request('/api/clients/unassigned', { headers: { Cookie: subAdminCookie } });
+  assert(queueBefore.status === 200 && queueBefore.data.clients.some(row => Number(row.id) === Number(musaId)), 'unassigned queue missing client');
+  const assign = await request(`/api/clients/${musaId}/assign`, {
+    method: 'POST', headers: { Cookie: subAdminCookie },
+    body: { branch_id: 1, relationship_manager_id: mkt1Id, reason: 'Phase 6 assignment verification' }
+  });
+  assert(assign.status === 200, `Sub Admin assignment expected 200, got ${assign.status}`);
+  const queueAfter = await request('/api/clients/unassigned', { headers: { Cookie: subAdminCookie } });
+  assert(!queueAfter.data.clients.some(row => Number(row.id) === Number(musaId)), 'assigned client still in unassigned queue');
+});
+
+await test('Permission matrix grants, audits, revokes and reports effective access', async () => {
+  const catalog = await request('/api/permissions/catalog', { headers: { Cookie: mdCookie } });
+  assert(catalog.status === 200, `permission catalogue expected 200, got ${catalog.status}`);
+  assert(catalog.data.permissions.some(row => row.name === 'targets.manage'), 'permissions list missing targets.manage');
+  assert(catalog.data.roles.some(row => row.name === 'Sub Admin'), 'roles list missing Sub Admin');
+  assert(catalog.data.users.some(row => Number(row.id) === Number(mkt1Id)), 'users list missing marketer');
+  const grant = await request('/api/permissions/grant', {
+    method: 'POST', headers: { Cookie: mdCookie },
+    body: { target_type: 'user', target_id: mkt1Id, permission_name: 'targets.manage', scope: 'national', reason: 'Phase 6 grant verification' }
+  });
+  assert(grant.status === 200, `permission grant expected 200, got ${grant.status}`);
+  const effective = await request(`/api/permissions/effective?user_id=${mkt1Id}`, { headers: { Cookie: mdCookie } });
+  assert(effective.status === 200 && effective.data.permissions.some(row => row.permission === 'targets.manage' && row.source === 'user'), 'user grant not effective');
+  const owner = await request(`/api/permissions/effective?user_id=${mdId}`, { headers: { Cookie: mdCookie } });
+  assert(owner.data.is_owner_authority === true, 'owner authority not reported');
+  const history = await request('/api/permissions/history', { headers: { Cookie: mdCookie } });
+  assert(history.status === 200 && history.data.history.some(row => row.action === 'grant' && row.permission_name === 'targets.manage'), 'grant not in history');
+  const auditRow = db.prepare("SELECT * FROM audit_logs WHERE action='permission.grant' ORDER BY id DESC LIMIT 1").get();
+  assert(auditRow && String(auditRow.target_id) === String(mkt1Id), 'grant was not audited');
+  const revoke = await request('/api/permissions/revoke', {
+    method: 'POST', headers: { Cookie: mdCookie },
+    body: { target_type: 'user', target_id: mkt1Id, permission_name: 'targets.manage', scope: 'national', reason: 'Phase 6 revoke verification' }
+  });
+  assert(revoke.status === 200, `permission revoke expected 200, got ${revoke.status}`);
+  const after = await request(`/api/permissions/effective?user_id=${mkt1Id}`, { headers: { Cookie: mdCookie } });
+  assert(!after.data.permissions.some(row => row.permission === 'targets.manage'), 'revoked permission still effective');
+  const forbidden = await request('/api/permissions/catalog', { headers: { Cookie: mkt1Cookie } });
+  assert(forbidden.status === 403, `non-owner permission catalogue expected 403, got ${forbidden.status}`);
+});
+
+await test('new client references use the Elpis prefix and legacy samples stay hidden', async () => {
+  const create = await request('/api/clients', {
+    method: 'POST', headers: { Cookie: mdCookie },
+    body: { full_name: 'Prefix Test Client', phone_number: '08069999999', assigned_branch_id: 1 }
+  });
+  assert(create.status === 200 && create.data.client_reference, `client creation expected 200, got ${create.status}`);
+  assert(String(create.data.client_reference).startsWith('ELP-'), `expected ELP- client reference, got ${create.data.client_reference}`);
+  const source = readFileSync('src/index.js', 'utf8');
+  assert(!source.includes('"BLC-" + Date.now()'), 'legacy BLC client reference generator remains');
+  const siteConfig = readFileSync('assets/js/site-config.js', 'utf8');
+  assert(siteConfig.includes('showDemoProperties: false'), 'legacy sample listings are not disabled by default');
+  assert(siteConfig.includes('showDemoProperties = c.showDemoProperties === true'), 'server demo flag is not applied');
+  const shell = readFileSync('assets/js/staff-shell.js', 'utf8');
+  assert(shell.includes('Sub Admin') && shell.includes('gsm-dashboard.html') && shell.includes('accountant-dashboard.html'), 'new dashboards missing from staff shell');
+  const login = readFileSync('login.html', 'utf8');
+  assert(login.includes('sub-admin-dashboard.html') && login.includes('accountant-dashboard.html'), 'role landing routes missing');
+  db.prepare('DELETE FROM clients WHERE client_reference=?').run(create.data.client_reference);
+});
+
+console.log('\n--- 9. Performance indexes and API contract safety ---');
+await test('hot list and throttling queries use the new covering indexes', async () => {
+  const expected = [
+    'idx_clients_active_created', 'idx_clients_branch_active_created', 'idx_audit_rate_limit',
+    'idx_payments_client_status', 'idx_commission_recipient_status_created', 'idx_properties_public_listing'
+  ];
+  for (const name of expected) {
+    const row = db.prepare("SELECT name FROM sqlite_master WHERE type='index' AND name=?").get(name);
+    assert(row, `missing performance index ${name}`);
+  }
+  const plan = (sql, ...args) => db.prepare('EXPLAIN QUERY PLAN ' + sql).all(...args).map(r => r.detail).join(' | ');
+  const clientsPlan = plan('SELECT c.id FROM clients c WHERE c.is_deleted=0 ORDER BY c.created_at DESC LIMIT 20');
+  assert(clientsPlan.includes('idx_clients_active_created') && !clientsPlan.includes('TEMP B-TREE'), `clients list must use the index: ${clientsPlan}`);
+  const auditPlan = plan("SELECT COUNT(*) FROM audit_logs WHERE action=? AND target_id=? AND created_at >= datetime('now','-15 minutes')", 'login.failure', 'x');
+  assert(auditPlan.includes('idx_audit_rate_limit'), `audit throttle must use the index: ${auditPlan}`);
+  const paymentPlan = plan('SELECT p.id FROM payments p WHERE p.client_id=? AND p.status=?', 1, 'verified');
+  assert(paymentPlan.includes('idx_payments_client_status'), `payment lookup must use the index: ${paymentPlan}`);
+  const commissionPlan = plan('SELECT ce.id FROM commission_entries ce WHERE ce.recipient_user_id=? AND ce.status=? ORDER BY ce.created_at DESC', 1, 'Approved');
+  assert(commissionPlan.includes('idx_commission_recipient_status_created'), `commission lookup must use the index: ${commissionPlan}`);
+});
+
+await test('public API response shapes stay backward compatible and carry Server-Timing', async () => {
+  const health = await request('/api/health');
+  assert(health.status === 200 && health.data.ok === true, 'health contract changed');
+  assert(health.headers.get('server-timing') && health.headers.get('server-timing').includes('app;dur='), 'Server-Timing header missing');
+  const props = await request('/api/properties?limit=1');
+  assert(props.status === 200, 'properties contract request failed');
+  assert(JSON.stringify(Object.keys(props.data).sort()) === JSON.stringify(['limit', 'page', 'properties', 'total']), 'properties response keys changed');
+  assert(Array.isArray(props.data.properties), 'properties array missing');
+  const site = await request('/api/site-config');
+  assert(site.status === 200 && site.data.config && Array.isArray(site.data.config.branches), 'site-config contract changed');
+  for (const key of ['companyName', 'tagline', 'phone', 'email', 'address', 'social', 'branches', 'showDemoProperties']) {
+    assert(Object.prototype.hasOwnProperty.call(site.data.config, key), `site-config key missing: ${key}`);
+  }
 });
 
 console.log('\n========================================================');

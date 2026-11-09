@@ -53,6 +53,8 @@ ENVIRONMENT = "staging"
 DEMO_MODE_ENABLED = "0"
 DEFAULT_GRACE_DAYS = "0"
 PAYMENT_MODE = "test"
+# Rollback: change to "safe" to restore revalidate-every-time asset caching.
+ASSET_CACHE_MODE = "standard"
 
 [observability]
 enabled = true

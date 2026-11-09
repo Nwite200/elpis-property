@@ -7,7 +7,7 @@ window.ELPIS_CONFIG = {
   phone: "0805 070 0000",
   email: "hr@elpisproperty.org",
   address: "1st Building by the 1st Pedestrian Bridge along Government Secondary School 3 road, Nyanya, Abuja, FCT, Nigeria.",
-  showDemoProperties: true,
+  showDemoProperties: false,
   social: { facebook: "", instagram: "", twitter: "", linkedin: "" },
   branches: [
     {
@@ -34,6 +34,7 @@ window.ELPIS_CONFIG_READY = fetch("/api/site-config", { credentials: "same-origi
       window.ELPIS_CONFIG.email = c.email || window.ELPIS_CONFIG.email;
       window.ELPIS_CONFIG.address = c.address || window.ELPIS_CONFIG.address;
       window.ELPIS_CONFIG.social = c.social || window.ELPIS_CONFIG.social;
+      window.ELPIS_CONFIG.showDemoProperties = c.showDemoProperties === true;
       if (Array.isArray(c.branches) && c.branches.length) window.ELPIS_CONFIG.branches = c.branches;
     }
     return window.ELPIS_CONFIG;

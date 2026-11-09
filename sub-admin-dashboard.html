@@ -86,7 +86,7 @@
       async function loadOptions() {
         const [b, u] = await Promise.all([ElpisStaff.fetchJson('/api/branches'), ElpisStaff.fetchJson('/api/users')]);
         branches = b.branches || [];
-        staff = (u.users || []).filter(x => x.is_active !== 0);
+        staff = (u.users || []).filter(x => x.is_active !== 0 && x.role_name !== 'Client');
         el('changeBranch').innerHTML = branches.map(x => `<option value="${x.id}">${esc(x.name)}</option>`).join('');
         el('changeManager').innerHTML = '<option value="">Leave Unassigned</option>' + staff.map(x => `<option value="${x.id}">${esc(x.full_name)} — ${esc(x.role_name || x.role || '')}</option>`).join('');
       }
