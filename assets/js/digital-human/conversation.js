@@ -4,6 +4,8 @@
 import { STORAGE_KEY, MAX_TRANSCRIPT, PERSONAS, personaByKey } from "./config.js";
 import { greetingFor, quickActionsFor } from "./context.js";
 import { summarizeDashboard } from "./tools/dashboard.js";
+import { compareProperties, searchProperties } from "./tools/properties.js";
+import { handoverOptions } from "./tools/handover.js";
 
 function scopeOf(context) {
   if (context.isStaff) return "staff";
@@ -49,14 +51,16 @@ const INTENTS = [
   {
     key: "property",
     handover: "solomon",
-    test: /(property|properties|house|home|land|apartment|duplex|terrace|buy|purchase|portfolio|listing)/i,
+    test: /(property|properties|house|home|land|apartment|duplex|terrace|bungalow|flat|plot|buy|purchase|portfolio|listing|budget|bedroom)/i,
+    async reply(context, input) {
+      return searchProperties(context, input);
+    }
+  },
+  {
+    key: "compare",
+    test: /\bcompare\b/i,
     reply(context) {
-      return {
-        text: context.isStaff
-          ? "You can open the live property register here. I can point you to it; conversational filtering arrives with our property specialist in the next phase."
-          : "I can take you to the live Elpis portfolio. A property specialist who filters by budget, location and type is being onboarded next.",
-        actions: [{ label: "Explore properties", href: portfolioHref(context) }]
-      };
+      return compareProperties(context);
     }
   },
   {
@@ -164,12 +168,9 @@ const INTENTS = [
   },
   {
     key: "human",
-    test: /(human|agent|staff|person|talk to|speak to|call|whatsapp|contact|branch)/i,
-    reply(context) {
-      return {
-        text: "I can point you to the team now. Live transfer to a staff member is being connected; until then, phone, email or WhatsApp will reach a person directly.",
-        actions: contactActions(context)
-      };
+    test: /(human|agent|staff|person|talk to|speak to|call|whatsapp|contact|branch|handover|transfer)/i,
+    async reply(context) {
+      return handoverOptions(context);
     }
   },
   {
@@ -320,7 +321,8 @@ export class Conversation {
       if (canUse(target, this.context)) {
         const intro = handoverIntro(target);
         this.push("assistant", intro, []);
-        const specialistReply = await intent.reply(this.context);
+        const specialistReply = await intent.reply(this.context, input);
+        if (specialistReply && specialistReply.results) this.context.lastProperties = specialistReply.results;
         this.context.lastIntent = intent.key;
         this.context.lastPersona = target.key;
         return {
@@ -331,7 +333,8 @@ export class Conversation {
       }
     }
 
-    const reply = intent ? await intent.reply(this.context) : fallback(this.context);
+    const reply = intent ? await intent.reply(this.context, input) : fallback(this.context);
+    if (reply && reply.results) this.context.lastProperties = reply.results;
     this.context.lastIntent = intent ? intent.key : "fallback";
     this.push("assistant", reply.text, reply.actions);
     return reply;

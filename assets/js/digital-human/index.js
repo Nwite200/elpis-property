@@ -7,6 +7,8 @@ import { getContext, introTextFor } from "./context.js";
 import { Conversation } from "./conversation.js";
 import { AssistantUI } from "./ui.js";
 import { createVoice } from "./voice/controller.js";
+import { createPaymentWatcher } from "./tools/payments.js";
+import { checkHandover, requestHandover } from "./tools/handover.js";
 
 const CSS_URL = new URL("../../css/digital-human.css", import.meta.url).href;
 
@@ -58,6 +60,12 @@ async function mount() {
     conversation,
     voice,
     mounted: true,
+    onHandover(action) {
+      requestHandover(context, action).then(reply => {
+        ui.notifyAssistant(reply.text, reply.actions);
+        if (reply.handoverId) startHandoverPolling(reply.handoverId);
+      });
+    },
     onSend(text) {
       return conversation.handle(text);
     },
@@ -68,6 +76,61 @@ async function mount() {
 
   const onKeydown = event => ui.onKeydown(event);
   document.addEventListener("keydown", onKeydown);
+
+  const paymentWatcher = context.signedIn
+    ? createPaymentWatcher(context, (event) => ui.notifyPayment(event.text, event.actions))
+    : null;
+  if (paymentWatcher) paymentWatcher.start();
+
+  let handoverTimer = null;
+  let handoverId = null;
+  function stopHandoverPolling() {
+    if (handoverTimer) { window.clearInterval(handoverTimer); handoverTimer = null; }
+    handoverId = null;
+  }
+  async function handleHandoverStatus(id) {
+    const handover = await checkHandover(id);
+    if (!handover || handoverId !== id) return;
+    if (handover.status === "accepted") {
+      stopHandoverPolling();
+      ui.notifyAssistant(
+        `${handover.staff_name} accepted your handover request. The transfer is now active; they will continue with you using your registered details.`,
+        context.isClient ? [{ label: "Contact details", href: "index.html#contact" }] : [{ label: "Open staff chat", href: "staff-chat.html" }]
+      );
+    } else if (handover.status === "declined") {
+      stopHandoverPolling();
+      ui.notifyAssistant(
+        `${handover.staff_name} could not take the handover. You can choose another team member or contact the team directly.`,
+        [{ label: "Contact the team", href: "index.html#contact" }]
+      );
+    }
+  }
+
+  function startHandoverPolling(id) {
+    stopHandoverPolling();
+    handoverId = id;
+    handleHandoverStatus(id).catch(() => {});
+    let attempts = 0;
+    handoverTimer = window.setInterval(async () => {
+      attempts += 1;
+      if (attempts > 16 || handoverId !== id) { stopHandoverPolling(); return; }
+      await handleHandoverStatus(id).catch(() => {});
+    }, 8000);
+  }
+
+  let presenceTimer = null;
+  function sendHeartbeat() {
+    fetch("/api/assistant/heartbeat", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "available" })
+    }).catch(() => {});
+  }
+  if (context.isStaff) {
+    sendHeartbeat();
+    presenceTimer = window.setInterval(() => { if (!document.hidden) sendHeartbeat(); }, 60000);
+  }
 
   const isHome = context.kind === "home";
   const isDashboard = context.kind === "dashboard" || /dashboard\.html$/.test(context.page);
@@ -93,9 +156,20 @@ async function mount() {
     state: () => (ui.open ? "open" : "closed"),
     voice,
     voiceSnapshot: () => voice.snapshot(),
+    payments: paymentWatcher
+      ? { checkNow: () => paymentWatcher.checkNow(), baseline: () => paymentWatcher.baseline(), stop: () => paymentWatcher.stop() }
+      : null,
+    handover: {
+      request: (staffId, staffName) => requestHandover(context, { staffId, staffName }),
+      check: id => checkHandover(id),
+      stop: () => stopHandoverPolling()
+    },
     hide: () => {
       try { sessionStorage.setItem("elp-dh-hidden", "1"); } catch (_) { /* ignore */ }
       document.removeEventListener("keydown", onKeydown);
+      if (paymentWatcher) paymentWatcher.stop();
+      stopHandoverPolling();
+      if (presenceTimer) { window.clearInterval(presenceTimer); presenceTimer = null; }
       ui.close();
       ui.destroy();
       delete window.ElpAssistant;

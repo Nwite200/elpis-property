@@ -1859,6 +1859,34 @@ await test('referral commission applies two-stage and flat rules, caps at 35,000
   assert(configView.status === 200 && configView.data.entries.some(row => row.client_id === eightMonthClient), 'configuration-required referral account missing from dashboard');
 });
 
+console.log('\n--- 13. Assistant human handover requires staff acceptance ---');
+await test('assistant handover is requested, accepted by staff and cannot be replayed', async () => {
+  const heartbeat = await request('/api/assistant/heartbeat', {
+    method: 'POST', headers: { Cookie: mdCookie }, body: { status: 'available' }
+  });
+  assert(heartbeat.status === 200, `heartbeat expected 200, got ${heartbeat.status}`);
+  const staff = await request('/api/assistant/staff', { headers: { Cookie: mdCookie } });
+  assert(staff.status === 200 && staff.data.staff.some(row => row.id === bm1Id), 'branch manager missing from staff list');
+  const created = await request('/api/assistant/handovers', {
+    method: 'POST', headers: { Cookie: mdCookie },
+    body: { staff_user_id: bm1Id, summary: 'Phase 8 handover test', department: 'Management' }
+  });
+  assert(created.status === 201 && created.data.handover.id, `handover create failed: ${created.status}`);
+  const id = created.data.handover.id;
+  const requested = await request(`/api/assistant/handovers/${id}`, { headers: { Cookie: bm1Cookie } });
+  assert(requested.status === 200 && requested.data.handover.status === 'requested', 'handover must start as requested');
+  const accepted = await request(`/api/assistant/handovers/${id}/respond`, {
+    method: 'POST', headers: { Cookie: bm1Cookie }, body: { action: 'accept' }
+  });
+  assert(accepted.status === 200 && accepted.data.handover.status === 'accepted', `accept failed: ${accepted.status}`);
+  const after = await request(`/api/assistant/handovers/${id}`, { headers: { Cookie: mdCookie } });
+  assert(after.data.handover.status === 'accepted', 'requester cannot see accepted status');
+  const replay = await request(`/api/assistant/handovers/${id}/respond`, {
+    method: 'POST', headers: { Cookie: bm1Cookie }, body: { action: 'accept' }
+  });
+  assert(replay.status === 409, `accepted handover must not be replayed, got ${replay.status}`);
+});
+
 console.log('\n--- 13. Performance flags preserve response contracts ---');
 await test('dashboard, analytics and finance JSON are identical with batching and sargable dates on/off', async () => {
   const paths = [
@@ -1894,7 +1922,7 @@ await test('all local migrations apply cleanly to a fresh SQLite database', asyn
   const clean = new DatabaseSync(cleanPath);
   clean.exec('PRAGMA foreign_keys = ON;');
   const files = readdirSync('migrations').filter(f => /^\d+_.*\.sql$/.test(f)).sort();
-  assert(files.length === 32, `expected 32 migrations, found ${files.length}`);
+  assert(files.length === 33, `expected 33 migrations, found ${files.length}`);
   for (const file of files) {
     clean.exec(readFileSync(join('migrations', file), 'utf8'));
   }

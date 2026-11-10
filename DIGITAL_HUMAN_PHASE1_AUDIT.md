@@ -352,3 +352,62 @@ persona handover/context continuity and male-voice selection after handover.
 
 **Tests:** 191 total; browser suite adds role-aware greetings (marketer, finance, super admin),
 a real client balance summary, and a portrait-file check for all nine personas.
+
+## 18. Phase 6 status (form awareness)
+
+- Generic HTML5 validity reader for every visible form, with no per-form rewrite: signup,
+  client registration, login, client login, profile/password, contact and property enquiry.
+- Detects missing, invalid-format, pattern, length and bad-input issues using the browser’s own
+  validity state. Password values are never read or repeated; only the label is mentioned.
+- Guidance appears on an invalid submit (one message per field, throttled) or when the user taps
+  the ✓ form-check button. “Looks complete” is never presented as a successful submission — the
+  UI explicitly says the system must respond first.
+- The check button and hints are keyboard accessible and the transcript remains the source of truth.
+
+## 19. Phase 7 status (property intelligence)
+
+- Real searches through `GET /api/properties` with the signed-in scope (public visitors only see
+  published listings). Budget, bedrooms, location and property type are parsed and applied; results
+  are filtered client-side for budget/bedrooms/location and sorted by price.
+- Replies list real titles, locations, prices and links to `property-details.html?id=…`. No listing,
+  price or availability is invented. Empty results state the real catalogue count.
+- “Compare these” keeps the last result set in conversation context.
+- Rental vs sale is not separated in the current data model; the assistant says so instead of
+  guessing, and routes rental enquiries to the team.
+
+## 20. Phase 8 status (payment announcements)
+
+- Polls the existing notification endpoint (staff or client) every 25 s, pauses when the tab is
+  hidden, and reacts only to `payment.verified` events.
+- Staff hear/read “Customer payment successful…”, clients hear/read the exact “Payment to ELPIS
+  ACCESS successful…” line; both include the real notification message.
+- Pending, failed, reversed and non-payment events never produce a success announcement. Notification
+  ids are deduped in-session, so re-polling or reloading does not replay an event.
+- If voice is off, the same message is shown as an in-app card/bubble.
+
+## 21. Phase 9 status (human handover)
+
+- New additive migration `0033_assistant_handover.sql`: `assistant_handovers` and `staff_presence`.
+- Endpoints: staff heartbeat, available-staff lookup, handover request, status, accept/decline and
+  the assigned-staff list. Every route is authenticated; request/accept/decline is audited and
+  notifies the other party through the existing notification system.
+- The assistant shows only staff currently marked available by a 5-minute heartbeat; the assistant
+  sends a heartbeat while a staff member is signed in.
+- The transfer stays **requested** until the assigned staff member accepts. The assistant polls the
+  status and only then says the handover is active; declining is reported honestly.
+- Staff see and accept requests in a new “Assistant handover requests” panel on
+  `staff-notifications.html`.
+- Public visitors cannot open a live handover (no verified identity); they get sign-in or callback
+  and contact routes. After acceptance, the staff member continues through the registered contact
+  details — there is no client↔staff real-time chat channel yet.
+
+## 22. Phase 10–11 status (polish, tests, staging)
+
+- The existing brand intro keeps its skip control; the assistant greeting is separate, optional and
+  never autoplays audio. Captions, mute, stop, replay, keyboard focus and reduced-motion behaviour
+  are in place; the mobile sheet hides the launcher when open.
+- All nine portraits are self-hosted and preloaded on first open; no external image or font request.
+- Full suite: 197 tests across six suites, including role dashboards, forms, property search,
+  payment announcements and the handover acceptance contract.
+- Production still needs the external provider credentials and a staging acceptance pass; this
+  deployment is the staging evaluation build.

@@ -6062,6 +6062,162 @@ async function handleFetch(request, env) {
       return json({ audit: results });
     }
 
+    // ---- Assistant-assisted human handover (Phase 9) ----
+    if (path === "/api/assistant/heartbeat" && request.method === "POST") {
+      const actor = await getSessionUser(env, request);
+      if (!actor) return json({ error: "Unauthenticated" }, 401);
+      if (actor.role_name === "Client") return json({ error: "Forbidden" }, 403);
+      const body = await request.json().catch(() => ({}));
+      const status = body.status === "busy" ? "busy" : "available";
+      await env.DB.prepare(`
+        INSERT INTO staff_presence (user_id, status, last_seen_at, updated_at)
+        VALUES (?, ?, datetime('now'), datetime('now'))
+        ON CONFLICT(user_id) DO UPDATE SET status=excluded.status, last_seen_at=excluded.last_seen_at, updated_at=excluded.updated_at
+      `).bind(actor.id, status).run();
+      return json({ ok: true, status });
+    }
+
+    if (path === "/api/assistant/staff" && request.method === "GET") {
+      const actor = await getSessionUser(env, request);
+      if (!actor) return json({ error: "Unauthenticated" }, 401);
+      const { results } = await env.DB.prepare(`
+        SELECT u.id, u.full_name, u.branch_id, r.name AS role_name, b.name AS branch_name,
+               sp.last_seen_at, sp.status AS presence_status,
+               CASE WHEN sp.last_seen_at IS NOT NULL AND sp.last_seen_at >= datetime('now','-5 minutes') THEN 1 ELSE 0 END AS is_available
+        FROM users u
+        JOIN roles r ON r.id=u.role_id
+        LEFT JOIN branches b ON b.id=u.branch_id
+        LEFT JOIN staff_presence sp ON sp.user_id=u.id
+        WHERE u.is_active=1 AND r.name<>'Client' AND u.id<>?
+        ORDER BY is_available DESC, sp.last_seen_at DESC, u.full_name ASC
+        LIMIT 8
+      `).bind(actor.id).all();
+      return json({
+        staff: results.map(row => ({
+          id: row.id,
+          full_name: row.full_name,
+          role: row.role_name,
+          branch_name: row.branch_name,
+          available: Boolean(row.is_available) && row.presence_status !== "busy",
+          last_seen_at: row.last_seen_at
+        }))
+      });
+    }
+
+    if (path === "/api/assistant/handovers" && request.method === "POST") {
+      if (!csrfOk(request)) return json({ error: "CSRF check failed" }, 403);
+      const actor = await getSessionUser(env, request);
+      if (!actor) return json({ error: "Unauthenticated" }, 401);
+      const body = await request.json().catch(() => ({}));
+      const staffId = Number(body.staff_user_id);
+      if (!staffId) return json({ error: "Select a staff member" }, 400);
+      const staff = await env.DB.prepare(`
+        SELECT u.id, u.full_name, u.branch_id, r.name AS role_name
+        FROM users u JOIN roles r ON r.id=u.role_id
+        WHERE u.id=? AND u.is_active=1 AND r.name<>'Client'
+      `).bind(staffId).first();
+      if (!staff) return json({ error: "Staff member is not available" }, 404);
+      const summary = String(body.summary || "").slice(0, 500);
+      const contextJson = body.context ? JSON.stringify(body.context).slice(0, 2000) : null;
+      const result = await env.DB.prepare(`
+        INSERT INTO assistant_handovers (conversation_key, user_id, client_id, branch_id, department, persona_key, staff_user_id, summary, context_json)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        String(body.conversation_key || "").slice(0, 80) || null,
+        actor.id,
+        body.client_id || null,
+        body.branch_id || staff.branch_id || actor.branch_id || null,
+        String(body.department || staff.role_name || "General").slice(0, 80),
+        String(body.persona_key || "adaora").slice(0, 40),
+        staffId,
+        summary || "Live handover request",
+        contextJson
+      ).run();
+      const handoverId = result.meta.last_row_id;
+      await createNotification(env, {
+        userId: staffId,
+        type: "assistant.handover.requested",
+        title: "Live handover request",
+        message: `${actor.full_name} requested a live handover: ${summary || "general enquiry"}. Accept or decline in Staff Notifications.`,
+        metadata: { handover_id: handoverId, requested_by: actor.id }
+      });
+      await audit(env, actor.id, "assistant.handover.requested", "assistant_handover", String(handoverId), { staff_user_id: staffId });
+      return json({ handover: { id: handoverId, status: "requested", staff_name: staff.full_name } }, 201);
+    }
+
+    const assistantHandoverMatch = path.match(/^\/api\/assistant\/handovers\/(\d+)$/);
+    if (assistantHandoverMatch && request.method === "GET") {
+      const actor = await getSessionUser(env, request);
+      if (!actor) return json({ error: "Unauthenticated" }, 401);
+      const row = await env.DB.prepare(`
+        SELECT h.*, u.full_name AS staff_name, s.full_name AS requester_name
+        FROM assistant_handovers h
+        LEFT JOIN users u ON u.id=h.staff_user_id
+        LEFT JOIN users s ON s.id=h.user_id
+        WHERE h.id=?
+      `).bind(assistantHandoverMatch[1]).first();
+      if (!row) return json({ error: "Handover not found" }, 404);
+      const actual = actor.actual_role_name || actor.role_name;
+      if (Number(row.user_id) !== Number(actor.id) && Number(row.staff_user_id) !== Number(actor.id) && actual !== "Super Admin") {
+        return json({ error: "Forbidden" }, 403);
+      }
+      return json({
+        handover: {
+          id: row.id,
+          status: row.status,
+          staff_name: row.staff_name,
+          staff_user_id: row.staff_user_id,
+          requester_name: row.requester_name,
+          summary: row.summary,
+          requested_at: row.requested_at,
+          responded_at: row.responded_at
+        }
+      });
+    }
+
+    const assistantHandoverRespondMatch = path.match(/^\/api\/assistant\/handovers\/(\d+)\/respond$/);
+    if (assistantHandoverRespondMatch && request.method === "POST") {
+      if (!csrfOk(request)) return json({ error: "CSRF check failed" }, 403);
+      const actor = await getSessionUser(env, request);
+      if (!actor) return json({ error: "Unauthenticated" }, 401);
+      const body = await request.json().catch(() => ({}));
+      const action = body.action === "decline" ? "declined" : body.action === "accept" ? "accepted" : null;
+      if (!action) return json({ error: "action must be accept or decline" }, 400);
+      const row = await env.DB.prepare("SELECT * FROM assistant_handovers WHERE id=?").bind(assistantHandoverRespondMatch[1]).first();
+      if (!row) return json({ error: "Handover not found" }, 404);
+      const actual = actor.actual_role_name || actor.role_name;
+      if (Number(row.staff_user_id) !== Number(actor.id) && actual !== "Super Admin") return json({ error: "Forbidden" }, 403);
+      if (row.status !== "requested") return json({ error: "This handover is no longer open" }, 409);
+      await env.DB.prepare("UPDATE assistant_handovers SET status=?, responded_at=datetime('now') WHERE id=? AND status='requested'")
+        .bind(action, row.id).run();
+      await createNotification(env, {
+        userId: row.user_id,
+        type: action === "accepted" ? "assistant.handover.accepted" : "assistant.handover.declined",
+        title: action === "accepted" ? "Handover accepted" : "Handover declined",
+        message: action === "accepted"
+          ? `${actor.full_name} accepted your handover request. Continue in Staff Chat.`
+          : `${actor.full_name} could not take the handover. The team has been notified.`,
+        metadata: { handover_id: row.id }
+      });
+      await audit(env, actor.id, `assistant.handover.${action}`, "assistant_handover", String(row.id), {});
+      return json({ handover: { id: row.id, status: action, staff_name: actor.full_name } });
+    }
+
+    if (path === "/api/assistant/handovers" && request.method === "GET") {
+      const actor = await getSessionUser(env, request);
+      if (!actor) return json({ error: "Unauthenticated" }, 401);
+      if (actor.role_name === "Client") return json({ error: "Forbidden" }, 403);
+      const status = url.searchParams.get("status") || "requested";
+      const { results } = await env.DB.prepare(`
+        SELECT h.id, h.status, h.summary, h.department, h.requested_at, h.responded_at,
+               u.full_name AS requester_name, u.email AS requester_email
+        FROM assistant_handovers h LEFT JOIN users u ON u.id=h.user_id
+        WHERE h.staff_user_id=? AND h.status=?
+        ORDER BY h.id DESC LIMIT 20
+      `).bind(actor.id, status).all();
+      return json({ handovers: results });
+    }
+
     // Staff in-app notifications
     if (path === "/api/staff/notifications" && request.method === "GET") {
       const actor = await getSessionUser(env, request);

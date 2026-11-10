@@ -1,6 +1,7 @@
 // Assistant shell: launcher, panel, transcript, captions and responsive states.
 
 import { COMPANY, VERSION, PERSONAS, personaByKey } from "./config.js";
+import { checkForm, hasVisibleForm, watchFormAttempts } from "./tools/forms.js";
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -42,7 +43,13 @@ function avatar(persona, className) {
   return wrap;
 }
 
-function actionLink(action) {
+function actionLink(action, onAction) {
+  if (action && action.action) {
+    const button = el("button", "elp-dh-action", action.label);
+    button.type = "button";
+    button.addEventListener("click", () => onAction && onAction(action));
+    return button;
+  }
   const link = el("a", "elp-dh-action", action.label);
   link.href = safeHref(action.href);
   if (isExternal(action.href) || action.external) {
@@ -56,13 +63,19 @@ function actionLink(action) {
 }
 
 export class AssistantUI {
-  constructor({ persona, conversation, onSend, onReset, mounted, voice }) {
+  constructor({ persona, conversation, onSend, onReset, mounted, voice, onHandover }) {
     this.persona = persona;
     this.conversation = conversation;
     this.onSend = onSend;
     this.onReset = onReset;
     this.mounted = mounted;
     this.voice = voice || null;
+    this.onHandover = onHandover || null;
+    this.handleAction = action => {
+      if (action && action.action === "handover" && this.onHandover) {
+        this.onHandover(action);
+      }
+    };
     this.lastAssistantText = "";
     this.open = false;
     this.root = el("div", "elp-dh");
@@ -149,6 +162,13 @@ export class AssistantUI {
     input.autocomplete = "off";
     input.placeholder = "Type your message…";
     input.maxLength = 500;
+    const formCheck = el("button", "elp-dh-formcheck", "✓");
+    formCheck.type = "button";
+    formCheck.setAttribute("aria-label", "Check this form");
+    formCheck.title = "Check this form";
+    formCheck.hidden = !hasVisibleForm();
+    formCheck.addEventListener("click", () => this.checkCurrentForm());
+
     const mic = el("button", "elp-dh-mic", "🎙");
     mic.type = "button";
     mic.setAttribute("aria-label", "Speak your message");
@@ -157,6 +177,7 @@ export class AssistantUI {
     const send = el("button", "elp-dh-send", "Send");
     send.type = "submit";
     form.appendChild(label);
+    form.appendChild(formCheck);
     form.appendChild(mic);
     form.appendChild(input);
     form.appendChild(send);
@@ -170,6 +191,7 @@ export class AssistantUI {
     this.input = input;
     this.sendButton = send;
     this.micButton = mic;
+    this.formCheckButton = formCheck;
 
     const footer = el("footer", "elp-dh-footer");
     const voiceBar = el("div", "elp-dh-voicebar");
@@ -201,6 +223,8 @@ export class AssistantUI {
     this.stopButton = stop;
     this.voiceStatus = voiceStatus;
     panel.appendChild(footer);
+
+    this.stopFormWatch = watchFormAttempts(issue => this.showFormGuidance(issue));
 
     if (this.voice) {
       if (!this.voice.state.recognition) mic.hidden = true;
@@ -245,7 +269,7 @@ export class AssistantUI {
       row.appendChild(el("div", "elp-dh-bubble", message.text));
       if (Array.isArray(message.actions) && message.actions.length) {
         const actions = el("div", "elp-dh-actions");
-        for (const action of message.actions) actions.appendChild(actionLink(action));
+        for (const action of message.actions) actions.appendChild(actionLink(action, this.handleAction));
         row.appendChild(actions);
       }
       transcript.appendChild(row);
@@ -260,7 +284,7 @@ export class AssistantUI {
     row.appendChild(el("div", "elp-dh-bubble", message.text));
     if (Array.isArray(message.actions) && message.actions.length) {
       const actions = el("div", "elp-dh-actions");
-      for (const action of message.actions) actions.appendChild(actionLink(action));
+      for (const action of message.actions) actions.appendChild(actionLink(action, this.handleAction));
       row.appendChild(actions);
     }
     this.transcript.appendChild(row);
@@ -427,6 +451,51 @@ export class AssistantUI {
     return true;
   }
 
+  showFormGuidance(text) {
+    if (!text) return;
+    const last = this.conversation.messages[this.conversation.messages.length - 1];
+    if (last && last.role === "assistant" && last.text === text) return;
+    if (!this.open) {
+      this.removeIntro();
+      this.showIntro(text);
+      return;
+    }
+    this.conversation.push("assistant", text, []);
+    this.append({ role: "assistant", text, actions: [] });
+    this.lastAssistantText = text;
+    if (this.voice) {
+      this.voice.lastAssistantText = text;
+      this.voice.speak(text);
+    }
+  }
+
+  checkCurrentForm() {
+    if (!this.open) this.show();
+    const result = checkForm();
+    this.showFormGuidance(result.text);
+    if (this.voiceStatus) this.syncVoice(this.voice ? this.voice.snapshot() : null);
+  }
+
+  notifyAssistant(text, actions = []) {
+    if (!text) return;
+    const last = this.conversation.messages[this.conversation.messages.length - 1];
+    if (last && last.role === "assistant" && last.text === text) return;
+    this.conversation.push("assistant", text, actions);
+    this.lastAssistantText = text;
+    if (this.voice) this.voice.lastAssistantText = text;
+    if (this.open) {
+      this.append({ role: "assistant", text, actions });
+      if (this.voice) this.voice.speak(text);
+    } else {
+      this.removeIntro();
+      this.showIntro(text);
+    }
+  }
+
+  notifyPayment(text, actions = []) {
+    this.notifyAssistant(text, actions);
+  }
+
   submit(text, { fromVoice = false } = {}) {
     const value = String(text || "").trim();
     if (!value || this.switching) return;
@@ -534,6 +603,7 @@ export class AssistantUI {
   }
 
   destroy() {
+    if (typeof this.stopFormWatch === "function") this.stopFormWatch();
     this.removeIntro();
     if (this.voice) this.voice.destroy();
     if (typeof this.unsubscribeVoice === "function") this.unsubscribeVoice();

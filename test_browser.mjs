@@ -127,6 +127,13 @@ const teamLeadRole = roleId('Team Lead');
 const teamLead = db.prepare("SELECT id FROM users WHERE email='tl.ikeja@elpisproperty.test'").get()
   || { id: upsert('tl.ikeja@elpisproperty.test', 'Branch 1 Team Lead', teamLeadRole, ikeja) };
 const existingMarketer = db.prepare("SELECT id FROM users WHERE email='mkt.ikeja@elpisproperty.test'").get();
+const testProperty = db.prepare("SELECT id FROM properties WHERE reference='TEST-BROWSER-PROP'").get();
+if (!testProperty) {
+  db.prepare(`INSERT INTO properties (reference, title, description, property_type, sale_price, state, city,
+    branch_id, bedrooms, bathrooms, status, is_published, is_demo, is_archived, created_by)
+    VALUES ('TEST-BROWSER-PROP','Browser Test Duplex','Phase 7 search fixture','Duplex',80000000,'FCT','Abuja',?,3,3,'Available',1,0,0,?)`)
+    .run(ikeja, mdId);
+}
 const property = db.prepare('SELECT id FROM properties ORDER BY id LIMIT 1').get();
 
 for (const [ref, temp] of [['TEST-BROWSER-HOT', 'Hot'], ['TEST-BROWSER-WARM', 'Warm'], ['TEST-BROWSER-COLD', 'Cold']]) {
@@ -288,7 +295,7 @@ try {
     await page.press('#elp-dh-input', 'Enter');
     await page.waitForFunction(() => {
       const nodes = Array.from(document.querySelectorAll('.elp-dh-bubble'));
-      return nodes.some(n => /portfolio/i.test(n.textContent));
+      return nodes.some(n => /(found|catalogue|available propert)/i.test(n.textContent));
     }, { timeout: 10000 });
     const actions = await page.locator('.elp-dh-action').count();
     assert(actions > 0, 'assistant reply has no actions');
@@ -424,6 +431,163 @@ try {
     }
   });
 
+  await test('form guidance reads real validity and never exposes passwords', async () => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await goto(page, BASE + '/signup.html');
+    await page.waitForSelector('.elp-dh-launcher', { timeout: 20000 });
+    await page.click('.elp-dh-launcher');
+    await page.waitForSelector('.elp-dh-panel:not([hidden])', { timeout: 10000 });
+    await page.fill('#password', 'SuperSecret123!');
+    await page.fill('#confirmPassword', 'SuperSecret123!');
+    await page.click('.elp-dh-formcheck');
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('.elp-dh-bubble')).some(n => /missing/i.test(n.textContent)), { timeout: 10000 });
+    let bubbles = await page.locator('.elp-dh-bubble').allInnerTexts();
+    assert(bubbles.some(text => /full name is missing/i.test(text)), `expected missing full name: ${bubbles.slice(-2).join(' | ')}`);
+    assert(!bubbles.some(text => text.includes('SuperSecret123')), 'password value leaked into the transcript');
+
+    await page.fill('#email', 'not-an-email');
+    await page.click('.elp-dh-formcheck');
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('.elp-dh-bubble')).some(n => /valid email address/i.test(n.textContent)), { timeout: 10000 });
+    bubbles = await page.locator('.elp-dh-bubble').allInnerTexts();
+    assert(!bubbles.some(text => text.includes('not-an-email')), 'email value leaked into the transcript');
+
+    await page.evaluate(() => document.getElementById('signupForm').requestSubmit());
+    await page.waitForTimeout(400);
+    const firstCount = (await page.locator('.elp-dh-bubble').allInnerTexts()).filter(text => /missing/i.test(text)).length;
+    await page.evaluate(() => document.getElementById('signupForm').requestSubmit());
+    await page.waitForTimeout(400);
+    const secondCount = (await page.locator('.elp-dh-bubble').allInnerTexts()).filter(text => /missing/i.test(text)).length;
+    assert(secondCount === firstCount, `form guidance repeated on a second invalid submit (${firstCount} → ${secondCount})`);
+    await context.close();
+  });
+
+  await test('property search reads the live catalogue and compare keeps context', async () => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await goto(page, BASE + '/');
+    await page.waitForSelector('.elp-dh-launcher', { timeout: 20000 });
+    await page.click('.elp-dh-launcher');
+    await page.waitForSelector('.elp-dh-panel:not([hidden])', { timeout: 10000 });
+    await page.fill('#elp-dh-input', 'find a 3 bedroom duplex in Abuja under 90 million');
+    await page.press('#elp-dh-input', 'Enter');
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('.elp-dh-bubble')).some(n => /Browser Test Duplex/.test(n.textContent)), { timeout: 15000 });
+    const reply = (await page.locator('.elp-dh-bubble').allInnerTexts()).find(text => /Browser Test Duplex/.test(text));
+    assert(/₦80,000,000/.test(reply), `search price missing: ${reply}`);
+    await page.fill('#elp-dh-input', 'compare these');
+    await page.press('#elp-dh-input', 'Enter');
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('.elp-dh-bubble')).some(n => /comparison from the live catalogue/i.test(n.textContent)), { timeout: 12000 });
+    await context.close();
+  });
+
+  await test('verified payments are announced once and pending payments stay silent', async () => {
+    const context = await browser.newContext();
+    let payload = { notifications: [], unread_count: 0 };
+    await context.route('**/api/staff/notifications*', route => route.fulfill({
+      status: 200, contentType: 'application/json', body: JSON.stringify(payload)
+    }));
+    const page = await context.newPage();
+    await login(page, 'browser.marketer@elpisproperty.test');
+    await page.evaluate(() => { try { sessionStorage.removeItem('elp-dh-payments-v1'); } catch (_) {} });
+    await goto(page, BASE + '/dashboard.html');
+    await page.waitForSelector('.elp-dh-launcher', { timeout: 20000 });
+    await page.waitForTimeout(600);
+
+    payload = {
+      notifications: [
+        { id: 9001, type: 'payment.verified', title: 'Payment Verified', message: '₦150,000 was verified for Browser Client (TEST-BROWSER-CLIENT).', is_read: 0, created_at: '2026-11-10 10:00:00' }
+      ],
+      unread_count: 1
+    };
+    const first = await page.evaluate(() => window.ElpAssistant.payments.checkNow());
+    assert(first.length === 1, `expected one payment event, got ${first.length}`);
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('.elp-dh-bubble, .elp-dh-intro__text')).some(n => /Customer payment successful/.test(n.textContent)), { timeout: 10000 });
+    const second = await page.evaluate(() => window.ElpAssistant.payments.checkNow());
+    assert(second.length === 0, 'duplicate payment event was announced again');
+
+    payload = {
+      notifications: [
+        { id: 9002, type: 'payment.pending', title: 'Payment Pending', message: 'Pending payment', is_read: 0, created_at: '2026-11-10 10:01:00' },
+        { id: 9003, type: 'payment.failed', title: 'Payment Failed', message: 'Failed payment', is_read: 0, created_at: '2026-11-10 10:02:00' }
+      ],
+      unread_count: 2
+    };
+    const pending = await page.evaluate(() => window.ElpAssistant.payments.checkNow());
+    assert(pending.length === 0, 'pending/failed payments must never be announced');
+    await context.close();
+  });
+
+  await test('client virtual account payment uses the ELPIS ACCESS announcement', async () => {
+    const context = await browser.newContext();
+    let payload = { notifications: [], unread_count: 0 };
+    await context.route('**/api/client/notifications*', route => route.fulfill({
+      status: 200, contentType: 'application/json', body: JSON.stringify(payload)
+    }));
+    const loginRes = await context.request.post(BASE + '/api/login', {
+      data: { email: 'browser.client@elpisproperty.test', password: PASSWORD }
+    });
+    assert(loginRes.ok(), `client login failed: ${loginRes.status()}`);
+    const page = await context.newPage();
+    await goto(page, BASE + '/client-dashboard.html');
+    await page.waitForSelector('.elp-dh-launcher', { timeout: 20000 });
+    await page.waitForTimeout(600);
+    payload = {
+      notifications: [
+        { id: 9101, type: 'payment.verified', title: 'Payment Successfully Verified', message: 'Your payment of ₦200,000 has been verified. Official Receipt #RCP-TEST is available.', is_read: 0, created_at: '2026-11-10 10:05:00' }
+      ],
+      unread_count: 1
+    };
+    const events = await page.evaluate(() => window.ElpAssistant.payments.checkNow());
+    assert(events.length === 1, `expected one client payment event, got ${events.length}`);
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('.elp-dh-bubble, .elp-dh-intro__text')).some(n => /Payment to ELPIS ACCESS successful/.test(n.textContent)), { timeout: 10000 });
+    await context.close();
+  });
+
+  await test('handover requests stay pending until a staff member accepts', async () => {
+    const context = await browser.newContext();
+    let handoverStatus = 'requested';
+    await context.route('**/api/assistant/staff*', route => route.fulfill({
+      status: 200, contentType: 'application/json',
+      body: JSON.stringify({ staff: [{ id: 999, full_name: 'Browser Manager', role: 'Branch Manager', branch_name: 'Branch 1', available: true }] })
+    }));
+    await context.route('**/api/assistant/handovers**', route => {
+      const request = route.request();
+      const url = request.url();
+      if (request.method() === 'POST' && /\/handovers$/.test(url)) {
+        return route.fulfill({
+          status: 201, contentType: 'application/json',
+          body: JSON.stringify({ handover: { id: 555, status: 'requested', staff_name: 'Browser Manager' } })
+        });
+      }
+      if (request.method() === 'GET' && /\/handovers\/555$/.test(url)) {
+        return route.fulfill({
+          status: 200, contentType: 'application/json',
+          body: JSON.stringify({ handover: { id: 555, status: handoverStatus, staff_name: 'Browser Manager' } })
+        });
+      }
+      return route.continue();
+    });
+    const loginRes = await context.request.post(BASE + '/api/login', {
+      data: { email: 'browser.client@elpisproperty.test', password: PASSWORD }
+    });
+    assert(loginRes.ok(), `client login failed: ${loginRes.status()}`);
+    const page = await context.newPage();
+    await goto(page, BASE + '/client-dashboard.html');
+    await page.waitForSelector('.elp-dh-launcher', { timeout: 20000 });
+    await page.click('.elp-dh-launcher');
+    await page.fill('#elp-dh-input', 'I want to speak to a human');
+    await page.press('#elp-dh-input', 'Enter');
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('.elp-dh-bubble')).some(n => /Available now/.test(n.textContent)), { timeout: 12000 });
+    await page.getByRole('button', { name: /Connect me to Browser Manager/ }).click();
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('.elp-dh-bubble')).some(n => /not.*active until they accept/i.test(n.textContent)), { timeout: 12000 });
+    const pendingBubbles = await page.locator('.elp-dh-bubble').allInnerTexts();
+    assert(!pendingBubbles.some(text => /accepted your handover request/i.test(text)), 'handover must not be reported as accepted before staff respond');
+    handoverStatus = 'accepted';
+    await page.waitForTimeout(9000);
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('.elp-dh-bubble')).some(n => /accepted your handover request/i.test(n.textContent)), { timeout: 12000 });
+    await context.close();
+  });
+
   await test('voice controls stay hidden and typing still works when speech APIs are missing', async () => {
     const context = await browser.newContext();
     await context.addInitScript(() => {
@@ -509,7 +673,7 @@ try {
     await page.fill('#elp-dh-input', 'I want a house');
     await page.press('#elp-dh-input', 'Enter');
     await page.waitForFunction(() => window.__voiceSpoken.length >= 2, { timeout: 10000 });
-    await page.waitForFunction(() => Array.from(document.querySelectorAll('.elp-dh-bubble')).some(n => /portfolio/i.test(n.textContent)), { timeout: 10000 });
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('.elp-dh-bubble')).some(n => /(found|catalogue|available propert)/i.test(n.textContent)), { timeout: 10000 });
     await page.waitForFunction(() => document.querySelector('.elp-dh-title')?.textContent === 'Solomon', null, { timeout: 12000 });
     const voiceName = await page.evaluate(() => window.ElpAssistant.voiceSnapshot().voiceName);
     assert(/Daniel/i.test(voiceName), `male voice not selected after handover: ${voiceName}`);
@@ -552,6 +716,7 @@ try {
       cleanup.prepare(`DELETE FROM lead_temperature_history WHERE changed_by IN (${marks}) OR lead_id IN (SELECT id FROM leads WHERE lead_reference LIKE 'TEST-BROWSER-%')`).run(...ids);
       cleanup.prepare(`DELETE FROM leads WHERE lead_reference LIKE 'TEST-BROWSER-%'`).run();
       cleanup.prepare(`DELETE FROM clients WHERE client_reference='TEST-BROWSER-CLIENT'`).run();
+      cleanup.prepare(`DELETE FROM properties WHERE reference='TEST-BROWSER-PROP'`).run();
       cleanup.prepare(`DELETE FROM sessions WHERE user_id IN (${marks})`).run(...ids);
       cleanup.prepare(`DELETE FROM staff_profiles WHERE user_id IN (${marks})`).run(...ids);
       cleanup.prepare(`DELETE FROM team_members WHERE user_id IN (${marks})`).run(...ids);

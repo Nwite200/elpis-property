@@ -409,6 +409,26 @@
 }
 
 /* ---- Voice controls ---- */
+.elp-dh-formcheck {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(232, 181, 45, 0.45);
+  border-radius: 12px;
+  background: #fffaf0;
+  color: var(--elp-dh-navy);
+  font: inherit;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+.elp-dh-formcheck:hover { border-color: rgba(232, 181, 45, 0.85); background: #fff4d8; }
+.elp-dh-formcheck:focus-visible { outline: 2px solid rgba(232, 181, 45, 0.85); outline-offset: 2px; }
+
 .elp-dh-mic {
   flex: 0 0 auto;
   width: 42px;
