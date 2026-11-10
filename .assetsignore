@@ -7,6 +7,7 @@ node_modules
 .assetsignore
 migrations
 scripts
+voice-server
 src
 package.json
 package-lock.json

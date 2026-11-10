@@ -1935,6 +1935,40 @@ await test('dashboard, analytics and finance JSON are identical with batching an
   }
 });
 
+console.log('\n--- 14. HeadTTS server inference security contract ---');
+await test('server synthesis rejects anonymous, invalid persona, oversized text and unconfigured hosting', async () => {
+  const anonymous = await request('/api/assistant/synthesize', {
+    method: 'POST', body: { text: 'Hello', persona: 'adaora' }
+  });
+  assert(anonymous.status === 401, `anonymous synthesis must be 401, got ${anonymous.status}`);
+  const badPersona = await request('/api/assistant/synthesize', {
+    method: 'POST', headers: { Cookie: mdCookie }, body: { text: 'Hello', persona: 'not-a-persona' }
+  });
+  assert(badPersona.status === 400, `invalid persona must be 400, got ${badPersona.status}`);
+  const oversized = await request('/api/assistant/synthesize', {
+    method: 'POST', headers: { Cookie: mdCookie }, body: { text: 'x'.repeat(501), persona: 'adaora' }
+  });
+  assert(oversized.status === 413, `oversized text must be 413, got ${oversized.status}`);
+  const unconfigured = await request('/api/assistant/synthesize', {
+    method: 'POST', headers: { Cookie: mdCookie }, body: { text: 'Hello', persona: 'adaora' }
+  });
+  assert(unconfigured.status === 503, `unconfigured server must be 503, got ${unconfigured.status}`);
+});
+
+console.log('\n--- 14. Assistant language/voice preferences ---');
+await test('authenticated users can store language and voice-engine preferences', async () => {
+  const initial = await request('/api/assistant/preferences', { headers: { Cookie: mdCookie } });
+  assert(initial.status === 200 && initial.data.preferences.language === 'auto', 'default preferences missing');
+  const saved = await request('/api/assistant/preferences', {
+    method: 'PUT', headers: { Cookie: mdCookie }, body: { language: 'pidgin', voice_engine: 'device' }
+  });
+  assert(saved.status === 200, `preference save failed: ${saved.status}`);
+  const after = await request('/api/assistant/preferences', { headers: { Cookie: mdCookie } });
+  assert(after.data.preferences.language === 'pidgin' && after.data.preferences.voice_engine === 'device', 'preferences were not persisted');
+  const anonymous = await request('/api/assistant/preferences');
+  assert(anonymous.status === 401, 'preferences must require sign-in');
+});
+
 console.log('\n--- 14. Migration reproducibility and database integrity ---');
 await test('scheduled cleanup removes expired sessions and aged auth attempts but keeps business audits', async () => {
   const expiredId = 'retention-expired-session';
@@ -1954,7 +1988,7 @@ await test('all local migrations apply cleanly to a fresh SQLite database', asyn
   const clean = new DatabaseSync(cleanPath);
   clean.exec('PRAGMA foreign_keys = ON;');
   const files = readdirSync('migrations').filter(f => /^\d+_.*\.sql$/.test(f)).sort();
-  assert(files.length === 33, `expected 33 migrations, found ${files.length}`);
+  assert(files.length === 34, `expected 34 migrations, found ${files.length}`);
   for (const file of files) {
     clean.exec(readFileSync(join('migrations', file), 'utf8'));
   }

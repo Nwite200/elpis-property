@@ -61,6 +61,10 @@ ASSET_CACHE_MODE = "standard"
 # Performance flags. One-line rollback for each: set to "0" and redeploy.
 PERF_BATCH_QUERIES = "1"
 PERF_SARGABLE_DATES = "1"
+# HeadTTS server inference. Leave empty until the Node service is hosted; the
+# browser adapter and device voice remain available. Set HEADTTS_SERVER_TOKEN
+# with `wrangler secret put HEADTTS_SERVER_TOKEN` (never in this file).
+HEADTTS_SERVER_URL = ""
 
 [observability]
 enabled = true

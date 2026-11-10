@@ -219,6 +219,35 @@
 .elp-dh-header__avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .elp-dh-header__avatar .elp-dh-monogram { font-size: 20px; }
 
+/* Approximate mouth motion driven by HeadTTS visemes. This is a visual cue,
+   not photoreal lip-sync. */
+.elp-dh-mouth {
+  position: absolute;
+  left: 50%;
+  top: 64%;
+  width: 18%;
+  height: 7%;
+  border-radius: 50%;
+  background: rgba(28, 12, 8, 0.62);
+  transform: translateX(-50%) scaleY(0.25);
+  opacity: 0;
+  transition: transform 70ms ease, opacity 120ms ease;
+  pointer-events: none;
+}
+.elp-dh[data-speaking="true"] .elp-dh-mouth { opacity: 0.5; }
+.elp-dh[data-viseme="aa"] .elp-dh-mouth,
+.elp-dh[data-viseme="E"] .elp-dh-mouth,
+.elp-dh[data-viseme="O"] .elp-dh-mouth,
+.elp-dh[data-viseme="U"] .elp-dh-mouth { transform: translateX(-50%) scaleY(1.55); opacity: 0.62; }
+.elp-dh[data-viseme="I"] .elp-dh-mouth,
+.elp-dh[data-viseme="CH"] .elp-dh-mouth,
+.elp-dh[data-viseme="RR"] .elp-dh-mouth { transform: translateX(-50%) scaleY(0.8); }
+.elp-dh[data-viseme="PP"] .elp-dh-mouth,
+.elp-dh[data-viseme="DD"] .elp-dh-mouth,
+.elp-dh[data-viseme="nn"] .elp-dh-mouth,
+.elp-dh[data-viseme="kk"] .elp-dh-mouth,
+.elp-dh[data-viseme="sil"] .elp-dh-mouth { transform: translateX(-50%) scaleY(0.2); }
+
 .elp-dh-identity { flex: 1 1 auto; min-width: 0; }
 .elp-dh-title {
   margin: 0;
@@ -487,6 +516,19 @@
   font-size: 10.5px;
 }
 .elp-dh-voice-select:focus-visible { outline: 2px solid rgba(232, 181, 45, 0.8); outline-offset: 2px; }
+
+.elp-dh-language-select {
+  max-width: 120px;
+  min-height: 28px;
+  padding: 3px 6px;
+  border: 1px solid var(--elp-dh-line);
+  border-radius: 999px;
+  background: var(--elp-dh-paper);
+  color: var(--elp-dh-ink);
+  font: inherit;
+  font-size: 10.5px;
+}
+.elp-dh-language-select:focus-visible { outline: 2px solid rgba(232, 181, 45, 0.8); outline-offset: 2px; }
 
 .elp-dh-voice-status {
   display: block;

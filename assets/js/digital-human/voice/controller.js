@@ -5,14 +5,19 @@ import { detectVoiceSupport, voiceSupportMessage } from "./capabilities.js";
 import { VoiceSynthesis } from "./synthesis.js";
 import { VoiceRecognition } from "./recognition.js";
 import { VoiceRecorder } from "./recorder.js";
+import { VoiceSelector } from "./selector.js";
+import { kokoroVoiceFor, KOKORO_VOICE_LABELS } from "./voice-config.js";
 
-export function createVoice(persona) {
+export function createVoice(persona, context) {
   const support = detectVoiceSupport();
   const synth = support.synthesis ? new VoiceSynthesis() : null;
   const recognition = support.recognition ? new VoiceRecognition(support) : null;
   const recorder = new VoiceRecorder();
+  const selector = new VoiceSelector({ signedIn: !!(context && context.signedIn) });
   const listeners = new Set();
+  let currentPersona = persona;
   let profile = persona.voice || { lang: "en-NG", rate: 1, pitch: 1 };
+  let speechToken = 0;
 
   const state = {
     supported: support.recognition || support.synthesis || recorder.supported,
@@ -28,7 +33,10 @@ export function createVoice(persona) {
     status: support.recognition || support.synthesis || recorder.supported
       ? "Voice is off — enable it to hear replies."
       : voiceSupportMessage(support),
-    error: ""
+    error: "",
+    engine: selector.engine,
+    route: "device",
+    viseme: "sil"
   };
 
   if (synth) {
@@ -41,6 +49,10 @@ export function createVoice(persona) {
   }
 
   function readyText() {
+    if (selector.engine === "neural") {
+      const voice = kokoroVoiceFor(currentPersona.key);
+      return `Neural voice ready · ${KOKORO_VOICE_LABELS[voice] || voice}`;
+    }
     const name = synth && synth.voiceName;
     return name
       ? `Voice ready · ${name}`
@@ -65,6 +77,9 @@ export function createVoice(persona) {
       listening: state.listening,
       recording: state.recording,
       speaking: state.speaking,
+      engine: selector.engine,
+      route: selector.route,
+      viseme: state.viseme,
       interim: state.interim,
       status: state.status,
       error: state.error,
@@ -80,8 +95,12 @@ export function createVoice(persona) {
   }
 
   function cancelAudio() {
+    speechToken += 1;
+    selector.stop();
     if (synth) synth.cancel();
     state.speaking = false;
+    state.viseme = "sil";
+    if (typeof controller.onViseme === "function") controller.onViseme("sil");
   }
 
   function stopListening() {
@@ -122,26 +141,26 @@ export function createVoice(persona) {
     return state.enabled ? disable() : enable();
   }
 
-  function speak(text, { force = false } = {}) {
-    if (!synth) return false;
-    if (!force && (!state.enabled || state.muted)) return false;
-    if (!force) {
-      state.enabled = true;
-      state.muted = false;
-    }
+  function speakNative(text, token) {
     const started = synth.speak(text, profile, {
       onStart() {
+        if (token !== speechToken) return;
         state.speaking = true;
+        state.route = "device";
         state.status = "Speaking… tap Stop to interrupt.";
         emit();
       },
       onEnd() {
+        if (token !== speechToken) return;
         state.speaking = false;
+        state.viseme = "sil";
         if (state.enabled) state.status = readyText();
         emit();
       },
       onError(reason) {
+        if (token !== speechToken) return;
         state.speaking = false;
+        state.viseme = "sil";
         state.status = reason === "blocked"
           ? "Your browser blocked spoken replies. Captions are always shown — tap Replay to try again."
           : reason === "synthesis-failed"
@@ -152,10 +171,78 @@ export function createVoice(persona) {
     });
     if (started) {
       state.speaking = true;
+      state.route = "device";
       state.status = "Speaking… tap Stop to interrupt.";
       emit();
     }
     return started;
+  }
+
+  function speak(text, { force = false } = {}) {
+    if (!force && (!state.enabled || state.muted)) return false;
+    if (!force) {
+      state.enabled = true;
+      state.muted = false;
+    }
+    const token = ++speechToken;
+    if (selector.engine === "neural") {
+      state.speaking = true;
+      state.status = "Preparing neural voice…";
+      emit();
+      selector.speak(text, currentPersona, {
+        onStatus(message) {
+          if (token !== speechToken) return;
+          state.status = message;
+          emit();
+        },
+        onStart() {
+          if (token !== speechToken) return;
+          state.speaking = true;
+          state.route = selector.route;
+          state.status = "Speaking… tap Stop to interrupt.";
+          emit();
+        },
+        onViseme(viseme) {
+          if (token !== speechToken) return;
+          state.viseme = viseme || "sil";
+          if (typeof controller.onViseme === "function") controller.onViseme(state.viseme);
+          emit();
+        },
+        onEnd() {
+          if (token !== speechToken) return;
+          state.speaking = false;
+          state.viseme = "sil";
+          if (typeof controller.onViseme === "function") controller.onViseme("sil");
+          if (state.enabled) state.status = readyText();
+          emit();
+        }
+      }).then(handled => {
+        if (token !== speechToken) return;
+        if (!handled) {
+          if (synth) speakNative(text, token);
+          else {
+            state.speaking = false;
+            state.status = "Neural voice unavailable and no device voice is installed. Captions are shown.";
+            emit();
+          }
+        }
+      }).catch(() => {
+        if (token !== speechToken) return;
+        if (synth) speakNative(text, token);
+      });
+      return true;
+    }
+    if (!synth) return false;
+    return speakNative(text, token);
+  }
+
+  function setEngine(engine) {
+    selector.setEngine(engine);
+    state.engine = selector.engine;
+    state.speaking = false;
+    if (state.enabled) state.status = readyText();
+    emit();
+    return selector.engine;
   }
 
   async function beginRecording() {
@@ -299,6 +386,7 @@ export function createVoice(persona) {
 
   function setPersona(nextPersona) {
     if (!nextPersona) return;
+    currentPersona = nextPersona;
     profile = nextPersona.voice || profile;
     cancelAudio();
     if (synth) synth.voiceName = "";
@@ -314,6 +402,8 @@ export function createVoice(persona) {
 
   function setVoice(name) {
     if (!synth) return false;
+    selector.setEngine("device");
+    state.engine = "device";
     synth.setPreferredVoice(name);
     synth.voiceName = name || "";
     if (state.enabled) state.status = readyText();
@@ -326,6 +416,7 @@ export function createVoice(persona) {
     cancelAudio();
     stopListening();
     if (recorder) recorder.destroy();
+    selector.stop();
     listeners.clear();
   }
 
@@ -350,6 +441,7 @@ export function createVoice(persona) {
     setPersona,
     voices,
     setVoice,
+    setEngine,
     destroy,
     onTranscript: null,
     lastAssistantText: ""

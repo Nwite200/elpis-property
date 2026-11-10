@@ -594,6 +594,7 @@ try {
       status: 200, contentType: 'application/json', body: JSON.stringify({ text: 'hello from my microphone' })
     }));
     await context.addInitScript(() => {
+      try { localStorage.setItem('elp-dh-voice-engine', 'device'); } catch (_) {}
       navigator.mediaDevices.getUserMedia = async () => ({ getTracks: () => [{ stop() {} }] });
       class FakeMediaRecorder {
         static isTypeSupported() { return true; }
@@ -619,6 +620,57 @@ try {
     await page.click('.elp-dh-mic');
     await page.waitForFunction(() => Array.from(document.querySelectorAll('.elp-dh-bubble')).some(n => n.textContent === 'hello from my microphone'), { timeout: 12000 });
     await page.waitForFunction(() => Array.from(document.querySelectorAll('.elp-dh-bubble')).some(n => /Adaora/.test(n.textContent)), { timeout: 8000 });
+    await context.close();
+  });
+
+  await test('Nigerian Pidgin is understood and answered without losing context', async () => {
+    const context = await browser.newContext();
+    await context.addInitScript(() => { try { localStorage.setItem('elp-dh-voice-engine', 'device'); } catch (_) {} });
+    const page = await context.newPage();
+    await goto(page, BASE + '/');
+    await page.waitForSelector('.elp-dh-launcher', { timeout: 20000 });
+    await page.click('.elp-dh-launcher');
+    await page.selectOption('.elp-dh-language-select', 'pidgin');
+    await page.fill('#elp-dh-input', 'Abeg I need house for Abuja under 90 million');
+    await page.press('#elp-dh-input', 'Enter');
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('.elp-dh-bubble')).some(n => /No wahala/i.test(n.textContent) && /Browser Test Duplex/.test(n.textContent)), { timeout: 15000 });
+    await page.selectOption('.elp-dh-language-select', 'english');
+    await page.fill('#elp-dh-input', 'compare these');
+    await page.press('#elp-dh-input', 'Enter');
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('.elp-dh-bubble')).some(n => /comparison from the live catalogue/i.test(n.textContent)), { timeout: 12000 });
+    const bubbles = await page.locator('.elp-dh-bubble').allInnerTexts();
+    assert(bubbles.some(text => text.includes('Abeg I need house for Abuja')), 'Pidgin context was lost after switching language');
+    await context.close();
+  });
+
+  await test('neural voice failure falls back to the device voice', async () => {
+    const context = await browser.newContext();
+    await context.route('**/assets/headtts/modules/headtts.mjs', route => route.abort());
+    await context.addInitScript(() => {
+      try { localStorage.setItem('elp-dh-voice-engine', 'neural'); } catch (_) {}
+      window.__voiceSpoken = [];
+      class FakeUtterance { constructor(text) { this.text = text; } }
+      const synth = {
+        speaking: false,
+        getVoices: () => [{ name: 'Samantha', lang: 'en-NG', localService: true }],
+        addEventListener() {}, removeEventListener() {},
+        speak(u) { window.__voiceSpoken.push(u.text); this.speaking = true; setTimeout(() => { u.onstart && u.onstart(); setTimeout(() => { this.speaking = false; u.onend && u.onend(); }, 10); }, 5); },
+        cancel() { this.speaking = false; }, resume() {}, pause() {}
+      };
+      Object.defineProperty(window, 'speechSynthesis', { value: synth, configurable: true });
+      Object.defineProperty(window, 'SpeechSynthesisUtterance', { value: FakeUtterance, configurable: true });
+    });
+    const page = await context.newPage();
+    await goto(page, BASE + '/login');
+    await page.waitForSelector('.elp-dh-launcher', { timeout: 20000 });
+    await page.click('.elp-dh-launcher');
+    await page.click('.elp-dh-voice-btn');
+    await page.waitForFunction(() => window.__voiceSpoken.length >= 1, { timeout: 15000 });
+    await page.fill('#elp-dh-input', 'Hello Adaora');
+    await page.press('#elp-dh-input', 'Enter');
+    await page.waitForFunction(() => window.__voiceSpoken.length >= 2, { timeout: 15000 });
+    const status = await page.locator('#elp-dh-voice-status').innerText();
+    assert(/device|Voice ready|unavailable|Speaking/i.test(status), `fallback status missing: ${status}`);
     await context.close();
   });
 
@@ -654,6 +706,7 @@ try {
   await test('voice engine speaks, replays, stops and accepts a spoken transcript', async () => {
     const context = await browser.newContext();
     await context.addInitScript(() => {
+      try { localStorage.setItem('elp-dh-voice-engine', 'device'); } catch (_) {}
       Object.defineProperty(window, 'MediaRecorder', { value: undefined, configurable: true });
       window.__voiceSpoken = [];
       window.__voiceCancelled = 0;

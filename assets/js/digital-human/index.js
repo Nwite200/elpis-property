@@ -60,6 +60,8 @@ async function mount() {
     conversation,
     voice,
     mounted: true,
+    onLanguage() { savePreferences(); },
+    onVoicePreference() { savePreferences(); },
     onHandover(action) {
       requestHandover(context, action).then(reply => {
         ui.notifyAssistant(reply.text, reply.actions);
@@ -156,6 +158,7 @@ async function mount() {
     state: () => (ui.open ? "open" : "closed"),
     voice,
     voiceSnapshot: () => voice.snapshot(),
+    setLanguage: mode => conversation.setLanguage(mode),
     payments: paymentWatcher
       ? { checkNow: () => paymentWatcher.checkNow(), baseline: () => paymentWatcher.baseline(), stop: () => paymentWatcher.stop() }
       : null,

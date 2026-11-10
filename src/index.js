@@ -6087,6 +6087,95 @@ async function handleFetch(request, env) {
       }
     }
 
+    if (path === "/api/assistant/synthesize" && request.method === "POST") {
+      if (!csrfOk(request)) return json({ error: "CSRF check failed" }, 403);
+      const actor = await getSessionUser(env, request);
+      if (!actor) return json({ error: "Sign in to use server neural voice" }, 401);
+      const body = await request.json().catch(() => ({}));
+      const text = String(body.text || "").trim();
+      const persona = String(body.persona || "");
+      const voices = {
+        adaora: "af_bella", solomon: "am_fenrir", chiamaka: "af_heart", emeka: "am_michael",
+        amara: "af_nicole", david: "am_puck", ngozi: "bf_emma", daniel: "bm_george", ifeoma: "af_sky"
+      };
+      if (!text) return json({ error: "Text is required" }, 400);
+      if (text.length > 500) return json({ error: "Text must be 500 characters or fewer" }, 413);
+      if (!voices[persona]) return json({ error: "Unknown persona" }, 400);
+      const attempts = await env.DB.prepare(
+        "SELECT COUNT(*) AS c FROM audit_logs WHERE action='assistant.synthesize.attempt' AND target_id=? AND created_at >= datetime('now','-10 minutes')"
+      ).bind(String(actor.id)).first();
+      if (attempts && Number(attempts.c) >= 30) return json({ error: "Too many voice requests. Please wait a few minutes." }, 429);
+      await audit(env, actor.id, "assistant.synthesize.attempt", "assistant", String(actor.id), { persona }).catch(() => {});
+      if (!env.HEADTTS_SERVER_URL || !env.HEADTTS_SERVER_TOKEN) {
+        return json({ error: "Server neural voice is not configured on this deployment." }, 503);
+      }
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 22000);
+      let upstream;
+      try {
+        upstream = await fetch(`${String(env.HEADTTS_SERVER_URL).replace(/\/$/, "")}/v1/synthesize`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${env.HEADTTS_SERVER_TOKEN}`
+          },
+          body: JSON.stringify({
+            input: text,
+            voice: voices[persona],
+            language: "en-us",
+            speed: Math.min(1.4, Math.max(0.75, Number(body.speed) || 1)),
+            audioEncoding: "wav"
+          }),
+          signal: controller.signal
+        });
+      } catch (error) {
+        clearTimeout(timer);
+        return json({ error: "Server neural voice timed out. Falling back to the device voice." }, 504);
+      }
+      clearTimeout(timer);
+      if (!upstream.ok) return json({ error: "Server neural voice failed." }, 502);
+      const data = await upstream.json().catch(() => null);
+      if (!data || !data.audio) return json({ error: "Server neural voice returned no audio." }, 502);
+      return json({
+        audio_base64: data.audio,
+        audioEncoding: data.audioEncoding || "wav",
+        words: data.words || [],
+        wtimes: data.wtimes || [],
+        wdurations: data.wdurations || [],
+        visemes: data.visemes || [],
+        vtimes: data.vtimes || [],
+        vdurations: data.vdurations || []
+      });
+    }
+
+    if (path === "/api/assistant/preferences" && request.method === "GET") {
+      const actor = await getSessionUser(env, request);
+      if (!actor) return json({ error: "Unauthenticated" }, 401);
+      const row = await env.DB.prepare("SELECT language, voice_engine, updated_at FROM assistant_preferences WHERE user_id=?").bind(actor.id).first();
+      return json({
+        preferences: {
+          language: row ? row.language : "auto",
+          voice_engine: row ? row.voice_engine : "neural",
+          updated_at: row ? row.updated_at : null
+        }
+      });
+    }
+
+    if (path === "/api/assistant/preferences" && request.method === "PUT") {
+      if (!csrfOk(request)) return json({ error: "CSRF check failed" }, 403);
+      const actor = await getSessionUser(env, request);
+      if (!actor) return json({ error: "Unauthenticated" }, 401);
+      const body = await request.json().catch(() => ({}));
+      const language = ["auto", "english", "pidgin"].includes(body.language) ? body.language : "auto";
+      const engine = ["neural", "device"].includes(body.voice_engine) ? body.voice_engine : "neural";
+      await env.DB.prepare(`
+        INSERT INTO assistant_preferences (user_id, language, voice_engine, updated_at)
+        VALUES (?, ?, ?, datetime('now'))
+        ON CONFLICT(user_id) DO UPDATE SET language=excluded.language, voice_engine=excluded.voice_engine, updated_at=excluded.updated_at
+      `).bind(actor.id, language, engine).run();
+      return json({ ok: true, preferences: { language, voice_engine: engine } });
+    }
+
     if (path === "/api/assistant/heartbeat" && request.method === "POST") {
       const actor = await getSessionUser(env, request);
       if (!actor) return json({ error: "Unauthenticated" }, 401);
@@ -14464,7 +14553,7 @@ export default {
     headers.set(
       "Content-Security-Policy",
       "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; " +
-      "form-action 'self'; script-src 'self' 'unsafe-inline'; " +
+      "form-action 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
       "style-src 'self' 'unsafe-inline'; " +
       "font-src 'self' data:; " +
       "img-src 'self' data: blob: https:; connect-src 'self' https: ws: wss:; " +

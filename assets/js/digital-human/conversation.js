@@ -6,6 +6,7 @@ import { greetingFor, quickActionsFor } from "./context.js";
 import { summarizeDashboard } from "./tools/dashboard.js";
 import { compareProperties, searchProperties } from "./tools/properties.js";
 import { handoverOptions } from "./tools/handover.js";
+import { localizeReply, readLanguagePreference, resolveReplyLanguage, toEnglishIntent, writeLanguagePreference } from "./language.js";
 
 function scopeOf(context) {
   if (context.isStaff) return "staff";
@@ -243,15 +244,23 @@ export class Conversation {
   constructor(context, persona) {
     this.context = context;
     this.persona = persona;
+    this.language = readLanguagePreference();
     this.messages = loadStored() || [];
     if (!this.messages.length) {
+      const greeting = greetingFor(context, persona);
+      const localized = localizeReply({ text: greeting, actions: quickActionsFor(context) }, this.language === "pidgin" ? "pidgin" : "english", "greeting");
       this.messages.push({
         role: "assistant",
-        text: greetingFor(context, persona),
-        actions: quickActionsFor(context)
+        text: localized.text,
+        actions: localized.actions || quickActionsFor(context)
       });
       this.save();
     }
+  }
+
+  setLanguage(mode) {
+    this.language = writeLanguagePreference(mode);
+    return this.language;
   }
 
   save() {
@@ -265,10 +274,12 @@ export class Conversation {
   reset() {
     this.messages = [];
     try { sessionStorage.removeItem(STORAGE_KEY); } catch (_) { /* ignore */ }
+    const greeting = greetingFor(this.context, this.persona);
+    const localized = localizeReply({ text: greeting, actions: quickActionsFor(this.context) }, this.language === "pidgin" ? "pidgin" : "english", "greeting");
     this.messages.push({
       role: "assistant",
-      text: greetingFor(this.context, this.persona),
-      actions: quickActionsFor(this.context)
+      text: localized.text,
+      actions: localized.actions || quickActionsFor(this.context)
     });
     this.save();
     return this.messages;
@@ -288,10 +299,13 @@ export class Conversation {
     const input = String(text || "").trim();
     if (!input) return null;
     this.push("user", input);
+    const replyLanguage = resolveReplyLanguage(input, this.language);
+    const intentInput = replyLanguage === "pidgin" ? toEnglishIntent(input) : input;
+    this.context.lastLanguage = replyLanguage;
 
     // Explicit request: "talk to Solomon", "bring Adaora back".
     const named = PERSONAS.find(persona =>
-      persona.key !== this.persona.key && new RegExp(`\\b${persona.name}\\b`, "i").test(input)
+      persona.key !== this.persona.key && new RegExp(`\\b${persona.name}\\b`, "i").test(intentInput)
     );
     if (named) {
       if (!canUse(named, this.context)) {
@@ -302,38 +316,48 @@ export class Conversation {
         this.push("assistant", reply.text, reply.actions);
         return reply;
       }
-      const intro = named.key === "adaora"
-        ? "Of course — I'll bring Adaora back to the conversation."
-        : handoverIntro(named);
+      const intro = replyLanguage === "pidgin"
+        ? (named.key === "adaora" ? "No wahala — I bring Adaora back." : `I go connect you to ${named.name}. ${named.name} go continue from here.`)
+        : (named.key === "adaora" ? "Of course — I'll bring Adaora back to the conversation." : handoverIntro(named));
       this.push("assistant", intro, []);
       this.context.lastIntent = "persona";
       this.context.lastPersona = named.key;
+      const greeting = replyLanguage === "pidgin"
+        ? `How far. I be ${named.name}, the ${named.department} specialist. Wetin you need?`
+        : named.greeting;
       return {
         text: intro,
         actions: [],
-        handover: { key: named.key, greeting: named.greeting, reply: null }
+        handover: { key: named.key, greeting, reply: null }
       };
     }
 
-    const intent = INTENTS.find(rule => rule.test.test(input));
+    const intent = INTENTS.find(rule => rule.test.test(intentInput));
     if (intent && intent.handover && intent.handover !== this.persona.key) {
       const target = personaByKey(intent.handover);
       if (canUse(target, this.context)) {
-        const intro = handoverIntro(target);
+        const intro = replyLanguage === "pidgin"
+          ? `I go connect you to ${target.name}, our ${target.department} specialist.`
+          : handoverIntro(target);
         this.push("assistant", intro, []);
-        const specialistReply = await intent.reply(this.context, input);
+        const rawReply = await intent.reply(this.context, intentInput);
+        const specialistReply = localizeReply(rawReply, replyLanguage, intent.key);
         if (specialistReply && specialistReply.results) this.context.lastProperties = specialistReply.results;
         this.context.lastIntent = intent.key;
         this.context.lastPersona = target.key;
+        const greeting = replyLanguage === "pidgin"
+          ? `How far. I be ${target.name}, the ${target.department} specialist. Wetin you need?`
+          : target.greeting;
         return {
           text: intro,
           actions: [],
-          handover: { key: target.key, greeting: target.greeting, reply: specialistReply }
+          handover: { key: target.key, greeting, reply: specialistReply }
         };
       }
     }
 
-    const reply = intent ? await intent.reply(this.context, input) : fallback(this.context);
+    const rawReply = intent ? await intent.reply(this.context, intentInput) : fallback(this.context);
+    const reply = localizeReply(rawReply, replyLanguage, intent ? intent.key : "fallback");
     if (reply && reply.results) this.context.lastProperties = reply.results;
     this.context.lastIntent = intent ? intent.key : "fallback";
     this.push("assistant", reply.text, reply.actions);

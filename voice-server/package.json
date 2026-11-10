@@ -1,0 +1,14 @@
+{
+  "name": "elpis-headtts-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Authenticated local HeadTTS (Kokoro) REST service for Elpis Property.",
+  "scripts": {
+    "start": "node ./server.mjs",
+    "benchmark": "node ./benchmark.mjs"
+  },
+  "dependencies": {
+    "@met4citizen/headtts": "1.3.0"
+  }
+}

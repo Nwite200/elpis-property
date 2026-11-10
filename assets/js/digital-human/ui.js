@@ -63,7 +63,7 @@ function actionLink(action, onAction) {
 }
 
 export class AssistantUI {
-  constructor({ persona, conversation, onSend, onReset, mounted, voice, onHandover }) {
+  constructor({ persona, conversation, onSend, onReset, mounted, voice, onHandover, onLanguage, onVoicePreference }) {
     this.persona = persona;
     this.conversation = conversation;
     this.onSend = onSend;
@@ -71,6 +71,8 @@ export class AssistantUI {
     this.mounted = mounted;
     this.voice = voice || null;
     this.onHandover = onHandover || null;
+    this.onLanguage = onLanguage || null;
+    this.onVoicePreference = onVoicePreference || null;
     this.handleAction = action => {
       if (action && action.action === "handover" && this.onHandover) {
         this.onHandover(action);
@@ -110,6 +112,8 @@ export class AssistantUI {
 
     const header = el("header", "elp-dh-header");
     this.headerAvatar = avatar(this.persona, "elp-dh-header__avatar");
+    this.mouth = el("span", "elp-dh-mouth");
+    this.headerAvatar.appendChild(this.mouth);
     header.appendChild(this.headerAvatar);
     const identity = el("div", "elp-dh-identity");
     const title = el("h2", "elp-dh-title", this.persona.name);
@@ -205,7 +209,28 @@ export class AssistantUI {
     voiceSelect.setAttribute("aria-label", "Choose a voice");
     voiceSelect.hidden = true;
     voiceSelect.addEventListener("change", () => {
-      if (this.voice) this.voice.setVoice(voiceSelect.value);
+      if (!this.voice) return;
+      if (voiceSelect.value === "__neural__") {
+        this.voice.setEngine("neural");
+      } else {
+        this.voice.setEngine("device");
+        this.voice.setVoice(voiceSelect.value);
+      }
+      if (typeof this.onVoicePreference === "function") this.onVoicePreference(voiceSelect.value);
+    });
+    const languageSelect = document.createElement("select");
+    languageSelect.className = "elp-dh-language-select";
+    languageSelect.setAttribute("aria-label", "Conversation language");
+    for (const [value, label] of [["auto", "Auto language"], ["english", "English"], ["pidgin", "Nigerian Pidgin"]]) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = label;
+      languageSelect.appendChild(option);
+    }
+    languageSelect.value = this.conversation.language || "auto";
+    languageSelect.addEventListener("change", () => {
+      this.conversation.setLanguage(languageSelect.value);
+      if (typeof this.onLanguage === "function") this.onLanguage(languageSelect.value);
     });
     const replay = el("button", "elp-dh-voice-btn", "↻ Replay");
     replay.type = "button";
@@ -217,6 +242,7 @@ export class AssistantUI {
     stop.addEventListener("click", () => this.stopVoice());
     voiceBar.appendChild(speaker);
     voiceBar.appendChild(voiceSelect);
+    voiceBar.appendChild(languageSelect);
     voiceBar.appendChild(replay);
     voiceBar.appendChild(stop);
     const voiceStatus = el("span", "elp-dh-voice-status", "Voice is off");
@@ -228,6 +254,7 @@ export class AssistantUI {
     this.footer = footer;
     this.speakerButton = speaker;
     this.voiceSelect = voiceSelect;
+    this.languageSelect = languageSelect;
     this.replayButton = replay;
     this.stopButton = stop;
     this.voiceStatus = voiceStatus;
@@ -326,13 +353,17 @@ export class AssistantUI {
   populateVoiceOptions() {
     if (!this.voiceSelect || !this.voice) return;
     const voices = this.voice.voices();
-    if (voices.length < 2) { this.voiceSelect.hidden = true; return; }
     let preferred = "";
     try { preferred = localStorage.getItem("elp-dh-voice-preference") || ""; } catch (_) { preferred = ""; }
+    const snapshot = this.voice.snapshot();
     this.voiceSelect.textContent = "";
+    const neural = document.createElement("option");
+    neural.value = "__neural__";
+    neural.textContent = "Neural voice (HeadTTS)";
+    this.voiceSelect.appendChild(neural);
     const auto = document.createElement("option");
     auto.value = "";
-    auto.textContent = "Voice · auto (best available)";
+    auto.textContent = "Device voice · auto";
     this.voiceSelect.appendChild(auto);
     for (const voice of voices.slice(0, 40)) {
       const option = document.createElement("option");
@@ -340,7 +371,9 @@ export class AssistantUI {
       option.textContent = `${voice.name} · ${voice.lang}`;
       this.voiceSelect.appendChild(option);
     }
-    this.voiceSelect.value = voices.some(v => v.name === preferred) ? preferred : "";
+    this.voiceSelect.value = snapshot.engine === "neural"
+      ? "__neural__"
+      : (voices.some(v => v.name === preferred) ? preferred : "");
     this.voiceSelect.hidden = false;
   }
 
@@ -349,6 +382,11 @@ export class AssistantUI {
     this.root.dataset.voice = snapshot.enabled && !snapshot.muted ? "on" : "off";
     this.root.dataset.listening = snapshot.listening ? "true" : "false";
     this.root.dataset.speaking = snapshot.speaking ? "true" : "false";
+    this.root.dataset.viseme = snapshot.viseme || "sil";
+    if (this.voiceSelect && document.activeElement !== this.voiceSelect) {
+      const expected = snapshot.engine === "neural" ? "__neural__" : this.voiceSelect.value;
+      if (expected !== this.voiceSelect.value) this.voiceSelect.value = expected;
+    }
     if (this.micButton) {
       this.micButton.classList.toggle("is-listening", !!snapshot.listening);
       this.micButton.setAttribute("aria-pressed", String(!!snapshot.listening));
@@ -428,9 +466,12 @@ export class AssistantUI {
   updateIdentity() {
     const header = avatar(this.persona, "elp-dh-header__avatar");
     const launcher = avatar(this.persona, "elp-dh-launcher__avatar");
+    const mouth = el("span", "elp-dh-mouth");
+    header.appendChild(mouth);
     if (this.headerAvatar) this.headerAvatar.replaceWith(header);
     if (this.launcherAvatar) this.launcherAvatar.replaceWith(launcher);
     this.headerAvatar = header;
+    this.mouth = mouth;
     this.launcherAvatar = launcher;
     if (this.titleNode) this.titleNode.textContent = this.persona.name;
     if (this.departmentNode) this.departmentNode.textContent = `${this.persona.department} · Digital assistant`;
