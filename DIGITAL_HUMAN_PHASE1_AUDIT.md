@@ -432,3 +432,59 @@ a real client balance summary, and a portrait-file check for all nine personas.
   sidebar link gives team leads the UI; marketers see the team read-only.
 - **Tests:** 198 total; Phase 8 covers add/remove/cross-branch denial, and the voice suite still
   covers unsupported fallback, speak/replay/stop and spoken input.
+
+## 24. HeadTTS + Pidgin delivery report
+
+**Files added**
+- `assets/headtts/` — vendored HeadTTS 1.3 browser module, worker, English dictionary, MIT licence (no model in the Worker bundle).
+- `voice/headtts-browser.js`, `voice/headtts-server.js`, `voice/selector.js`, `voice/pronunciation.js`, `voice/voice-config.js`.
+- `language.js` — Pidgin detection, intent mapping, Pidgin reply leads.
+- `voice-server/` — authenticated local Node HeadTTS service, config, benchmark and README.
+- `migrations/0034_assistant_preferences.sql` — per-user language and voice-engine preference.
+- `test_voice_units.mjs` + new browser/API tests.
+
+**Persona voices (distinct Kokoro voices)**
+Adaora af_bella · Solomon am_fenrir · Chiamaka af_heart · Emeka am_michael · Amara af_nicole ·
+David am_puck · Ngozi bf_emma · Daniel bm_george · Ifeoma af_sky.
+
+**Dependencies/licences**
+HeadTTS 1.3 (MIT), Kokoro-82M timestamped ONNX + voices (Apache-2.0, downloaded from Hugging
+Face at runtime, not committed), transformers.js/ONNX Runtime (Apache-2.0), Cloudflare Workers AI
+Whisper for transcription. No paid voice API is used.
+
+**Browser inference**
+Implemented with lazy WebGPU/WASM loading, local worker/dictionary, loading status, stop, model
+singleton, device/server/native fallback and approximate viseme mouth motion. **Not accepted yet:**
+in a headful Chrome probe the model failed to initialise (“Loading models failed” before the
+CSP/blob fix; not re-benchmarked after) and first load was ~65 s. Browser inference is therefore
+**unverified**, and the reliable device voice is the default. Neural is available in the voice
+selector for testing. No claim of working neural audio is made.
+
+**Server inference**
+Worker proxy is complete and authenticated (sign-in, persona allowlist, 500-char limit,
+30 requests/10 min, 22 s timeout, bearer secret, no text logging). The Node service is scaffolded
+and **not hosted**; staging returns **503** until `HEADTTS_SERVER_URL` and
+`HEADTTS_SERVER_TOKEN` are set and the service is deployed. No CPU/GPU benchmark was run.
+
+**Pidgin**
+Detection, intent mapping, property/form/payment/handover intents, Pidgin text replies, manual
+Auto/English/Pidgin selection, persistence (localStorage + D1 for signed-in users) and context
+continuity are implemented and tested. Spoken Pidgin currently uses English Kokoro voices plus
+pronunciation overrides; it is **not** native Pidgin TTS and has **not** had native-speaker audio
+approval. Acceptance items 4 and 10 remain open.
+
+**Security findings**
+Synthesis requires auth; anonymous → 401, invalid persona → 400, >500 chars → 413. Secrets are
+environment-only. Permissions-Policy now allows `microphone=(self)` only. Audio/transcripts are
+not stored. CSP allows `blob:` workers and jsDelivr (transformers.js) only.
+
+**Staging verification**
+`https://elpisproperty.org` 200; HeadTTS module/dictionary 200; preferences GET/PUT 200 for the
+Super Admin; Pidgin reply verified live; microphone starts without the old permission block.
+Full suite: **210 tests** (63 + 31 + 26 + 55 + 5 + 6 + 24).
+
+**Open blockers**
+1. Browser HeadTTS model initialisation must be fixed and benchmarked (cold/warm, Chrome/Edge/Safari/mobile).
+2. A CPU VM/container must be approved and hosted for server inference; cost estimate required.
+3. Native-speaker Pidgin audio review.
+4. Formal viseme/lip-sync acceptance against a real HeadTTS stream.
