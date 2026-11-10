@@ -37,7 +37,18 @@ export function kokoroSpeedFor(persona) {
 
 export const ENGINE_KEY = "elp-dh-voice-engine";
 export function readEnginePreference() {
-  try { return localStorage.getItem(ENGINE_KEY) === "device" ? "device" : "neural"; } catch (_) { return "neural"; }
+  // Device voice is the reliable default; neural is opt-in until its model
+  // loading is verified on the target device/network.
+  try {
+    if (localStorage.getItem("elp-dh-engine-v2") !== "1") {
+      localStorage.setItem("elp-dh-engine-v2", "1");
+      localStorage.setItem(ENGINE_KEY, "device");
+      return "device";
+    }
+    return localStorage.getItem(ENGINE_KEY) === "neural" ? "neural" : "device";
+  } catch (_) {
+    return "device";
+  }
 }
 export function writeEnginePreference(engine) {
   try { localStorage.setItem(ENGINE_KEY, engine === "device" ? "device" : "neural"); } catch (_) { /* ignore */ }

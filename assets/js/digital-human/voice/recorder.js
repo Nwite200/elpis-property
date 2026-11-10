@@ -26,8 +26,47 @@ export class VoiceRecorder {
     this.cancelled = false;
     return new Promise((resolve, reject) => {
       let timer = null;
+      let vadTimer = null;
+      let vadCtx = null;
+      let autoStopped = false;
+      const stopForSilence = () => {
+        if (autoStopped) return;
+        autoStopped = true;
+        onAutoStop && onAutoStop();
+        if (recorder.state !== "inactive") recorder.stop();
+      };
+      // Simple energy-based end-of-speech detection so one tap is enough.
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) {
+          vadCtx = new AudioCtx();
+          const sourceNode = vadCtx.createMediaStreamSource(stream);
+          const analyser = vadCtx.createAnalyser();
+          analyser.fftSize = 1024;
+          sourceNode.connect(analyser);
+          const data = new Uint8Array(analyser.fftSize);
+          let spoke = false;
+          let silenceSince = 0;
+          const startedAt = Date.now();
+          vadTimer = setInterval(() => {
+            analyser.getByteTimeDomainData(data);
+            let sum = 0;
+            for (const value of data) { const v = (value - 128) / 128; sum += v * v; }
+            const rms = Math.sqrt(sum / data.length);
+            const now = Date.now();
+            if (rms > 0.025) { spoke = true; silenceSince = 0; }
+            else if (spoke) {
+              if (!silenceSince) silenceSince = now;
+              else if (now - silenceSince > 1100) stopForSilence();
+            }
+            if (now - startedAt > 15000) stopForSilence();
+          }, 100);
+        }
+      } catch (_) { /* VAD is optional; the manual stop and 15s cap remain */ }
       const cleanup = () => {
         if (timer) clearTimeout(timer);
+        if (vadTimer) clearInterval(vadTimer);
+        if (vadCtx) { try { vadCtx.close(); } catch (_) {} }
         for (const track of stream.getTracks()) track.stop();
         this.active = false;
         this.stopFn = null;
@@ -62,12 +101,7 @@ export class VoiceRecorder {
       };
       this.stopFn = () => { if (recorder.state !== "inactive") recorder.stop(); };
       recorder.start();
-      timer = setTimeout(() => {
-        if (recorder.state !== "inactive") {
-          onAutoStop && onAutoStop();
-          recorder.stop();
-        }
-      }, 15000);
+      timer = setTimeout(stopForSilence, 15000);
     });
   }
 

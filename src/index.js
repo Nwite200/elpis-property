@@ -6155,7 +6155,7 @@ async function handleFetch(request, env) {
       return json({
         preferences: {
           language: row ? row.language : "auto",
-          voice_engine: row ? row.voice_engine : "neural",
+          voice_engine: row ? row.voice_engine : "device",
           updated_at: row ? row.updated_at : null
         }
       });

@@ -259,7 +259,7 @@ export function createVoice(persona, context) {
     state.recording = true;
     state.listening = true;
     state.error = "";
-    state.status = "Listening… speak, then tap the mic to stop.";
+    state.status = "Listening… speak now; I'll stop when you pause.";
     emit();
     let text = "";
     try {

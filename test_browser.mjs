@@ -341,7 +341,7 @@ try {
   });
 
   await test('dashboard entry greets the signed-in role', async () => {
-    await pageA.evaluate(() => { try { sessionStorage.removeItem('elp-dh-intro-home'); sessionStorage.removeItem('elp-dh-intro-dashboard'); } catch (_) {} });
+    await pageA.evaluate(() => { try { localStorage.removeItem('elp-dh-intro-home-at'); localStorage.removeItem('elp-dh-intro-dashboard-at'); } catch (_) {} });
     await goto(pageA, BASE + '/dashboard.html');
     await pageA.waitForSelector('.elp-dh-intro', { timeout: 20000 });
     const text = await pageA.locator('.elp-dh-intro__text').innerText();
@@ -386,8 +386,8 @@ try {
       await login(page, item.email);
       await page.evaluate(() => {
         try {
-          sessionStorage.removeItem('elp-dh-intro-home');
-          sessionStorage.removeItem('elp-dh-intro-dashboard');
+          localStorage.removeItem('elp-dh-intro-home-at');
+          localStorage.removeItem('elp-dh-intro-dashboard-at');
         } catch (_) {}
       });
       await goto(page, BASE + item.path);

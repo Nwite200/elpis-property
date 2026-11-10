@@ -162,13 +162,14 @@ async function mount() {
 
   const isHome = context.kind === "home";
   const isDashboard = context.kind === "dashboard" || /dashboard\.html$/.test(context.page);
-  const introKey = isHome ? "elp-dh-intro-home" : "elp-dh-intro-dashboard";
-  let introSeen = false;
-  try { introSeen = sessionStorage.getItem(introKey) === "1"; } catch (_) { /* ignore */ }
-  if ((isHome || isDashboard) && !introSeen) {
+  const introKey = isHome ? "elp-dh-intro-home-at" : "elp-dh-intro-dashboard-at";
+  let lastIntro = 0;
+  try { lastIntro = Number(localStorage.getItem(introKey) || 0); } catch (_) { /* ignore */ }
+  const introDue = !lastIntro || (Date.now() - lastIntro) > 12 * 60 * 60 * 1000;
+  if ((isHome || isDashboard) && introDue) {
     const intro = introTextFor(context);
     window.setTimeout(() => ui.showIntro(intro), 900);
-    try { sessionStorage.setItem(introKey, "1"); } catch (_) { /* ignore */ }
+    try { localStorage.setItem(introKey, String(Date.now())); } catch (_) { /* ignore */ }
   }
 
   window.ElpAssistant = {
