@@ -200,6 +200,13 @@ export class AssistantUI {
     speaker.setAttribute("aria-pressed", "false");
     speaker.title = "Turn spoken replies on or off";
     speaker.addEventListener("click", () => this.toggleVoice());
+    const voiceSelect = document.createElement("select");
+    voiceSelect.className = "elp-dh-voice-select";
+    voiceSelect.setAttribute("aria-label", "Choose a voice");
+    voiceSelect.hidden = true;
+    voiceSelect.addEventListener("change", () => {
+      if (this.voice) this.voice.setVoice(voiceSelect.value);
+    });
     const replay = el("button", "elp-dh-voice-btn", "↻ Replay");
     replay.type = "button";
     replay.hidden = true;
@@ -209,6 +216,7 @@ export class AssistantUI {
     stop.hidden = true;
     stop.addEventListener("click", () => this.stopVoice());
     voiceBar.appendChild(speaker);
+    voiceBar.appendChild(voiceSelect);
     voiceBar.appendChild(replay);
     voiceBar.appendChild(stop);
     const voiceStatus = el("span", "elp-dh-voice-status", "Voice is off");
@@ -219,6 +227,7 @@ export class AssistantUI {
     footer.appendChild(voiceStatus);
     this.footer = footer;
     this.speakerButton = speaker;
+    this.voiceSelect = voiceSelect;
     this.replayButton = replay;
     this.stopButton = stop;
     this.voiceStatus = voiceStatus;
@@ -235,6 +244,11 @@ export class AssistantUI {
       }
       this.voice.onTranscript = text => this.submit(text, { fromVoice: true });
       this.unsubscribeVoice = this.voice.subscribe(snapshot => this.syncVoice(snapshot));
+      window.setTimeout(() => this.populateVoiceOptions(), 700);
+      if (window.speechSynthesis && typeof window.speechSynthesis.addEventListener === "function") {
+        this.onVoicesChanged = () => this.populateVoiceOptions();
+        window.speechSynthesis.addEventListener("voiceschanged", this.onVoicesChanged);
+      }
     } else {
       mic.hidden = true;
       speaker.hidden = true;
@@ -307,6 +321,27 @@ export class AssistantUI {
       this.typing = null;
       this.root.dataset.thinking = "false";
     }
+  }
+
+  populateVoiceOptions() {
+    if (!this.voiceSelect || !this.voice) return;
+    const voices = this.voice.voices();
+    if (voices.length < 2) { this.voiceSelect.hidden = true; return; }
+    let preferred = "";
+    try { preferred = localStorage.getItem("elp-dh-voice-preference") || ""; } catch (_) { preferred = ""; }
+    this.voiceSelect.textContent = "";
+    const auto = document.createElement("option");
+    auto.value = "";
+    auto.textContent = "Voice · auto (best available)";
+    this.voiceSelect.appendChild(auto);
+    for (const voice of voices.slice(0, 40)) {
+      const option = document.createElement("option");
+      option.value = voice.name;
+      option.textContent = `${voice.name} · ${voice.lang}`;
+      this.voiceSelect.appendChild(option);
+    }
+    this.voiceSelect.value = voices.some(v => v.name === preferred) ? preferred : "";
+    this.voiceSelect.hidden = false;
   }
 
   syncVoice(snapshot) {
@@ -604,6 +639,9 @@ export class AssistantUI {
 
   destroy() {
     if (typeof this.stopFormWatch === "function") this.stopFormWatch();
+    if (this.onVoicesChanged && window.speechSynthesis) {
+      try { window.speechSynthesis.removeEventListener("voiceschanged", this.onVoicesChanged); } catch (_) {}
+    }
     this.removeIntro();
     if (this.voice) this.voice.destroy();
     if (typeof this.unsubscribeVoice === "function") this.unsubscribeVoice();

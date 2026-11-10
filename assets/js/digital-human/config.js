@@ -22,7 +22,7 @@ export const PERSONAS = [
     available: true,
     scope: ["public", "client", "staff"],
     greeting: "Welcome to Elpis Property. I'm Adaora, your concierge. I can guide you around the platform and point you to the right team.",
-    voice: { lang: "en-NG", rate: 1.0, pitch: 1.05, genderHint: "female", preferredNames: ["Ada", "Samantha", "Victoria", "Google UK English Female"] },
+    voice: { lang: "en-NG", rate: 1.0, pitch: 1.02, genderHint: "female", preferredNames: ["Microsoft Aria", "Aria", "Jenny", "Samantha", "Victoria", "Google UK English Female"] },
     quickActions: [
       { label: "Explore properties", href: "index.html#properties" },
       { label: "Create an account", href: "signup.html" },
@@ -42,7 +42,7 @@ export const PERSONAS = [
     available: true,
     scope: ["public", "client", "staff"],
     greeting: "Hello, I'm Solomon. Adaora shared your request. Let's find the right property for you.",
-    voice: { lang: "en-NG", rate: 1.0, pitch: 0.95, genderHint: "male", preferredNames: ["Daniel", "Alex", "Google UK English Male"] },
+    voice: { lang: "en-NG", rate: 1.0, pitch: 0.979, genderHint: "male", preferredNames: ["Microsoft Guy", "Guy", "Daniel", "Ryan", "Alex", "Google UK English Male"] },
     quickActions: [
       { label: "Browse the portfolio", href: "index.html#properties" },
       { label: "Talk to sales", href: "index.html#contact" }
@@ -61,7 +61,7 @@ export const PERSONAS = [
     available: true,
     scope: ["public", "client", "staff"],
     greeting: "Hello, I'm Chiamaka from Sales. I can explain how an Elpis purchase works.",
-    voice: { lang: "en-NG", rate: 1.02, pitch: 1.1, genderHint: "female", preferredNames: ["Chiamaka", "Zira", "Samantha"] },
+    voice: { lang: "en-NG", rate: 1.02, pitch: 1.03, genderHint: "female", preferredNames: ["Microsoft Aria", "Chiamaka", "Zira", "Samantha"] },
     quickActions: [{ label: "See available property", href: "index.html#properties" }],
     handoverTo: ["solomon", "adaora"]
   },
@@ -77,7 +77,7 @@ export const PERSONAS = [
     available: true,
     scope: ["public", "client", "staff"],
     greeting: "Hello, I'm Emeka. I look after rental and leasing enquiries.",
-    voice: { lang: "en-NG", rate: 0.98, pitch: 0.92, genderHint: "male", preferredNames: ["Emeka", "Daniel", "Alex"] },
+    voice: { lang: "en-NG", rate: 0.98, pitch: 0.978, genderHint: "male", preferredNames: ["Microsoft Guy", "Emeka", "Daniel", "Alex"] },
     quickActions: [{ label: "Rental enquiries", href: "index.html#contact" }],
     handoverTo: ["solomon", "adaora"]
   },
@@ -93,7 +93,7 @@ export const PERSONAS = [
     available: true,
     scope: ["client", "staff"],
     greeting: "Hello, I'm Amara from Customer Relations. I can help with your account and service questions.",
-    voice: { lang: "en-NG", rate: 1.0, pitch: 1.08, genderHint: "female", preferredNames: ["Amara", "Samantha", "Zira"] },
+    voice: { lang: "en-NG", rate: 1.0, pitch: 1.02, genderHint: "female", preferredNames: ["Microsoft Aria", "Amara", "Samantha", "Zira"] },
     quickActions: [{ label: "Client portal", href: "client-login.html" }],
     handoverTo: ["adaora"]
   },
@@ -109,7 +109,7 @@ export const PERSONAS = [
     available: false,
     scope: ["staff"],
     greeting: "Hello, I'm David. I help authorised staff review assigned leads and follow-ups.",
-    voice: { lang: "en-NG", rate: 1.0, pitch: 0.94, genderHint: "male", preferredNames: ["David", "Daniel", "Alex"] },
+    voice: { lang: "en-NG", rate: 1.0, pitch: 0.979, genderHint: "male", preferredNames: ["Microsoft Guy", "David", "Daniel", "Alex"] },
     quickActions: [{ label: "Open leads", href: "leads.html" }],
     handoverTo: ["adaora"]
   },
@@ -125,7 +125,7 @@ export const PERSONAS = [
     available: false,
     scope: ["staff"],
     greeting: "Hello, I'm Ngozi. I support authorised property management operations.",
-    voice: { lang: "en-NG", rate: 1.0, pitch: 1.04, genderHint: "female", preferredNames: ["Ngozi", "Zira", "Samantha"] },
+    voice: { lang: "en-NG", rate: 1.0, pitch: 1.01, genderHint: "female", preferredNames: ["Microsoft Aria", "Ngozi", "Zira", "Samantha"] },
     quickActions: [{ label: "Open properties", href: "properties.html" }],
     handoverTo: ["adaora"]
   },
@@ -141,7 +141,7 @@ export const PERSONAS = [
     available: false,
     scope: ["staff"],
     greeting: "Hello, I'm Daniel. I help authorised managers review operational performance.",
-    voice: { lang: "en-NG", rate: 0.97, pitch: 0.9, genderHint: "male", preferredNames: ["Daniel", "Alex", "Google UK English Male"] },
+    voice: { lang: "en-NG", rate: 0.97, pitch: 0.97, genderHint: "male", preferredNames: ["Microsoft Guy", "Guy", "Daniel", "Ryan", "Alex", "Google UK English Male"] },
     quickActions: [{ label: "Open reports", href: "reports.html" }],
     handoverTo: ["adaora"]
   },
@@ -157,7 +157,7 @@ export const PERSONAS = [
     available: false,
     scope: ["public", "client", "staff"],
     greeting: "Hello, I'm Ifeoma. I help route enquiries to the right branch.",
-    voice: { lang: "en-NG", rate: 1.01, pitch: 1.06, genderHint: "female", preferredNames: ["Ifeoma", "Zira", "Samantha"] },
+    voice: { lang: "en-NG", rate: 1.01, pitch: 1.02, genderHint: "female", preferredNames: ["Microsoft Aria", "Ifeoma", "Zira", "Samantha"] },
     quickActions: [{ label: "Branch contact", href: "index.html#contact" }],
     handoverTo: ["adaora"]
   }

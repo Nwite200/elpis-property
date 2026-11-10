@@ -15,6 +15,11 @@ export class VoiceSynthesis {
     this.synth = window.speechSynthesis || null;
     this.voices = [];
     this.voiceName = "";
+    try {
+      this.preferredName = localStorage.getItem("elp-dh-voice-preference") || "";
+    } catch (_) {
+      this.preferredName = "";
+    }
     this.speaking = false;
     this.current = null;
     this.onStateChange = null;
@@ -34,9 +39,30 @@ export class VoiceSynthesis {
     return this.voices;
   }
 
+  setPreferredVoice(name) {
+    this.preferredName = String(name || "");
+    try {
+      if (this.preferredName) localStorage.setItem("elp-dh-voice-preference", this.preferredName);
+      else localStorage.removeItem("elp-dh-voice-preference");
+    } catch (_) { /* ignore */ }
+  }
+
+  normalize(text) {
+    return String(text || "")
+      .replace(/₦/g, "naira ")
+      .replace(/\bNGN\b/g, "naira")
+      .replace(/&/g, " and ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
   pickVoice(profile) {
     this.refreshVoices();
     if (!this.voices.length) return null;
+    if (this.preferredName) {
+      const exact = this.voices.find(v => v.name === this.preferredName);
+      if (exact) return exact;
+    }
     const wantedLang = String(profile.lang || "en").toLowerCase();
     const base = wantedLang.split("-")[0];
     const preferred = (profile.preferredNames || []).map(n => String(n).toLowerCase());
@@ -60,6 +86,9 @@ export class VoiceSynthesis {
         if (nameHas(name, MALE_HINTS)) score += 18;
         if (nameHas(name, FEMALE_HINTS)) score -= 22;
       }
+      const natural = /(natural|neural|enhanced|premium|siri|online|studio|wavenet)/i.test(name);
+      if (natural) score += 55;
+      if (/compact|espeak|festival|robot/i.test(name)) score -= 40;
       if (voice.localService) score += 4;
       if (voice.default) score += 2;
       if (score > bestScore) { bestScore = score; best = voice; }
@@ -103,7 +132,7 @@ export class VoiceSynthesis {
   speak(text, profile, { onStart, onEnd, onError } = {}) {
     if (!this.synth) return false;
     this.cancel(true);
-    const chunks = this.chunk(text);
+    const chunks = this.chunk(this.normalize(text));
     if (!chunks.length) return false;
     const voice = this.pickVoice(profile);
     this.voiceName = voice ? voice.name : "";

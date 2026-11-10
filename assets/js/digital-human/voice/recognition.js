@@ -28,6 +28,7 @@ export class VoiceRecognition {
       return false;
     }
     if (this.active) return false;
+    const begin = (chosenLang, allowFallback) => {
     let rec;
     try {
       rec = new this.Recognition();
@@ -35,7 +36,7 @@ export class VoiceRecognition {
       onError && onError(ERROR_MESSAGES.unsupported, "unsupported");
       return false;
     }
-    rec.lang = lang;
+    rec.lang = chosenLang || "en-GB";
     rec.continuous = false;
     rec.interimResults = true;
     rec.maxAlternatives = 1;
@@ -62,16 +63,24 @@ export class VoiceRecognition {
     };
     rec.onerror = event => {
       const code = event && event.error ? event.error : "unknown";
+      if (code === "language-not-supported" && allowFallback) {
+        this.active = false;
+        this.rec = null;
+        begin(navigator.language && /^en/i.test(navigator.language) ? navigator.language : "en-GB", false);
+        return;
+      }
       const key = code === "not-allowed" || code === "service-not-allowed" ? "permission"
         : code === "audio-capture" ? "microphone"
         : code === "network" ? "network"
         : code === "no-speech" ? "no-speech"
+        : code === "language-not-supported" ? "unsupported"
         : code === "aborted" ? "aborted"
         : "unknown";
       if (key === "aborted") return;
       onError && onError(ERROR_MESSAGES[key], key);
     };
     rec.onend = () => {
+      if (this.rec !== rec) return;
       this.active = false;
       this.rec = null;
       onEnd && onEnd();
@@ -90,6 +99,8 @@ export class VoiceRecognition {
       onError && onError(message, "unknown");
       return false;
     }
+    };
+    return begin(lang || "en-GB", true);
   }
 
   stop() {

@@ -475,6 +475,19 @@
 .elp-dh-voice-btn[aria-pressed="true"] { border-color: rgba(232, 181, 45, 0.75); background: #fffaf0; color: var(--elp-dh-navy); }
 .elp-dh-voice-btn:focus-visible { outline: 2px solid rgba(232, 181, 45, 0.8); outline-offset: 2px; }
 
+.elp-dh-voice-select {
+  max-width: 150px;
+  min-height: 28px;
+  padding: 3px 6px;
+  border: 1px solid var(--elp-dh-line);
+  border-radius: 999px;
+  background: var(--elp-dh-paper);
+  color: var(--elp-dh-ink);
+  font: inherit;
+  font-size: 10.5px;
+}
+.elp-dh-voice-select:focus-visible { outline: 2px solid rgba(232, 181, 45, 0.8); outline-offset: 2px; }
+
 .elp-dh-voice-status {
   display: block;
   min-height: 15px;

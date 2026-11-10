@@ -142,6 +142,7 @@
       { section: "Sales & Teams" },
       { href: "leads.html", label: "🎯 Lead Pipeline", page: "leads", roles: ["Managing Director", "Branch Manager", "Team Lead", "Marketer"] },
       { href: "staff-management.html", label: "👔 Staff & Teams", page: "staff", roles: ["Managing Director", "Branch Manager"] },
+      { href: "my-team.html", label: "👥 My Team", page: "my-team", roles: ["Team Lead", "Marketer"] },
       { href: "activity-centre.html", label: "🕘 Activity Centre", page: "activity", roles: ["Managing Director", "Branch Manager", "Team Lead", "Marketer", "Finance Officer"] },
       { section: "Finance" },
       { href: "commissions.html", label: "💰 Commissions", page: "commissions", roles: ["Managing Director", "Finance Officer", "Branch Manager", "Team Lead", "Marketer"], commissionNav: true },

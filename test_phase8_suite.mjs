@@ -1859,6 +1859,29 @@ await test('referral commission applies two-stage and flat rules, caps at 35,000
   assert(configView.status === 200 && configView.data.entries.some(row => row.client_id === eightMonthClient), 'configuration-required referral account missing from dashboard');
 });
 
+console.log('\n--- 13. Team Lead member management ---');
+await test('a team lead can add and remove an eligible marketer in their own team', async () => {
+  const members = await request(`/api/teams/${teamBranch1Id}/members`, { headers: { Cookie: tlCookie } });
+  assert(members.status === 200, `team members expected 200, got ${members.status}`);
+  assert((members.data.candidates || []).some(row => row.id === mktNoTeamId), 'eligible marketer missing from candidates');
+  const added = await request(`/api/teams/${teamBranch1Id}/members`, {
+    method: 'POST', headers: { Cookie: tlCookie }, body: { user_id: mktNoTeamId }
+  });
+  assert(added.status === 200, `team lead add failed: ${added.status} ${JSON.stringify(added.data)}`);
+  const afterAdd = await request(`/api/teams/${teamBranch1Id}/members`, { headers: { Cookie: tlCookie } });
+  assert(afterAdd.data.members.some(row => row.id === mktNoTeamId), 'marketer was not added to the team');
+  const crossBranch = await request(`/api/teams/${teamBranch1Id}/members`, {
+    method: 'POST', headers: { Cookie: bm2Cookie }, body: { user_id: mktNoTeamId }
+  });
+  assert(crossBranch.status === 403, `cross-branch team management must be forbidden, got ${crossBranch.status}`);
+  const removed = await request(`/api/teams/${teamBranch1Id}/members/${mktNoTeamId}`, {
+    method: 'DELETE', headers: { Cookie: tlCookie }
+  });
+  assert(removed.status === 200, `team lead remove failed: ${removed.status}`);
+  const afterRemove = await request(`/api/teams/${teamBranch1Id}/members`, { headers: { Cookie: tlCookie } });
+  assert(!afterRemove.data.members.some(row => row.id === mktNoTeamId), 'marketer was not removed from the team');
+});
+
 console.log('\n--- 13. Assistant human handover requires staff acceptance ---');
 await test('assistant handover is requested, accepted by staff and cannot be replayed', async () => {
   const heartbeat = await request('/api/assistant/heartbeat', {

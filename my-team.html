@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#071747" />
+  <title>My Team | Elpis Property Limited</title>
+  <link rel="preload" href="assets/fonts/fc88c23021-rP2Hp2ywxg089UriCZOIHTWEBlw.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/f2edea8e97-xn7gYHE41ni1AdIRggexSvfedN4.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/fonts/fonts.css">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/motion.css">
+  <script src="assets/js/intro-config.js"></script>
+  <script src="assets/js/motion.js"></script>
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Elpis Property">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
+</head>
+<body>
+  <div class="dash">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="dash-main">
+      <div class="dash-top">
+        <div>
+          <h1>My Team</h1>
+          <p style="color:var(--brand-muted);font-size:13px">The marketers under your lead. Add eligible staff from your branch or remove a member.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3 id="teamTitle">Team</h3>
+          <span class="small muted" id="teamMeta"></span>
+        </div>
+        <div class="field" style="margin-top:12px">
+          <label for="teamSelect">Team</label>
+          <select id="teamSelect"></select>
+        </div>
+        <div id="teamMsg" class="small" style="min-height:18px;margin:8px 0"></div>
+        <div class="table-responsive">
+          <table class="table">
+            <thead><tr><th>Member</th><th>Role</th><th style="text-align:right">Action</th></tr></thead>
+            <tbody id="teamBody"><tr><td colspan="3" class="empty-state">Loading…</td></tr></tbody>
+          </table>
+        </div>
+        <div id="addWrap" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-top:16px">
+          <div class="field" style="flex:1 1 260px;margin:0">
+            <label for="memberSelect">Add an eligible marketer</label>
+            <select id="memberSelect"></select>
+          </div>
+          <button class="btn btn-brand" type="button" id="addMemberBtn">Add to my team</button>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="assets/js/staff-shell.js"></script>
+  <script src="assets/js/my-team.js"></script>
+  <script src="assets/js/mobile-nav.js"></script>
+  <script src="assets/js/pwa.js"></script>
+  <script type="module" src="assets/js/digital-human/index.js"></script>
+</body>
+</html>

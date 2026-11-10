@@ -159,6 +159,8 @@ export function createVoice(persona) {
       state.enabled = true;
       state.muted = false;
     }
+    state.status = "Requesting microphone…";
+    emit();
     const started = recognition.start({
       lang: profile.lang || "en-NG",
       onStart() {
@@ -225,6 +227,21 @@ export function createVoice(persona) {
     emit();
   }
 
+  function voices() {
+    if (!synth) return [];
+    return (synth.voices || []).map(voice => ({ name: voice.name, lang: voice.lang, local: !!voice.localService }));
+  }
+
+  function setVoice(name) {
+    if (!synth) return false;
+    synth.setPreferredVoice(name);
+    synth.voiceName = name || "";
+    if (state.enabled) state.status = readyText();
+    emit();
+    if (name) speak("This is how I will sound.", { force: true });
+    return true;
+  }
+
   function destroy() {
     cancelAudio();
     stopListening();
@@ -249,6 +266,8 @@ export function createVoice(persona) {
     stopListening,
     stop,
     setPersona,
+    voices,
+    setVoice,
     destroy,
     onTranscript: null,
     lastAssistantText: ""

@@ -6602,6 +6602,11 @@ async function handleFetch(request, env) {
         binds.push(actor.branch_id);
       }
       if (url.searchParams.get("include_inactive") !== "1") clauses.push("t.is_active=1");
+      if (url.searchParams.get("mine") === "1") {
+        if (actor.role_name === "Team Lead") clauses.push("t.team_lead_user_id=?");
+        else if (actor.role_name === "Marketer") clauses.push("t.id IN (SELECT team_id FROM team_members WHERE user_id=?)");
+        if (["Team Lead", "Marketer"].includes(actor.role_name)) binds.push(actor.id);
+      }
       const whereSql = clauses.length ? "WHERE " + clauses.join(" AND ") : "";
       const { results } = await env.DB.prepare(`
         SELECT t.id, t.name, t.branch_id, t.team_lead_user_id, t.is_active,
@@ -6662,6 +6667,96 @@ async function handleFetch(request, env) {
       }
       await audit(env, actor.id, "team.create", "team", String(teamId), { name, branch_id: branchId }, branchId);
       return json({ ok: true, team_id: teamId });
+    }
+
+    const teamMemberMatch = path.match(/^\/api\/teams\/(\d+)\/members$/);
+    if (teamMemberMatch && request.method === "GET") {
+      const actor = await getSessionUser(env, request);
+      if (!actor) return json({ error: "Unauthenticated" }, 401);
+      const teamId = Number(teamMemberMatch[1]);
+      const team = await env.DB.prepare(`
+        SELECT t.id, t.name, t.branch_id, t.team_lead_user_id, t.is_active, b.name AS branch_name, u.full_name AS team_lead_name
+        FROM teams t LEFT JOIN branches b ON b.id=t.branch_id LEFT JOIN users u ON u.id=t.team_lead_user_id
+        WHERE t.id=?
+      `).bind(teamId).first();
+      if (!team) return json({ error: "Team not found" }, 404);
+      const actual = actor.actual_role_name || actor.role_name;
+      const allowed = actual === "Managing Director" ||
+        (actual === "Branch Manager" && Number(team.branch_id) === Number(actor.branch_id)) ||
+        (actor.role_name === "Team Lead" && Number(team.team_lead_user_id) === Number(actor.id));
+      if (!allowed) return json({ error: "Forbidden" }, 403);
+      const { results: members } = await env.DB.prepare(`
+        SELECT u.id, u.full_name, u.email, r.name AS role_name
+        FROM team_members tm JOIN users u ON u.id=tm.user_id JOIN roles r ON r.id=u.role_id
+        WHERE tm.team_id=? ORDER BY u.full_name
+      `).bind(teamId).all();
+      const { results: candidates } = await env.DB.prepare(`
+        SELECT u.id, u.full_name, u.email, r.name AS role_name
+        FROM users u JOIN roles r ON r.id=u.role_id
+        WHERE u.is_active=1 AND r.name='Marketer' AND u.branch_id=?
+          AND u.id NOT IN (SELECT user_id FROM team_members WHERE team_id=?)
+        ORDER BY u.full_name
+      `).bind(team.branch_id, teamId).all();
+      return json({ team, members, candidates });
+    }
+
+    if (teamMemberMatch && request.method === "POST") {
+      if (!csrfOk(request)) return json({ error: "CSRF check failed" }, 403);
+      const actor = await getSessionUser(env, request);
+      if (!actor) return json({ error: "Unauthenticated" }, 401);
+      const teamId = Number(teamMemberMatch[1]);
+      const team = await env.DB.prepare("SELECT id, name, branch_id, team_lead_user_id FROM teams WHERE id=? AND is_active=1").bind(teamId).first();
+      if (!team) return json({ error: "Team not found" }, 404);
+      const actual = actor.actual_role_name || actor.role_name;
+      const allowed = actual === "Managing Director" ||
+        (actual === "Branch Manager" && Number(team.branch_id) === Number(actor.branch_id)) ||
+        (actor.role_name === "Team Lead" && Number(team.team_lead_user_id) === Number(actor.id));
+      if (!allowed) return json({ error: "You can only manage your own team" }, 403);
+      const body = await request.json().catch(() => ({}));
+      const userId = Number(body.user_id);
+      if (!userId) return json({ error: "Select a staff member" }, 400);
+      const member = await env.DB.prepare(`
+        SELECT u.id, u.full_name, u.branch_id, u.is_active, r.name AS role_name
+        FROM users u JOIN roles r ON r.id=u.role_id WHERE u.id=?
+      `).bind(userId).first();
+      if (!member || !member.is_active) return json({ error: "Staff member not found" }, 404);
+      if (member.role_name !== "Marketer") return json({ error: "Only active marketers can join a team" }, 400);
+      if (Number(member.branch_id) !== Number(team.branch_id)) return json({ error: "Member must be in the same branch" }, 400);
+      const inserted = await env.DB.prepare("INSERT OR IGNORE INTO team_members (team_id, user_id) VALUES (?, ?)").bind(teamId, userId).run();
+      if (!inserted.meta || Number(inserted.meta.changes) === 0) return json({ error: "This marketer is already in the team" }, 409);
+      const managerId = team.team_lead_user_id || await inferManagerId(env, "Marketer", team.branch_id, teamId);
+      await env.DB.prepare("UPDATE users SET manager_id=? WHERE id=?").bind(managerId, userId).run();
+      await createNotification(env, {
+        userId,
+        type: "team.added",
+        title: "Added to a team",
+        message: `You were added to ${team.name} by ${actor.full_name}.`,
+        metadata: { team_id: teamId, added_by: actor.id }
+      });
+      await audit(env, actor.id, "team.member.add", "team", String(teamId), { user_id: userId }, team.branch_id);
+      return json({ ok: true, team_id: teamId, user_id: userId });
+    }
+
+    const teamMemberDeleteMatch = path.match(/^\/api\/teams\/(\d+)\/members\/(\d+)$/);
+    if (teamMemberDeleteMatch && request.method === "DELETE") {
+      if (!csrfOk(request)) return json({ error: "CSRF check failed" }, 403);
+      const actor = await getSessionUser(env, request);
+      if (!actor) return json({ error: "Unauthenticated" }, 401);
+      const teamId = Number(teamMemberDeleteMatch[1]);
+      const userId = Number(teamMemberDeleteMatch[2]);
+      const team = await env.DB.prepare("SELECT id, name, branch_id, team_lead_user_id FROM teams WHERE id=? AND is_active=1").bind(teamId).first();
+      if (!team) return json({ error: "Team not found" }, 404);
+      const actual = actor.actual_role_name || actor.role_name;
+      const allowed = actual === "Managing Director" ||
+        (actual === "Branch Manager" && Number(team.branch_id) === Number(actor.branch_id)) ||
+        (actor.role_name === "Team Lead" && Number(team.team_lead_user_id) === Number(actor.id));
+      if (!allowed) return json({ error: "You can only manage your own team" }, 403);
+      const removed = await env.DB.prepare("DELETE FROM team_members WHERE team_id=? AND user_id=?").bind(teamId, userId).run();
+      if (!removed.meta || Number(removed.meta.changes) === 0) return json({ error: "Member not found in this team" }, 404);
+      const managerId = await inferManagerId(env, "Marketer", team.branch_id, null);
+      await env.DB.prepare("UPDATE users SET manager_id=? WHERE id=?").bind(managerId, userId).run();
+      await audit(env, actor.id, "team.member.remove", "team", String(teamId), { user_id: userId }, team.branch_id);
+      return json({ ok: true });
     }
 
     // =========================================================================

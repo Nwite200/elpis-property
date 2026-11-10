@@ -397,7 +397,7 @@ try {
       await page.click('.elp-dh-intro__open');
       await page.fill('#elp-dh-input', 'summary');
       await page.press('#elp-dh-input', 'Enter');
-      await page.waitForTimeout(1800);
+      await page.waitForFunction(source => Array.from(document.querySelectorAll('.elp-dh-bubble')).some(n => new RegExp(source, 'i').test(n.textContent)), item.answer.source, { timeout: 15000 });
       const bubbles = await page.locator('.elp-dh-bubble').allInnerTexts();
       assert(bubbles.some(text => item.answer.test(text)), `${item.email} summary missing: ${bubbles.slice(-3).join(' | ')}`);
       await context.close();
@@ -678,12 +678,12 @@ try {
     const voiceName = await page.evaluate(() => window.ElpAssistant.voiceSnapshot().voiceName);
     assert(/Daniel/i.test(voiceName), `male voice not selected after handover: ${voiceName}`);
 
-    await page.click('.elp-dh-voice-btn:nth-child(2)');
+    await page.getByRole('button', { name: /Replay/ }).click();
     await page.waitForFunction(() => window.__voiceSpoken.length >= 3, { timeout: 10000 });
-    await page.waitForSelector('.elp-dh-voice-btn:nth-child(3):not([hidden])', { timeout: 5000 });
+    await page.getByRole('button', { name: /Stop/ }).waitFor({ state: 'visible', timeout: 5000 });
 
     const beforeStop = await page.evaluate(() => window.__voiceCancelled);
-    await page.click('.elp-dh-voice-btn:nth-child(3)');
+    await page.getByRole('button', { name: /Stop/ }).click();
     await page.waitForFunction(previous => window.__voiceCancelled > previous, beforeStop, { timeout: 10000 });
 
     await page.click('.elp-dh-mic');
