@@ -311,7 +311,7 @@ speak/replay/stop/spoken-transcript flow.
   supplied; no face is reused for two names.
 - **Entry introduction:** on the landing page and any dashboard (staff, finance, sub-admin, GSM,
   accountant, super-admin, client) a compact bubble introduces Adaora with a role-aware greeting,
-  once per browser session. It can open the panel, speak the greeting through an explicit button,
+  once per browser session for each entry type (landing and dashboards independently). It can open the panel, speak the greeting through an explicit button,
   or be dismissed. It never blocks the launcher or page controls.
 - **Personas:** Adaora (concierge), Solomon (property discovery), Chiamaka (sales), Emeka
   (rentals), Amara (client relations) are live for their authorised audiences. David, Ngozi,

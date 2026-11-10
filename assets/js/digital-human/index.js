@@ -69,10 +69,12 @@ async function mount() {
   const onKeydown = event => ui.onKeydown(event);
   document.addEventListener("keydown", onKeydown);
 
-  const isEntryPage = context.kind === "home" || context.kind === "dashboard" || /dashboard\.html$/.test(context.page);
+  const isHome = context.kind === "home";
+  const isDashboard = context.kind === "dashboard" || /dashboard\.html$/.test(context.page);
+  const introKey = isHome ? "elp-dh-intro-home" : "elp-dh-intro-dashboard";
   let introSeen = false;
-  try { introSeen = sessionStorage.getItem("elp-dh-intro-shown") === "1"; } catch (_) { /* ignore */ }
-  if (isEntryPage && !introSeen) {
+  try { introSeen = sessionStorage.getItem(introKey) === "1"; } catch (_) { /* ignore */ }
+  if ((isHome || isDashboard) && !introSeen) {
     const first = context.firstName ? `, ${context.firstName}` : "";
     const intro = context.isClient
       ? `Welcome back${first}. I'm Adaora. I can help you with your account, payments or the right team.`
@@ -80,7 +82,7 @@ async function mount() {
         ? `Welcome back${first}. I'm Adaora. Ask me about this dashboard, or tell me what you need.`
         : "Welcome to Elpis Property. I'm Adaora. I can help you explore the portfolio or reach the right team.";
     window.setTimeout(() => ui.showIntro(intro), 900);
-    try { sessionStorage.setItem("elp-dh-intro-shown", "1"); } catch (_) { /* ignore */ }
+    try { sessionStorage.setItem(introKey, "1"); } catch (_) { /* ignore */ }
   }
 
   window.ElpAssistant = {

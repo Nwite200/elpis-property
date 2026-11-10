@@ -321,7 +321,7 @@ try {
   });
 
   await test('dashboard entry greets the signed-in role', async () => {
-    await pageA.evaluate(() => { try { sessionStorage.removeItem('elp-dh-intro-shown'); } catch (_) {} });
+    await pageA.evaluate(() => { try { sessionStorage.removeItem('elp-dh-intro-home'); sessionStorage.removeItem('elp-dh-intro-dashboard'); } catch (_) {} });
     await goto(pageA, BASE + '/dashboard.html');
     await pageA.waitForSelector('.elp-dh-intro', { timeout: 20000 });
     const text = await pageA.locator('.elp-dh-intro__text').innerText();
