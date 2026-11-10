@@ -53,7 +53,33 @@ async function mount() {
   const context = await getContext();
   const persona = personaByKey("adaora");
   const conversation = new Conversation(context, persona);
-  const voice = createVoice(persona);
+  const voice = createVoice(persona, context);
+
+  if (context.signedIn) {
+    try {
+      const res = await fetch("/api/assistant/preferences", { credentials: "same-origin", headers: { Accept: "application/json" } });
+      if (res.ok) {
+        const data = await res.json();
+        const prefs = data.preferences || {};
+        if (prefs.language) conversation.setLanguage(prefs.language);
+        if (prefs.voice_engine) voice.setEngine(prefs.voice_engine);
+      }
+    } catch (_) { /* local preference remains */ }
+  }
+
+  let prefTimer = null;
+  function savePreferences() {
+    if (!context.signedIn) return;
+    if (prefTimer) window.clearTimeout(prefTimer);
+    prefTimer = window.setTimeout(() => {
+      fetch("/api/assistant/preferences", {
+        method: "PUT",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ language: conversation.language, voice_engine: voice.snapshot().engine })
+      }).catch(() => {});
+    }, 350);
+  }
 
   const ui = new AssistantUI({
     persona,

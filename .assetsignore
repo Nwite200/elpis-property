@@ -21,6 +21,9 @@ seed_*.py
 seed_phase5.py
 wipe_test_data.py
 
+# HeadTTS English dictionary is required at runtime despite the *.txt exclude.
+!assets/headtts/dictionaries/en-us.txt
+
 # Keep the root copy out of the public bundle; the served copy lives in assets/images.
 /elpis-legacy-logo.png
 
