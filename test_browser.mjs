@@ -324,7 +324,7 @@ try {
     await context.close();
   });
 
-  await test('assistant introduces itself on entry and only once per session', async () => {
+  await test('assistant introduces itself on entry', async () => {
     const context = await browser.newContext();
     const page = await context.newPage();
     await goto(page, BASE + '/');
@@ -335,8 +335,8 @@ try {
     await page.waitForSelector('.elp-dh-panel:not([hidden])', { timeout: 10000 });
     await page.keyboard.press('Escape');
     await page.reload({ waitUntil: 'networkidle' });
-    await page.waitForTimeout(2200);
-    assert((await page.locator('.elp-dh-intro').count()) === 0, 'introduction repeated after reload in the same session');
+    await page.waitForSelector('.elp-dh-intro', { timeout: 20000 });
+    assert(await page.locator('.elp-dh-intro').isVisible(), 'introduction missing after a new page entry');
     await context.close();
   });
 
@@ -648,7 +648,7 @@ try {
     const context = await browser.newContext();
     await context.route('**/assets/headtts/modules/headtts.mjs', route => route.abort());
     await context.addInitScript(() => {
-      try { localStorage.setItem('elp-dh-voice-engine', 'neural'); } catch (_) {}
+      try { localStorage.setItem('elp-dh-engine-v3', '1'); localStorage.setItem('elp-dh-voice-engine', 'neural'); } catch (_) {}
       window.__voiceSpoken = [];
       class FakeUtterance { constructor(text) { this.text = text; } }
       const synth = {

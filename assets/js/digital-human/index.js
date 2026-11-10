@@ -162,14 +162,11 @@ async function mount() {
 
   const isHome = context.kind === "home";
   const isDashboard = context.kind === "dashboard" || /dashboard\.html$/.test(context.page);
-  const introKey = isHome ? "elp-dh-intro-home-at" : "elp-dh-intro-dashboard-at";
-  let lastIntro = 0;
-  try { lastIntro = Number(localStorage.getItem(introKey) || 0); } catch (_) { /* ignore */ }
-  const introDue = !lastIntro || (Date.now() - lastIntro) > 12 * 60 * 60 * 1000;
-  if ((isHome || isDashboard) && introDue) {
+  // Welcome on every full entry to the public site or a dashboard. Internal
+  // navigation still plays no overlay; this is a single bubble per page load.
+  if (isHome || isDashboard) {
     const intro = introTextFor(context);
-    window.setTimeout(() => ui.showIntro(intro), 900);
-    try { localStorage.setItem(introKey, String(Date.now())); } catch (_) { /* ignore */ }
+    window.setTimeout(() => ui.showIntro(intro), 700);
   }
 
   window.ElpAssistant = {

@@ -40,8 +40,8 @@ export function readEnginePreference() {
   // Device voice is the reliable default; neural is opt-in until its model
   // loading is verified on the target device/network.
   try {
-    if (localStorage.getItem("elp-dh-engine-v2") !== "1") {
-      localStorage.setItem("elp-dh-engine-v2", "1");
+    if (localStorage.getItem("elp-dh-engine-v3") !== "1") {
+      localStorage.setItem("elp-dh-engine-v3", "1");
       localStorage.setItem(ENGINE_KEY, "device");
       return "device";
     }

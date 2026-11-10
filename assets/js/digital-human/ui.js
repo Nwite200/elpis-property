@@ -359,7 +359,7 @@ export class AssistantUI {
     this.voiceSelect.textContent = "";
     const neural = document.createElement("option");
     neural.value = "__neural__";
-    neural.textContent = "Neural voice (HeadTTS)";
+    neural.textContent = "Neural voice (HeadTTS · experimental)";
     this.voiceSelect.appendChild(neural);
     const auto = document.createElement("option");
     auto.value = "";

@@ -96,7 +96,7 @@ export class VoiceSynthesis {
     return best || this.voices[0] || null;
   }
 
-  chunk(text, limit = 180) {
+  chunk(text, limit = 320) {
     const clean = String(text || "").replace(/\s+/g, " ").trim();
     if (!clean) return [];
     const sentences = clean.match(/[^.!?]+[.!?]?/g) || [clean];

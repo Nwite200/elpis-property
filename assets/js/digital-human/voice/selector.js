@@ -6,7 +6,7 @@ import { HeadTTSServer } from "./headtts-server.js";
 import { prepareForSpeech } from "./pronunciation.js";
 import { readEnginePreference, writeEnginePreference } from "./voice-config.js";
 
-const BROWSER_TIMEOUT_MS = 120000;
+const BROWSER_TIMEOUT_MS = 60000;
 
 function withTimeout(promise, ms) {
   return Promise.race([
@@ -23,12 +23,17 @@ export class VoiceSelector {
     this.server = new HeadTTSServer();
     this.route = "device";
     this.lastError = "";
+    this.browserFailed = false;
   }
 
   setEngine(engine) {
     this.engine = engine === "device" ? "device" : "neural";
     writeEnginePreference(this.engine);
     this.stop();
+    if (this.engine === "neural" && (headttsSupport().webgpu || headttsSupport().wasm)) {
+      this.browserFailed = false;
+      this.browser.prewarm().catch(() => { this.browserFailed = true; });
+    }
   }
 
   getCapabilities() {
@@ -47,9 +52,16 @@ export class VoiceSelector {
     }
     const support = this.getCapabilities();
     const lowMemory = typeof navigator.deviceMemory === "number" && navigator.deviceMemory < 3;
-    const browserViable = (support.webgpu || (support.wasm && !lowMemory));
+    let browserViable = (support.webgpu || (support.wasm && !lowMemory));
     const spoken = prepareForSpeech(text);
 
+    if (browserViable && this.browserFailed) browserViable = false;
+    if (browserViable && !this.browser.isReady()) {
+      this.browser.prewarm().catch(() => { this.browserFailed = true; });
+      onStatus && onStatus("Neural voice is loading in the background · using the device voice for now.");
+      this.route = "device";
+      return false;
+    }
     if (browserViable) {
       try {
         this.route = "browser";

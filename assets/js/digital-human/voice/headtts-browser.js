@@ -74,6 +74,14 @@ export class HeadTTSBrowser {
     this.stopped = false;
   }
 
+  isReady() {
+    return !!shared;
+  }
+
+  async prewarm(onStatus) {
+    return initialize(onStatus);
+  }
+
   async speak(text, persona, { onStatus, onStart, onViseme, onEnd } = {}) {
     const state = await initialize(onStatus);
     this.state = state;
