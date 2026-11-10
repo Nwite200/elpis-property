@@ -233,8 +233,9 @@
       if (logout) {
         logout.addEventListener("click", async event => {
           event.preventDefault();
+          if (window.ElpisSession) return window.ElpisSession.logout();
           await fetch("/api/logout", { method: "POST", credentials: "include" });
-          window.location.href = "/login.html";
+          window.location.href = "/";
         });
       }
     }

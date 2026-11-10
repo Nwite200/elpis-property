@@ -714,6 +714,26 @@ try {
     await context.close();
   });
 
+  await test('logout returns to the landing page and clears assistant state', async () => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await login(page, 'browser.marketer@elpisproperty.test');
+    await page.click('.elp-dh-launcher').catch(() => {});
+    await goto(page, BASE + '/dashboard.html');
+    await page.waitForSelector('#logoutBtn', { timeout: 20000 });
+    await page.evaluate(() => {
+      try { sessionStorage.setItem('elp-dh-transcript-v1', JSON.stringify({ messages: [{ role: 'assistant', text: 'private dashboard context' }] })); } catch (_) {}
+    });
+    await page.click('#logoutBtn');
+    await page.waitForURL(url => url.pathname === '/' || url.pathname === '/index.html', { timeout: 20000 });
+    const transcript = await page.evaluate(() => sessionStorage.getItem('elp-dh-transcript-v1'));
+    assert(!transcript || !transcript.includes('private dashboard context'), 'assistant transcript survived logout');
+    await goto(page, BASE + '/dashboard.html');
+    await page.waitForURL(/login/, { timeout: 20000 }).catch(() => {});
+    assert(!page.url().includes('/dashboard'), `logged-out dashboard access was not blocked: ${page.url()}`);
+    await context.close();
+  });
+
   await test('voice controls stay hidden and typing still works when speech APIs are missing', async () => {
     const context = await browser.newContext();
     await context.addInitScript(() => {
