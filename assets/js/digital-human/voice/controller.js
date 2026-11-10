@@ -52,6 +52,7 @@ export function createVoice(persona, context) {
   function readyText() {
     if (selector.engine === "neural") {
       if (neuralFailed) return "Neural voice unavailable · using the device voice.";
+      if (!selector.isNeuralReady()) return "Neural voice loading in the background · using the device voice for now.";
       const voice = kokoroVoiceFor(currentPersona.key);
       return `Neural voice ready · ${KOKORO_VOICE_LABELS[voice] || voice}`;
     }

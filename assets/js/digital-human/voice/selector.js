@@ -44,6 +44,10 @@ export class VoiceSelector {
     return { route: this.route, error: this.lastError, engine: this.engine };
   }
 
+  isNeuralReady() {
+    return this.browser.isReady() && !this.browserFailed;
+  }
+
   async speak(text, persona, callbacks = {}) {
     const { onStatus, onError } = callbacks;
     if (this.engine === "device") {

@@ -37,13 +37,15 @@ export function kokoroSpeedFor(persona) {
 
 export const ENGINE_KEY = "elp-dh-voice-engine";
 export function readEnginePreference() {
-  // Device voice is the reliable default; neural is opt-in until its model
-  // loading is verified on the target device/network.
+  // HeadTTS is the preferred engine on devices that can run it (WebGPU or
+  // WebAssembly); the device voice answers immediately until the model is
+  // ready. Older browsers fall back to the device voice.
   try {
-    if (localStorage.getItem("elp-dh-engine-v3") !== "1") {
-      localStorage.setItem("elp-dh-engine-v3", "1");
-      localStorage.setItem(ENGINE_KEY, "device");
-      return "device";
+    if (localStorage.getItem("elp-dh-engine-v4") !== "1") {
+      localStorage.setItem("elp-dh-engine-v4", "1");
+      const capable = typeof navigator !== "undefined" && (!!navigator.gpu || typeof WebAssembly === "object");
+      localStorage.setItem(ENGINE_KEY, capable ? "neural" : "device");
+      return capable ? "neural" : "device";
     }
     return localStorage.getItem(ENGINE_KEY) === "neural" ? "neural" : "device";
   } catch (_) {

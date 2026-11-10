@@ -595,7 +595,7 @@ try {
       status: 200, contentType: 'application/json', body: JSON.stringify({ text: 'hello from my microphone' })
     }));
     await context.addInitScript(() => {
-      try { localStorage.setItem('elp-dh-voice-engine', 'device'); } catch (_) {}
+      try { localStorage.setItem('elp-dh-engine-v4','1'); localStorage.setItem('elp-dh-voice-engine', 'device'); } catch (_) {}
       navigator.mediaDevices.getUserMedia = async () => ({ getTracks: () => [{ stop() {} }] });
       class FakeMediaRecorder {
         static isTypeSupported() { return true; }
@@ -626,7 +626,7 @@ try {
 
   await test('Nigerian Pidgin is understood and answered without losing context', async () => {
     const context = await browser.newContext();
-    await context.addInitScript(() => { try { localStorage.setItem('elp-dh-voice-engine', 'device'); } catch (_) {} });
+    await context.addInitScript(() => { try { localStorage.setItem('elp-dh-engine-v4','1'); localStorage.setItem('elp-dh-voice-engine', 'device'); } catch (_) {} });
     const page = await context.newPage();
     await goto(page, BASE + '/');
     await page.waitForSelector('.elp-dh-launcher', { timeout: 20000 });
@@ -648,7 +648,7 @@ try {
     const context = await browser.newContext();
     await context.route('**/assets/headtts/modules/headtts.mjs', route => route.abort());
     await context.addInitScript(() => {
-      try { localStorage.setItem('elp-dh-engine-v3', '1'); localStorage.setItem('elp-dh-voice-engine', 'neural'); } catch (_) {}
+      try { localStorage.setItem('elp-dh-engine-v4','1'); localStorage.setItem('elp-dh-engine-v3','1'); localStorage.setItem('elp-dh-voice-engine','neural'); } catch (_) {}
       window.__voiceSpoken = [];
       class FakeUtterance { constructor(text) { this.text = text; } }
       const synth = {
@@ -707,7 +707,7 @@ try {
   await test('voice engine speaks, replays, stops and accepts a spoken transcript', async () => {
     const context = await browser.newContext();
     await context.addInitScript(() => {
-      try { localStorage.setItem('elp-dh-voice-engine', 'device'); } catch (_) {}
+      try { localStorage.setItem('elp-dh-engine-v4','1'); localStorage.setItem('elp-dh-voice-engine', 'device'); } catch (_) {}
       Object.defineProperty(window, 'MediaRecorder', { value: undefined, configurable: true });
       window.__voiceSpoken = [];
       window.__voiceCancelled = 0;
