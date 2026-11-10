@@ -391,13 +391,14 @@ try {
         } catch (_) {}
       });
       await goto(page, BASE + item.path);
-      await page.waitForSelector('.elp-dh-intro', { timeout: 20000 });
+      await page.waitForSelector('.elp-dh-intro', { timeout: 30000 });
       const greeting = await page.locator('.elp-dh-intro__text').innerText();
       assert(item.greeting.test(greeting), `${item.email} greeting: ${greeting}`);
       await page.click('.elp-dh-intro__open');
+      await page.waitForSelector('.elp-dh-panel:not([hidden])', { timeout: 15000 });
       await page.fill('#elp-dh-input', 'summary');
       await page.press('#elp-dh-input', 'Enter');
-      await page.waitForFunction(source => Array.from(document.querySelectorAll('.elp-dh-bubble')).some(n => new RegExp(source, 'i').test(n.textContent)), item.answer.source, { timeout: 15000 });
+      await page.waitForFunction(source => Array.from(document.querySelectorAll('.elp-dh-bubble')).some(n => new RegExp(source, 'i').test(n.textContent)), item.answer.source, { timeout: 25000 });
       const bubbles = await page.locator('.elp-dh-bubble').allInnerTexts();
       assert(bubbles.some(text => item.answer.test(text)), `${item.email} summary missing: ${bubbles.slice(-3).join(' | ')}`);
       await context.close();

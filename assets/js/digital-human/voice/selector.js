@@ -6,7 +6,7 @@ import { HeadTTSServer } from "./headtts-server.js";
 import { prepareForSpeech } from "./pronunciation.js";
 import { readEnginePreference, writeEnginePreference } from "./voice-config.js";
 
-const BROWSER_TIMEOUT_MS = 45000;
+const BROWSER_TIMEOUT_MS = 120000;
 
 function withTimeout(promise, ms) {
   return Promise.race([
@@ -52,6 +52,7 @@ export class VoiceSelector {
 
     if (browserViable) {
       try {
+        this.route = "browser";
         await withTimeout(this.browser.speak(spoken, persona, callbacks), BROWSER_TIMEOUT_MS);
         this.route = "browser";
         this.lastError = "";
