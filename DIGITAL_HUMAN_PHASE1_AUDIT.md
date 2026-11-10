@@ -488,3 +488,12 @@ Full suite: **210 tests** (63 + 31 + 26 + 55 + 5 + 6 + 24).
 2. A CPU VM/container must be approved and hosted for server inference; cost estimate required.
 3. Native-speaker Pidgin audio review.
 4. Formal viseme/lip-sync acceptance against a real HeadTTS stream.
+
+## 25. Browser HeadTTS verification (free path)
+
+- Fixed CSP: `blob:`, `'wasm-unsafe-eval'` for the ONNX/WASM worker; `microphone=(self)` for recording.
+- Verified in Chrome (headful, Apple Metal WebGPU): model ready ~**40 s** on first use; the device voice answers immediately while the model loads; the next reply runs on HeadTTS with `AUDIO START → AUDIO END` and viseme IDs.
+- Verified forced **WASM** fallback (`--disable-gpu`): model ready ~**85 s**; audio path remains the same.
+- Default engine is now HeadTTS on WebGPU/WASM-capable devices (v4 preference), with the device voice as the immediate and failure fallback. Neural can be disabled in the voice picker.
+- Still unverified: Safari, Firefox, low-memory mobile, Edge; long-session audio interruption. Server inference remains unhosted (503) and optional.
+- **Hosting cost for this route: $0.** The model runs on the visitor’s device; no HeadTTS server is required. First use downloads/caches the Kokoro model; subsequent visits are faster.
