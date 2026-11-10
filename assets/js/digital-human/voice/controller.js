@@ -82,6 +82,8 @@ export function createVoice(persona, context) {
       speaking: state.speaking,
       engine: selector.engine,
       route: selector.route,
+      neuralReady: selector.isNeuralReady(),
+      neuralPending: selector.isPending(),
       viseme: state.viseme,
       interim: state.interim,
       status: state.status,
@@ -223,7 +225,7 @@ export function createVoice(persona, context) {
       }).then(handled => {
         if (token !== speechToken) return;
         if (!handled) {
-          neuralFailed = true;
+          if (!selector.isPending()) neuralFailed = true;
           if (synth) speakNative(text, token);
           else {
             state.speaking = false;

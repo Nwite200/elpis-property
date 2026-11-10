@@ -24,6 +24,7 @@ export class VoiceSelector {
     this.route = "device";
     this.lastError = "";
     this.browserFailed = false;
+    this.pending = false;
   }
 
   setEngine(engine) {
@@ -48,6 +49,10 @@ export class VoiceSelector {
     return this.browser.isReady() && !this.browserFailed;
   }
 
+  isPending() {
+    return this.pending;
+  }
+
   async speak(text, persona, callbacks = {}) {
     const { onStatus, onError } = callbacks;
     if (this.engine === "device") {
@@ -61,11 +66,13 @@ export class VoiceSelector {
 
     if (browserViable && this.browserFailed) browserViable = false;
     if (browserViable && !this.browser.isReady()) {
+      this.pending = true;
       this.browser.prewarm().catch(() => { this.browserFailed = true; });
       onStatus && onStatus("Neural voice is loading in the background · using the device voice for now.");
       this.route = "device";
       return false;
     }
+    this.pending = false;
     if (browserViable) {
       try {
         this.route = "browser";
