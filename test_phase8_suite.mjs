@@ -293,6 +293,14 @@ await test('malformed JSON returns a controlled 400 instead of an unhandled work
 });
 
 console.log('\n--- 2. Public enquiry and signup protection ---');
+await test('www host permanently redirects to the canonical apex domain', async () => {
+  const res = await worker.fetch(new Request('https://www.elpisproperty.org/client-login?x=1'), env);
+  assert(res.status === 301, `www GET expected 301, got ${res.status}`);
+  assert(res.headers.get('location') === 'https://elpisproperty.org/client-login?x=1', `unexpected redirect target ${res.headers.get('location')}`);
+  const post = await worker.fetch(new Request('https://www.elpisproperty.org/api/login', { method: 'POST', body: '{}' }), env);
+  assert(post.status === 308, `www POST expected 308, got ${post.status}`);
+});
+
 await test('public enquiry creates a real lead with branch/property attribution', async () => {
   const res = await request('/api/public/enquiries', {
     method: 'POST', body: {

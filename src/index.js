@@ -4883,6 +4883,16 @@ async function handleFetch(request, env) {
     const url = new URL(request.url);
     const path = url.pathname;
 
+    // ---- Canonical host ----
+    // www is attached via a proxied CNAME, not a Worker Custom Domain, so it
+    // must be redirected before routing to avoid duplicate content and origin
+    // resolution errors. 301 for safe methods, 308 so POSTs keep their body.
+    if (url.hostname === "www.elpisproperty.org") {
+      url.hostname = "elpisproperty.org";
+      const status = request.method === "GET" || request.method === "HEAD" ? 301 : 308;
+      return Response.redirect(url.toString(), status);
+    }
+
     // ---- Health check ----
     if (path === "/api/health") return json({ ok: true });
 
