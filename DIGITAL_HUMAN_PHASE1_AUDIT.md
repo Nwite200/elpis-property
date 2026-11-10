@@ -497,3 +497,44 @@ Full suite: **210 tests** (63 + 31 + 26 + 55 + 5 + 6 + 24).
 - Default engine is now HeadTTS on WebGPU/WASM-capable devices (v4 preference), with the device voice as the immediate and failure fallback. Neural can be disabled in the voice picker.
 - Still unverified: Safari, Firefox, low-memory mobile, Edge; long-session audio interruption. Server inference remains unhosted (503) and optional.
 - **Hosting cost for this route: $0.** The model runs on the visitor’s device; no HeadTTS server is required. First use downloads/caches the Kokoro model; subsequent visits are faster.
+
+## 26. Passkeys / WebAuthn delivery report
+
+**Architecture audit**
+Existing auth uses `ELPIS_session` cookies backed by the D1 `sessions` table, `getSessionUser`,
+`createSession`, password login, role permissions and the existing password recovery flow. Passkeys
+add a second credential type; they do not replace or modify password login.
+
+**Implementation**
+- `@simplewebauthn/server` 13.3.3 (MIT) bundled in the Worker; `@simplewebauthn/browser` 13.3.0
+  (MIT) self-hosted at `assets/js/simplewebauthn-browser.js`.
+- Migration `0035_passkeys.sql`: `passkey_credentials` (public key only) and
+  `passkey_challenges` (one-time, five-minute expiry). Applied to staging.
+- Endpoints: registration options/verify, authentication options/verify, list, rename, delete.
+  Registration requires a session; authentication creates a normal application session.
+- Security: random challenges, D1 one-time consumption, expiry, origin/RP ID checks, required user
+  verification, signature verification, counter updates, credential ownership checks, IP rate
+  limiting, audit logs, session rotation, password confirmation before deletion.
+- UI: “Continue with Passkey” on staff and client login; optional prompt after password login;
+  `passkeys.html` device management linked from the staff sidebar and client profile.
+- No fingerprint, face, PIN, biometric template or private key is collected or stored.
+
+**Verified live** on `https://elpisproperty.org` using Chrome’s virtual authenticator:
+1. Password sign-in as Super Admin.
+2. Register a passkey → listed on Passkeys & Devices.
+3. Log out → “Continue with Passkey” → signed in to `/dashboard`.
+4. Remove the passkey with password confirmation → empty state.
+All temporary credentials were removed (remote passkey count 0).
+
+**Automated tests:** 212 total, including passkey API contract and a browser test for register,
+login and remove. Real-device biometric testing is still required: macOS Touch ID, iPhone Face ID,
+Android fingerprint, Windows Hello, Safari/iOS/Firefox compatibility and multiple devices.
+
+**Known limitations**
+- Passkeys are domain-scoped: credentials created on `elpisproperty.org` will not work on the
+  `workers.dev` staging hostname and vice versa.
+- The post-login prompt appears once after a password login; users can add more from Passkeys.
+- Existing financial/role authorization remains unchanged; no new step-up policy was added to
+  individual privileged operations in this phase.
+- No paid service was introduced; usage stays within the existing Cloudflare Worker, D1 and static
+  assets.
