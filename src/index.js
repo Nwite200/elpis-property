@@ -5551,7 +5551,7 @@ async function handleFetch(request, env) {
           residentKey: "preferred",
           userVerification: "required"
         },
-        timeout: 60000
+        timeout: 120000
       });
       const challengeId = await savePasskeyChallenge(env, { userId: actor.id, type: "registration", challenge: options.challenge });
       return json({ challengeId, options, rpID, origin: origins[0] });
@@ -5630,6 +5630,9 @@ async function handleFetch(request, env) {
           const creds = await env.DB.prepare(
             "SELECT credential_id, transports FROM passkey_credentials WHERE user_id=?"
           ).bind(user.id).all();
+          if (!creds.results.length) {
+            return json({ error: "No passkey is registered for this account. Sign in with your password, then add a passkey from Passkeys & Devices." }, 404);
+          }
           allowCredentials = creds.results.map(row => ({
             id: row.credential_id,
             transports: row.transports ? JSON.parse(row.transports) : undefined
@@ -5641,7 +5644,7 @@ async function handleFetch(request, env) {
         rpID,
         allowCredentials,
         userVerification: "required",
-        timeout: 60000
+        timeout: 120000
       });
       const challengeId = await savePasskeyChallenge(env, { userId: user ? user.id : null, type: "authentication", challenge: options.challenge });
       return json({ challengeId, options });

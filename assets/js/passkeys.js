@@ -33,6 +33,24 @@
     return data;
   }
 
+  function friendlyPasskeyError(error) {
+    const cause = (error && error.cause && error.cause.name) || (error && error.name) || "";
+    const message = String((error && error.message) || "");
+    if (cause === "InvalidStateError" || /previously registered|already registered/i.test(message)) {
+      return "This device already has a passkey for your account. You can sign in with it, or rename/remove it under Passkeys & Devices.";
+    }
+    if (cause === "AbortError" || /cancel|abort/i.test(message)) {
+      return "The passkey prompt was cancelled. Try again when you are ready.";
+    }
+    if (cause === "SecurityError" || /invalid domain|rp id|rpId|SecurityError/i.test(message)) {
+      return "Passkeys are tied to the exact site address. Use https://elpisproperty.org (without www or the workers.dev link) and try again.";
+    }
+    if (cause === "NotAllowedError" || /timed out|not allowed|privacy/i.test(message)) {
+      return "The device prompt was cancelled, timed out, or this device has no fingerprint, Face ID, Windows Hello or screen-lock PIN set up. Make sure your device has a screen lock, then try again — or sign in with your password.";
+    }
+    return message || "Passkey operation failed. Please try again or use your password.";
+  }
+
   function fingerprintIcon() {
     return '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7v3h2V9a5 5 0 0 1 10 0v1.1a9.9 9.9 0 0 1-.4 2.9l1.9.6c.3-1.1.5-2.3.5-3.5V9a7 7 0 0 0-7-7Zm0 3a4 4 0 0 0-4 4v3.4c0 2.2-.4 4.3-1.2 6.3l1.9.7A17 17 0 0 0 10 12.4V9a2 2 0 0 1 4 0v3.5c0 2.6.4 5.1 1.1 7.5l1.9-.6a27 27 0 0 1-1-6.9V9a4 4 0 0 0-4-4Zm-7 8v2.4c0 2-.3 3.9-.9 5.7l1.9.6c.7-2 .9-4.1.9-6.3V13H5Z"/></svg>';
   }
@@ -88,7 +106,7 @@
         const email = emailInput && emailInput.value.includes("@") ? emailInput.value.trim() : "";
         await loginWithPasskey(email);
       } catch (error) {
-        if (msg) msg.textContent = error.message || "Passkey sign-in was cancelled.";
+        if (msg) msg.textContent = friendlyPasskeyError(error);
         button.disabled = false;
         button.innerHTML = original;
       }
@@ -140,7 +158,7 @@
                 window.location.reload();
               } catch (error) {
                 const text = close.querySelector(".passkey-modal-text");
-                if (text) text.textContent = error.message || "Passkey setup was cancelled.";
+                if (text) text.textContent = friendlyPasskeyError(error);
               }
             }
           }
@@ -223,7 +241,7 @@
         if (message) message.textContent = "Passkey added.";
         await load();
       } catch (error) {
-        if (message) message.textContent = error.message || "Passkey setup was cancelled.";
+        if (message) message.textContent = friendlyPasskeyError(error);
       } finally {
         addBtn.disabled = !supportsPasskeys();
         addBtn.textContent = "Add a passkey";
