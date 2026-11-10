@@ -2739,8 +2739,28 @@ async function queryActivities(env, scope, url, defaultLimit = 20) {
   };
 }
 
+// Run a group of independent prepared statements in one D1 round trip when the
+// PERF_BATCH_QUERIES flag is on. Falls back to sequential execution so local
+// adapters and the flag-off path behave exactly as before.
+async function runReadBatch(env, statements) {
+  if (env.PERF_BATCH_QUERIES === "1" && env.DB && typeof env.DB.batch === "function") {
+    return env.DB.batch(statements);
+  }
+  const results = [];
+  for (const statement of statements) results.push(await statement.all());
+  return results;
+}
+function batchFirst(result) {
+  return result && result.results && result.results.length ? result.results[0] : null;
+}
+
 async function buildAnalytics(env, actor, scope, url) {
   const range = defaultDateRange(url);
+  // One-line rollback: PERF_SARGABLE_DATES="0" restores date(col) BETWEEN.
+  const sargableDates = env.PERF_SARGABLE_DATES === "1";
+  const rangeClause = (column) => sargableDates
+    ? `${column} >= date(?) AND ${column} < datetime(date(?), '+1 day')`
+    : `date(${column}) BETWEEN date(?) AND date(?)`;
   const includeTest = url.searchParams.get("include_test") === "1";
   const clientScope = clientScopeSql(scope, "c");
   const financeScope = scope.role === "Finance Officer";
@@ -2773,34 +2793,6 @@ async function buildAnalytics(env, actor, scope, url) {
   const leadWhere = `l.is_demo=0 AND ${leadScope.clause}${leadBranch}`;
   const paymentWhere = `p.status='verified' AND p.is_demo=0 AND p.currency='NGN' AND ${clientScope.clause}${clientBranch}${categoryFilter}${includeTest ? "" : " AND COALESCE(p.is_internal_test,0)=0 AND COALESCE(p.is_archived,0)=0"}`;
 
-  const clientAgg = await env.DB.prepare(`
-    SELECT COUNT(*) AS total,
-           SUM(CASE WHEN c.status IN ('Active Buyer','Completed') THEN 1 ELSE 0 END) AS active_clients,
-           SUM(CASE WHEN c.status='Prospect' THEN 1 ELSE 0 END) AS prospects,
-           COALESCE(SUM(c.agreed_purchase_price),0) AS contract_value
-    FROM clients c WHERE ${clientWhere}
-  `).bind(...clientBinds).first();
-
-  const paymentAgg = await env.DB.prepare(`
-    SELECT COALESCE(SUM(p.amount_kobo),0) AS verified_kobo, COUNT(*) AS verified_count
-    FROM payments p JOIN clients c ON c.id=p.client_id
-    WHERE ${paymentWhere}
-  `).bind(...clientBinds).first();
-
-  const leadAgg = await env.DB.prepare(`
-    SELECT COUNT(*) AS total,
-           SUM(CASE WHEN l.status='Converted' THEN 1 ELSE 0 END) AS converted,
-           SUM(CASE WHEN l.status IN (${LEAD_OPEN_STATUSES.map(() => "?").join(",")}) THEN 1 ELSE 0 END) AS open_leads
-    FROM leads l WHERE ${leadWhere}
-  `).bind(...LEAD_OPEN_STATUSES, ...leadBinds).first();
-
-  const dueFollowUps = await env.DB.prepare(`
-    SELECT COUNT(*) AS c FROM leads l
-    WHERE ${leadWhere} AND l.next_follow_up_date IS NOT NULL
-      AND date(l.next_follow_up_date) <= date('now')
-      AND l.status NOT IN ('Converted','Lost')
-  `).bind(...leadBinds).first();
-
   let propertyWhere = "1=1";
   let propertyBinds = [];
   if (canCompanyReport) {
@@ -2820,16 +2812,6 @@ async function buildAnalytics(env, actor, scope, url) {
     propertyBinds = [...clientBinds];
   }
 
-  const propertyAgg = await env.DB.prepare(`
-    SELECT COUNT(*) AS total,
-           SUM(CASE WHEN p.is_published=1 THEN 1 ELSE 0 END) AS published,
-           SUM(CASE WHEN p.status='Available' THEN 1 ELSE 0 END) AS available,
-           SUM(CASE WHEN p.status='Reserved' THEN 1 ELSE 0 END) AS reserved,
-           SUM(CASE WHEN p.status='Sold' THEN 1 ELSE 0 END) AS sold,
-           SUM(CASE WHEN p.status='Unavailable' THEN 1 ELSE 0 END) AS unavailable
-    FROM properties p WHERE ${propertyWhere}
-  `).bind(...propertyBinds).first();
-
   let staffWhere = financeScope ? "1=0" : "u.is_active=1 AND r.name<>'Client'";
   let staffBinds = [];
   if (!financeScope && scope.role === "Branch Manager") {
@@ -2842,73 +2824,115 @@ async function buildAnalytics(env, actor, scope, url) {
     staffWhere += " AND u.id=?";
     staffBinds = [scope.actorId];
   }
-  const staffAgg = await env.DB.prepare(`
-    SELECT COUNT(*) AS total,
-           SUM(CASE WHEN r.name='Marketer' THEN 1 ELSE 0 END) AS marketers,
-           SUM(CASE WHEN r.name='Team Lead' THEN 1 ELSE 0 END) AS team_leads
-    FROM users u JOIN roles r ON r.id=u.role_id WHERE ${staffWhere}
-  `).bind(...staffBinds).first();
 
-  const periodClient = await env.DB.prepare(`
-    SELECT COUNT(*) AS new_clients, COALESCE(SUM(c.agreed_purchase_price),0) AS contract_value
-    FROM clients c
-    WHERE ${clientWhere} AND date(c.created_at) BETWEEN date(?) AND date(?)
-  `).bind(...clientBinds, range.from, range.to).first();
-
-  const periodPayment = await env.DB.prepare(`
-    SELECT COALESCE(SUM(p.amount_kobo),0) AS verified_kobo, COUNT(*) AS verified_count
-    FROM payments p JOIN clients c ON c.id=p.client_id
-    WHERE ${paymentWhere} AND date(p.verified_at) BETWEEN date(?) AND date(?)
-  `).bind(...clientBinds, range.from, range.to).first();
-
-  const periodLead = await env.DB.prepare(`
-    SELECT COUNT(*) AS generated,
-           SUM(CASE WHEN l.status='Converted' THEN 1 ELSE 0 END) AS converted
-    FROM leads l
-    WHERE ${leadWhere} AND date(l.created_at) BETWEEN date(?) AND date(?)
-  `).bind(...leadBinds, range.from, range.to).first();
-
-  const periodConversions = await env.DB.prepare(`
-    SELECT COUNT(*) AS converted
-    FROM leads l
-    WHERE ${leadWhere} AND l.converted_at IS NOT NULL
-      AND date(l.converted_at) BETWEEN date(?) AND date(?)
-  `).bind(...leadBinds, range.from, range.to).first();
-
-  // Trend buckets
-  const paymentGroup = periodSql("p.verified_at", range.granularity);
-  const contractGroup = periodSql("c.created_at", range.granularity);
-  const leadGroup = periodSql("l.created_at", range.granularity);
-  const conversionGroup = periodSql("l.converted_at", range.granularity);
-
-  const { results: paymentTrend } = await env.DB.prepare(`
-    SELECT ${paymentGroup} AS period, COALESCE(SUM(p.amount_kobo),0) AS verified_kobo
-    FROM payments p JOIN clients c ON c.id=p.client_id
-    WHERE ${paymentWhere} AND date(p.verified_at) BETWEEN date(?) AND date(?)
-    GROUP BY period ORDER BY period
-  `).bind(...clientBinds, range.from, range.to).all();
-
-  const { results: contractTrend } = await env.DB.prepare(`
-    SELECT ${contractGroup} AS period, COALESCE(SUM(c.agreed_purchase_price),0) AS contract_value
-    FROM clients c
-    WHERE ${clientWhere} AND date(c.created_at) BETWEEN date(?) AND date(?)
-    GROUP BY period ORDER BY period
-  `).bind(...clientBinds, range.from, range.to).all();
-
-  const { results: leadTrend } = await env.DB.prepare(`
-    SELECT ${leadGroup} AS period, COUNT(*) AS leads
-    FROM leads l
-    WHERE ${leadWhere} AND date(l.created_at) BETWEEN date(?) AND date(?)
-    GROUP BY period ORDER BY period
-  `).bind(...leadBinds, range.from, range.to).all();
-
-  const { results: conversionTrend } = await env.DB.prepare(`
-    SELECT ${conversionGroup} AS period, COUNT(*) AS conversions
-    FROM leads l
-    WHERE ${leadWhere} AND l.converted_at IS NOT NULL
-      AND date(l.converted_at) BETWEEN date(?) AND date(?)
-    GROUP BY period ORDER BY period
-  `).bind(...leadBinds, range.from, range.to).all();
+  const baseStatements = [
+    env.DB.prepare(`
+      SELECT COUNT(*) AS total,
+             SUM(CASE WHEN c.status IN ('Active Buyer','Completed') THEN 1 ELSE 0 END) AS active_clients,
+             SUM(CASE WHEN c.status='Prospect' THEN 1 ELSE 0 END) AS prospects,
+             COALESCE(SUM(c.agreed_purchase_price),0) AS contract_value
+      FROM clients c WHERE ${clientWhere}
+    `).bind(...clientBinds),
+    env.DB.prepare(`
+      SELECT COALESCE(SUM(p.amount_kobo),0) AS verified_kobo, COUNT(*) AS verified_count
+      FROM payments p JOIN clients c ON c.id=p.client_id
+      WHERE ${paymentWhere}
+    `).bind(...clientBinds),
+    env.DB.prepare(`
+      SELECT COUNT(*) AS total,
+             SUM(CASE WHEN l.status='Converted' THEN 1 ELSE 0 END) AS converted,
+             SUM(CASE WHEN l.status IN (${LEAD_OPEN_STATUSES.map(() => "?").join(",")}) THEN 1 ELSE 0 END) AS open_leads
+      FROM leads l WHERE ${leadWhere}
+    `).bind(...LEAD_OPEN_STATUSES, ...leadBinds),
+    env.DB.prepare(`
+      SELECT COUNT(*) AS c FROM leads l
+      WHERE ${leadWhere} AND l.next_follow_up_date IS NOT NULL
+        AND date(l.next_follow_up_date) <= date('now')
+        AND l.status NOT IN ('Converted','Lost')
+    `).bind(...leadBinds),
+    env.DB.prepare(`
+      SELECT COUNT(*) AS total,
+             SUM(CASE WHEN p.is_published=1 THEN 1 ELSE 0 END) AS published,
+             SUM(CASE WHEN p.status='Available' THEN 1 ELSE 0 END) AS available,
+             SUM(CASE WHEN p.status='Reserved' THEN 1 ELSE 0 END) AS reserved,
+             SUM(CASE WHEN p.status='Sold' THEN 1 ELSE 0 END) AS sold,
+             SUM(CASE WHEN p.status='Unavailable' THEN 1 ELSE 0 END) AS unavailable
+      FROM properties p WHERE ${propertyWhere}
+    `).bind(...propertyBinds),
+    env.DB.prepare(`
+      SELECT COUNT(*) AS total,
+             SUM(CASE WHEN r.name='Marketer' THEN 1 ELSE 0 END) AS marketers,
+             SUM(CASE WHEN r.name='Team Lead' THEN 1 ELSE 0 END) AS team_leads
+      FROM users u JOIN roles r ON r.id=u.role_id WHERE ${staffWhere}
+    `).bind(...staffBinds),
+    env.DB.prepare(`
+      SELECT COUNT(*) AS new_clients, COALESCE(SUM(c.agreed_purchase_price),0) AS contract_value
+      FROM clients c
+      WHERE ${clientWhere} AND ${rangeClause("c.created_at")}
+    `).bind(...clientBinds, range.from, range.to),
+    env.DB.prepare(`
+      SELECT COALESCE(SUM(p.amount_kobo),0) AS verified_kobo, COUNT(*) AS verified_count
+      FROM payments p JOIN clients c ON c.id=p.client_id
+      WHERE ${paymentWhere} AND ${rangeClause("p.verified_at")}
+    `).bind(...clientBinds, range.from, range.to),
+    env.DB.prepare(`
+      SELECT COUNT(*) AS generated,
+             SUM(CASE WHEN l.status='Converted' THEN 1 ELSE 0 END) AS converted
+      FROM leads l
+      WHERE ${leadWhere} AND ${rangeClause("l.created_at")}
+    `).bind(...leadBinds, range.from, range.to),
+    env.DB.prepare(`
+      SELECT COUNT(*) AS converted
+      FROM leads l
+      WHERE ${leadWhere} AND l.converted_at IS NOT NULL
+        AND ${rangeClause("l.converted_at")}
+    `).bind(...leadBinds, range.from, range.to),
+    env.DB.prepare(`
+      SELECT ${periodSql("p.verified_at", range.granularity)} AS period, COALESCE(SUM(p.amount_kobo),0) AS verified_kobo
+      FROM payments p JOIN clients c ON c.id=p.client_id
+      WHERE ${paymentWhere} AND ${rangeClause("p.verified_at")}
+      GROUP BY period ORDER BY period
+    `).bind(...clientBinds, range.from, range.to),
+    env.DB.prepare(`
+      SELECT ${periodSql("c.created_at", range.granularity)} AS period, COALESCE(SUM(c.agreed_purchase_price),0) AS contract_value
+      FROM clients c
+      WHERE ${clientWhere} AND ${rangeClause("c.created_at")}
+      GROUP BY period ORDER BY period
+    `).bind(...clientBinds, range.from, range.to),
+    env.DB.prepare(`
+      SELECT ${periodSql("l.created_at", range.granularity)} AS period, COUNT(*) AS leads
+      FROM leads l
+      WHERE ${leadWhere} AND ${rangeClause("l.created_at")}
+      GROUP BY period ORDER BY period
+    `).bind(...leadBinds, range.from, range.to),
+    env.DB.prepare(`
+      SELECT ${periodSql("l.converted_at", range.granularity)} AS period, COUNT(*) AS conversions
+      FROM leads l
+      WHERE ${leadWhere} AND l.converted_at IS NOT NULL
+        AND ${rangeClause("l.converted_at")}
+      GROUP BY period ORDER BY period
+    `).bind(...leadBinds, range.from, range.to),
+    env.DB.prepare(`
+      SELECT l.status, COUNT(*) AS count FROM leads l
+      WHERE ${leadWhere} GROUP BY l.status
+    `).bind(...leadBinds)
+  ];
+  const baseResults = await runReadBatch(env, baseStatements);
+  const clientAgg = batchFirst(baseResults[0]);
+  const paymentAgg = batchFirst(baseResults[1]);
+  const leadAgg = batchFirst(baseResults[2]);
+  const dueFollowUps = batchFirst(baseResults[3]);
+  const propertyAgg = batchFirst(baseResults[4]);
+  const staffAgg = batchFirst(baseResults[5]);
+  const periodClient = batchFirst(baseResults[6]);
+  const periodPayment = batchFirst(baseResults[7]);
+  const periodLead = batchFirst(baseResults[8]);
+  const periodConversions = batchFirst(baseResults[9]);
+  const paymentTrend = baseResults[10].results;
+  const contractTrend = baseResults[11].results;
+  const leadTrend = baseResults[12].results;
+  const conversionTrend = baseResults[13].results;
+  const pipelineRows = baseResults[14].results;
 
   const trendMap = new Map();
   for (const key of buildPeriodKeys(range.from, range.to, range.granularity)) {
@@ -2926,10 +2950,6 @@ async function buildAnalytics(env, actor, scope, url) {
   for (const row of conversionTrend) ensureTrend(row.period).conversions = Number(row.conversions);
   const trends = [...trendMap.values()].sort((a, b) => String(a.period).localeCompare(String(b.period)));
 
-  const { results: pipelineRows } = await env.DB.prepare(`
-    SELECT l.status, COUNT(*) AS count FROM leads l
-    WHERE ${leadWhere} GROUP BY l.status
-  `).bind(...leadBinds).all();
   const leadPipeline = {};
   for (const status of LEAD_STATUSES) leadPipeline[status] = 0;
   for (const row of pipelineRows) leadPipeline[row.status] = Number(row.count);
@@ -2947,33 +2967,40 @@ async function buildAnalytics(env, actor, scope, url) {
       branchBindsList.push(branchId);
     }
     branchSql += " ORDER BY name";
-    const { results: branchRows } = await env.DB.prepare(branchSql).bind(...branchBindsList).all();
-
-    const { results: clientByBranch } = await env.DB.prepare(`
-      SELECT c.assigned_branch_id AS branch_id, COUNT(*) AS clients,
-             COALESCE(SUM(c.agreed_purchase_price),0) AS contract_value,
-             SUM(CASE WHEN c.status IN ('Active Buyer','Completed') THEN 1 ELSE 0 END) AS active_clients
-      FROM clients c
-      WHERE c.is_deleted=0 AND c.client_reference NOT LIKE 'DEMO-%' ${categoryFilter}
-      GROUP BY c.assigned_branch_id
-    `).bind(...categoryBinds).all();
-    const { results: paymentByBranch } = await env.DB.prepare(`
-      SELECT c.assigned_branch_id AS branch_id, COALESCE(SUM(p.amount_kobo),0) AS verified_kobo
-      FROM payments p JOIN clients c ON c.id=p.client_id
-      WHERE p.status='verified' AND p.is_demo=0 AND p.currency='NGN' ${categoryFilter}
-      GROUP BY c.assigned_branch_id
-    `).bind(...categoryBinds).all();
-    const { results: leadByBranch } = await env.DB.prepare(`
-      SELECT l.branch_id, COUNT(*) AS leads,
-             SUM(CASE WHEN l.status='Converted' THEN 1 ELSE 0 END) AS conversions
-      FROM leads l WHERE l.is_demo=0 GROUP BY l.branch_id
-    `).all();
     const propertyCategoryFilter = requestedCategory ? " WHERE p.category_id=?" : "";
-    const { results: propertyByBranch } = await env.DB.prepare(`
-      SELECT p.branch_id, COUNT(*) AS properties,
-             SUM(CASE WHEN p.is_published=1 THEN 1 ELSE 0 END) AS published
-      FROM properties p${propertyCategoryFilter} GROUP BY p.branch_id
-    `).bind(...categoryBinds).all();
+    const branchStatements = [
+      env.DB.prepare(branchSql).bind(...branchBindsList),
+      env.DB.prepare(`
+        SELECT c.assigned_branch_id AS branch_id, COUNT(*) AS clients,
+               COALESCE(SUM(c.agreed_purchase_price),0) AS contract_value,
+               SUM(CASE WHEN c.status IN ('Active Buyer','Completed') THEN 1 ELSE 0 END) AS active_clients
+        FROM clients c
+        WHERE c.is_deleted=0 AND c.client_reference NOT LIKE 'DEMO-%' ${categoryFilter}
+        GROUP BY c.assigned_branch_id
+      `).bind(...categoryBinds),
+      env.DB.prepare(`
+        SELECT c.assigned_branch_id AS branch_id, COALESCE(SUM(p.amount_kobo),0) AS verified_kobo
+        FROM payments p JOIN clients c ON c.id=p.client_id
+        WHERE p.status='verified' AND p.is_demo=0 AND p.currency='NGN' ${categoryFilter}
+        GROUP BY c.assigned_branch_id
+      `).bind(...categoryBinds),
+      env.DB.prepare(`
+        SELECT l.branch_id, COUNT(*) AS leads,
+               SUM(CASE WHEN l.status='Converted' THEN 1 ELSE 0 END) AS conversions
+        FROM leads l WHERE l.is_demo=0 GROUP BY l.branch_id
+      `),
+      env.DB.prepare(`
+        SELECT p.branch_id, COUNT(*) AS properties,
+               SUM(CASE WHEN p.is_published=1 THEN 1 ELSE 0 END) AS published
+        FROM properties p${propertyCategoryFilter} GROUP BY p.branch_id
+      `).bind(...categoryBinds)
+    ];
+    const branchResults = await runReadBatch(env, branchStatements);
+    const branchRows = branchResults[0].results;
+    const clientByBranch = branchResults[1].results;
+    const paymentByBranch = branchResults[2].results;
+    const leadByBranch = branchResults[3].results;
+    const propertyByBranch = branchResults[4].results;
     const clientMap = new Map(clientByBranch.map(r => [r.branch_id, r]));
     const paymentMap = new Map(paymentByBranch.map(r => [r.branch_id, r]));
     const leadMap = financeScope ? new Map() : new Map(leadByBranch.map(r => [r.branch_id, r]));
@@ -3128,27 +3155,41 @@ async function buildAnalytics(env, actor, scope, url) {
     };
   }
 
-  const { results: categoryClientRows } = await env.DB.prepare(`
-    SELECT COALESCE(pc.name,'Uncategorised') AS category_name,
-           COUNT(*) AS clients,
-           COALESCE(SUM(c.agreed_purchase_price),0) AS contract_value
-    FROM clients c
-    LEFT JOIN properties p ON p.id=c.interested_property_id
-    LEFT JOIN property_categories pc ON pc.id=p.category_id
-    WHERE ${clientWhere} AND date(c.created_at) BETWEEN date(?) AND date(?)
-    GROUP BY category_name ORDER BY contract_value DESC
-  `).bind(...clientBinds, range.from, range.to).all();
-
-  const { results: categoryPaymentRows } = await env.DB.prepare(`
-    SELECT COALESCE(pc.name,'Uncategorised') AS category_name,
-           COALESCE(SUM(p.amount_kobo),0) AS verified_kobo
-    FROM payments p
-    JOIN clients c ON c.id=p.client_id
-    LEFT JOIN properties prop ON prop.id=c.interested_property_id
-    LEFT JOIN property_categories pc ON pc.id=prop.category_id
-    WHERE ${paymentWhere} AND date(p.verified_at) BETWEEN date(?) AND date(?)
-    GROUP BY category_name
-  `).bind(...clientBinds, range.from, range.to).all();
+  const categoryStatements = [
+    env.DB.prepare(`
+      SELECT COALESCE(pc.name,'Uncategorised') AS category_name,
+             COUNT(*) AS clients,
+             COALESCE(SUM(c.agreed_purchase_price),0) AS contract_value
+      FROM clients c
+      LEFT JOIN properties p ON p.id=c.interested_property_id
+      LEFT JOIN property_categories pc ON pc.id=p.category_id
+      WHERE ${clientWhere} AND ${rangeClause("c.created_at")}
+      GROUP BY category_name ORDER BY contract_value DESC
+    `).bind(...clientBinds, range.from, range.to),
+    env.DB.prepare(`
+      SELECT COALESCE(pc.name,'Uncategorised') AS category_name,
+             COALESCE(SUM(p.amount_kobo),0) AS verified_kobo
+      FROM payments p
+      JOIN clients c ON c.id=p.client_id
+      LEFT JOIN properties prop ON prop.id=c.interested_property_id
+      LEFT JOIN property_categories pc ON pc.id=prop.category_id
+      WHERE ${paymentWhere} AND ${rangeClause("p.verified_at")}
+      GROUP BY category_name
+    `).bind(...clientBinds, range.from, range.to),
+    env.DB.prepare(`
+      SELECT fa.adjustment_type, COUNT(*) AS count, COALESCE(SUM(fa.amount_kobo),0) AS amount_kobo
+      FROM financial_adjustments fa
+      JOIN payments p ON p.id=fa.payment_id
+      JOIN clients c ON c.id=p.client_id
+      WHERE ${clientScope.clause}${clientBranch}${categoryFilter} AND p.is_demo=0
+        AND ${rangeClause("fa.created_at")}
+      GROUP BY fa.adjustment_type
+    `).bind(...clientBinds, range.from, range.to)
+  ];
+  const categoryResults = await runReadBatch(env, categoryStatements);
+  const categoryClientRows = categoryResults[0].results;
+  const categoryPaymentRows = categoryResults[1].results;
+  const refundRows = categoryResults[2].results;
 
   const categoryMap = new Map();
   for (const row of categoryClientRows) {
@@ -3169,15 +3210,6 @@ async function buildAnalytics(env, actor, scope, url) {
   const propertyCategorySales = [...categoryMap.values()]
     .sort((a, b) => b.contract_value_kobo - a.contract_value_kobo);
 
-  const { results: refundRows } = await env.DB.prepare(`
-    SELECT fa.adjustment_type, COUNT(*) AS count, COALESCE(SUM(fa.amount_kobo),0) AS amount_kobo
-    FROM financial_adjustments fa
-    JOIN payments p ON p.id=fa.payment_id
-    JOIN clients c ON c.id=p.client_id
-    WHERE ${clientScope.clause}${clientBranch}${categoryFilter} AND p.is_demo=0
-      AND date(fa.created_at) BETWEEN date(?) AND date(?)
-    GROUP BY fa.adjustment_type
-  `).bind(...clientBinds, range.from, range.to).all();
   const refundSummary = refundRows.map(row => ({
     adjustment_type: row.adjustment_type,
     count: Number(row.count || 0),

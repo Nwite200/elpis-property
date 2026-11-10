@@ -75,6 +75,10 @@
     }, NAV_MARKER_TTL + 50);
   }
 
+  function skipInternalIntro() {
+    return CFG.INTRO_INTERNAL === "off";
+  }
+
   function initialMode() {
     var quick = CFG.INTRO_MODE === "quick";
     var type = navigationType();
@@ -82,8 +86,8 @@
       clearMarker();
       return quick ? "quick" : "full";
     }
-    if (type === "back_forward") return "short";
-    if (consumeInternalMarker()) return "short";
+    if (type === "back_forward") return skipInternalIntro() ? "none" : "short";
+    if (consumeInternalMarker()) return skipInternalIntro() ? "none" : "short";
     return quick ? "quick" : "full";
   }
 
@@ -358,6 +362,12 @@
   }
 
   function runIntro(mode, options) {
+    if (mode === "none") {
+      // Mark the document as handled so the later pageshow handler does not
+      // fall through to the full intro after the internal marker was consumed.
+      startedOnThisDocument = true;
+      return;
+    }
     var opts = options || {};
     var now = Date.now();
     if (opts.dedupe && activeRun && now - lastStartAt < 400) return;
@@ -456,13 +466,14 @@
 
   function onPageshow(event) {
     if (event.persisted) {
-      runIntro("short", { dedupe: true });
+      if (!skipInternalIntro()) runIntro("short", { dedupe: true });
     } else if (!startedOnThisDocument) {
       runIntro(initialMode(), { dedupe: true });
     }
   }
 
   function onPopstate() {
+    if (skipInternalIntro()) return;
     window.setTimeout(function () {
       runIntro("short", { dedupe: true });
     }, 0);

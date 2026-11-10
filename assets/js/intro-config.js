@@ -5,6 +5,9 @@
 window.ELPIS_INTRO_CONFIG = {
   INTRO_STYLE: "hype", // "hype" | "classic"
   INTRO_MODE: "quick", // "quick" (3.8s) | "full" (15s legacy)
+  // One-line rollback: set to "short" to replay the 1.2s transition on every
+  // internal navigation again. "off" plays the intro only on a direct load.
+  INTRO_INTERNAL: "off", // "off" | "short"
   LOGO_SRC: "assets/images/elpis-property-logo-original.png",
   BRAND_NAME: "ELPIS PROPERTY LIMITED",
   TAGLINE: "Spaces. Assets. Possibilities.",

@@ -55,6 +55,9 @@ DEFAULT_GRACE_DAYS = "0"
 PAYMENT_MODE = "test"
 # Rollback: change to "safe" to restore revalidate-every-time asset caching.
 ASSET_CACHE_MODE = "standard"
+# Performance flags. One-line rollback for each: set to "0" and redeploy.
+PERF_BATCH_QUERIES = "1"
+PERF_SARGABLE_DATES = "1"
 
 [observability]
 enabled = true

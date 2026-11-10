@@ -159,8 +159,18 @@ try {
     const intro = readFileSync('assets/js/intro-config.js', 'utf8');
     assert(intro.includes('INTRO_MODE: "quick"') && intro.includes('total: 3800'), 'quick intro flag/timing missing');
     assert(intro.includes('total: 15000') && intro.includes('total: 1200'), 'legacy full/short intro timings must remain for rollback');
+    assert(/INTRO_INTERNAL:\s*"off"/.test(intro), 'internal-navigation intro skip flag missing');
     const motion = readFileSync('assets/js/motion.js', 'utf8');
     assert(motion.includes('mode === "quick"') && motion.includes('CFG.QUICK'), 'motion.js does not consume the quick mode');
+  });
+
+  await test('internal navigation does not replay the intro overlay', async () => {
+    await goto(pageA, BASE + '/login');
+    await pageA.waitForTimeout(4500);
+    await Promise.all([pageA.waitForNavigation({ waitUntil: 'load' }), pageA.click('a[href="signup.html"]')]);
+    await pageA.waitForTimeout(400);
+    const overlays = await pageA.locator('.elpis-intro').count();
+    assert(overlays === 0, `intro overlay replayed on internal navigation (${overlays} present)`);
   });
 
   await test('drill-down breadcrumbs show National > Branch > Team Lead and can drill back up', async () => {

@@ -37,6 +37,11 @@ function createD1Adapter(database) {
         }
       };
       return stmtObj;
+    },
+    async batch(statements) {
+      const results = [];
+      for (const statement of statements) results.push(await statement.all());
+      return results;
     }
   };
 }
@@ -1854,7 +1859,23 @@ await test('referral commission applies two-stage and flat rules, caps at 35,000
   assert(configView.status === 200 && configView.data.entries.some(row => row.client_id === eightMonthClient), 'configuration-required referral account missing from dashboard');
 });
 
-console.log('\n--- 13. Migration reproducibility and database integrity ---');
+console.log('\n--- 13. Performance flags preserve response contracts ---');
+await test('dashboard, analytics and finance JSON are identical with batching and sargable dates on/off', async () => {
+  const paths = [
+    '/api/dashboard',
+    '/api/analytics/performance?from=2026-01-01&to=2026-12-31&granularity=month',
+    '/api/finance/overview?from=2026-01-01&to=2026-12-31'
+  ];
+  for (const path of paths) {
+    const headers = { Cookie: mdCookie };
+    const off = await request(path, { headers, env: makeEnv({ PERF_BATCH_QUERIES: '0', PERF_SARGABLE_DATES: '0' }) });
+    const on = await request(path, { headers, env: makeEnv({ PERF_BATCH_QUERIES: '1', PERF_SARGABLE_DATES: '1' }) });
+    assert(off.status === 200 && on.status === 200, `${path} expected 200, got ${off.status}/${on.status}`);
+    assert(JSON.stringify(off.data) === JSON.stringify(on.data), `${path} response changed when PERF flags were enabled`);
+  }
+});
+
+console.log('\n--- 14. Migration reproducibility and database integrity ---');
 await test('scheduled cleanup removes expired sessions and aged auth attempts but keeps business audits', async () => {
   const expiredId = 'retention-expired-session';
   db.prepare("INSERT OR REPLACE INTO sessions (id,user_id,expires_at) VALUES (?,?,datetime('now','-1 day'))").run(expiredId, mdId);
