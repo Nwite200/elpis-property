@@ -8,13 +8,13 @@ Use this checklist before staging and again before production. Do not tick an it
 
 - [x] Phase 1–7 functionality preserved.
 - [x] Phase 8 integration and security suite added.
-- [x] Full local regression suite passes: **145 passed, 0 failed, 0 skipped**.
+- [x] Full local regression suite passes: **177 passed, 0 failed, 0 skipped**.
 - [x] JavaScript syntax checks pass.
 - [x] Inline HTML scripts syntax-checked.
 - [x] `git diff --check` clean.
 - [x] No secrets, local databases, logs or temporary audit files in the working tree.
 - [x] `.dev.vars` ignored and untracked.
-- [x] All nine local migrations reproduce on a clean SQLite database.
+- [x] All 32 local migrations reproduce on a clean SQLite database.
 - [x] Clean migration database passes integrity and foreign-key checks.
 - [ ] Phase 8 changes committed and reviewed.
 - [ ] Phase 8 pushed to GitHub after explicit authorization.
@@ -90,7 +90,7 @@ Production secrets must be set through Wrangler secrets or the Cloudflare dashbo
 - [ ] Confirm notification delivery records are written.
 - [ ] Confirm email/WhatsApp adapters are either implemented or explicitly disabled.
 - [ ] Confirm the cron trigger is intended (`0 6 * * *`) and timezone assumptions are approved.
-- [ ] Add cleanup jobs for expired sessions/reset tokens if required.
+- [x] Add cleanup jobs for expired sessions/reset tokens if required. (`cleanupOperationalState` runs on the daily cron; migration `0032` adds the supporting indexes.)
 - [ ] Add monitoring for queue backlog and repeated retries.
 
 ---
