@@ -87,6 +87,7 @@ export function createVoice(persona) {
   }
 
   function enable({ silent = false } = {}) {
+    state.error = "";
     if (!support.synthesis) {
       setStatus(voiceSupportMessage(support), "unsupported");
       return false;
@@ -160,12 +161,14 @@ export function createVoice(persona) {
       state.muted = false;
     }
     state.status = "Requesting microphone…";
+    state.error = "";
     emit();
     const started = recognition.start({
       lang: profile.lang || "en-NG",
       onStart() {
         state.listening = true;
         state.interim = "";
+        state.error = "";
         state.status = "Listening… speak now.";
         emit();
       },
@@ -177,6 +180,7 @@ export function createVoice(persona) {
       onFinal(text) {
         state.listening = false;
         state.interim = "";
+        state.error = "";
         state.status = "Got it…";
         emit();
         if (typeof controller.onTranscript === "function") controller.onTranscript(text);
@@ -184,7 +188,7 @@ export function createVoice(persona) {
       onEnd() {
         state.listening = false;
         state.interim = "";
-        if (state.enabled && !state.speaking) state.status = readyText();
+        if (state.enabled && !state.speaking && !state.error) state.status = readyText();
         emit();
       },
       onError(message, code) {

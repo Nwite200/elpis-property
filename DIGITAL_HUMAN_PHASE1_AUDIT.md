@@ -411,3 +411,24 @@ a real client balance summary, and a portrait-file check for all nine personas.
   payment announcements and the handover acceptance contract.
 - Production still needs the external provider credentials and a staging acceptance pass; this
   deployment is the staging evaluation build.
+
+## 23. Voice realism + team-lead member management
+
+- **Voice:** the synthesis engine now scores device voices for `natural/neural/enhanced/premium/
+  siri/online/studio/wavenet`, penalises compact/espeak voices, removes the artificial pitch
+  shifting (pitch is now 0.97–1.03) and normalises currency/ampersands before speaking. A persistent
+  voice picker lists every installed voice; “auto” chooses the best natural voice available. This is
+  the realistic ceiling of the free browser API — true studio-grade neural TTS needs a paid provider
+  and a server-side key, which the free-only brief excludes.
+- **Microphone:** recognition uses the device language, retries once with the browser locale if
+  `en-NG` is unsupported, reports “Requesting microphone…”, preserves permission/no-microphone/
+  network errors in the status line (an `onend` no longer overwrites the error), and always keeps
+  typed input available. Chrome/Edge have the best recognition support; Safari is partial and
+  Firefox has none. Headless browsers can deny the mic even with a granted permission, which now
+  shows an honest error instead of silently doing nothing.
+- **Team leads:** new authenticated endpoints list, add and remove marketers in a team the caller
+  leads. Cross-branch and non-lead access is denied; only active marketers in the same branch are
+  eligible; changes update `manager_id`, notify the member, and are audited. `my-team.html` plus a
+  sidebar link gives team leads the UI; marketers see the team read-only.
+- **Tests:** 198 total; Phase 8 covers add/remove/cross-branch denial, and the voice suite still
+  covers unsupported fallback, speak/replay/stop and spoken input.
