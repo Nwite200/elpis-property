@@ -3221,7 +3221,7 @@ body.page-home .hero-section::before {
     background-image: url('../images/hero-estate-800.avif');
     background-image: image-set(
       url('../images/hero-estate-800.avif') 1x,
-      url('../images/hero-estate-1600.avif') 2x
+      url('../images/hero-estate-1200.avif') 2x
     );
   }
 }
