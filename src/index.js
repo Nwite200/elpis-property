@@ -14549,11 +14549,11 @@ export default {
     headers.set("X-Content-Type-Options", "nosniff");
     headers.set("X-Frame-Options", "DENY");
     headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-    headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=()");
+    headers.set("Permissions-Policy", "camera=(), microphone=(self), geolocation=(), payment=()");
     headers.set(
       "Content-Security-Policy",
       "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; " +
-      "form-action 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
+      "form-action 'self'; script-src 'self' 'unsafe-inline' blob: https://cdn.jsdelivr.net; " +
       "style-src 'self' 'unsafe-inline'; " +
       "font-src 'self' data:; " +
       "img-src 'self' data: blob: https:; connect-src 'self' https: ws: wss:; " +

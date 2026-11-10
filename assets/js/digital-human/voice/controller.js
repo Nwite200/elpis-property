@@ -18,6 +18,7 @@ export function createVoice(persona, context) {
   let currentPersona = persona;
   let profile = persona.voice || { lang: "en-NG", rate: 1, pitch: 1 };
   let speechToken = 0;
+  let neuralFailed = false;
 
   const state = {
     supported: support.recognition || support.synthesis || recorder.supported,
@@ -50,6 +51,7 @@ export function createVoice(persona, context) {
 
   function readyText() {
     if (selector.engine === "neural") {
+      if (neuralFailed) return "Neural voice unavailable · using the device voice.";
       const voice = kokoroVoiceFor(currentPersona.key);
       return `Neural voice ready · ${KOKORO_VOICE_LABELS[voice] || voice}`;
     }
@@ -197,6 +199,7 @@ export function createVoice(persona, context) {
         },
         onStart() {
           if (token !== speechToken) return;
+          neuralFailed = false;
           state.speaking = true;
           state.route = selector.route;
           state.status = "Speaking… tap Stop to interrupt.";
@@ -219,6 +222,7 @@ export function createVoice(persona, context) {
       }).then(handled => {
         if (token !== speechToken) return;
         if (!handled) {
+          neuralFailed = true;
           if (synth) speakNative(text, token);
           else {
             state.speaking = false;
@@ -238,6 +242,7 @@ export function createVoice(persona, context) {
 
   function setEngine(engine) {
     selector.setEngine(engine);
+    neuralFailed = false;
     state.engine = selector.engine;
     state.speaking = false;
     if (state.enabled) state.status = readyText();
@@ -388,6 +393,7 @@ export function createVoice(persona, context) {
     if (!nextPersona) return;
     currentPersona = nextPersona;
     profile = nextPersona.voice || profile;
+    neuralFailed = false;
     cancelAudio();
     if (synth) synth.voiceName = "";
     state.interim = "";
