@@ -1,6 +1,6 @@
 // Assistant shell: launcher, panel, transcript, captions and responsive states.
 
-import { COMPANY, VERSION, personaByKey } from "./config.js";
+import { COMPANY, VERSION, PERSONAS, personaByKey } from "./config.js";
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -489,8 +489,20 @@ export class AssistantUI {
     else this.show();
   }
 
+  preloadPortraits() {
+    if (this.portraitsPreloaded) return;
+    this.portraitsPreloaded = true;
+    for (const persona of PERSONAS) {
+      if (!persona.avatar) continue;
+      const image = new Image();
+      image.decoding = "async";
+      image.src = persona.avatar;
+    }
+  }
+
   show() {
     this.removeIntro();
+    this.preloadPortraits();
     if (this.open) return;
     this.open = true;
     this.panel.hidden = false;
