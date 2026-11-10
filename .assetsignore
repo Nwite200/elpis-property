@@ -6,6 +6,7 @@ node_modules
 .gitignore
 .assetsignore
 migrations
+scripts
 src
 package.json
 package-lock.json

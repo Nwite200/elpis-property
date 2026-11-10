@@ -1,11 +1,14 @@
 /* Elpis Property Limited — PWA service worker.
    Static assets only. API and authenticated financial data are never cached. */
-const CACHE_VERSION = "elpis-pwa-v8";
+const CACHE_VERSION = "elpis-pwa-v9";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const CORE_ASSETS = [
   "/",
   "/offline",
   "/manifest.json",
+  "/assets/fonts/fonts.css",
+  "/assets/fonts/fc88c23021-rP2Hp2ywxg089UriCZOIHTWEBlw.woff2",
+  "/assets/fonts/f2edea8e97-xn7gYHE41ni1AdIRggexSvfedN4.woff2",
   "/assets/css/styles.css",
   "/assets/css/motion.css",
   "/assets/js/intro-config.js",

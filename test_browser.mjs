@@ -72,11 +72,14 @@ async function goto(page, url) {
 }
 
 async function login(page, email) {
-  await goto(page, BASE + '/login.html');
+  await goto(page, BASE + '/login');
   await page.fill('#email', email);
   await page.fill('#password', PASSWORD);
   await page.click('#submitBtn');
-  await page.waitForURL(url => !url.pathname.endsWith('/login.html'), { timeout: 20000 });
+  // Wait for the authenticated shell, not just a URL change: the clean
+  // /login URL can satisfy a naive pathname check before the session cookie
+  // is applied.
+  await page.waitForSelector('#logoutBtn', { timeout: 25000 });
 }
 
 if (!existsSync(CHROME)) {

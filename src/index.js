@@ -2431,6 +2431,31 @@ async function expireMonthlyMarketerAccess(env) {
 
 
 
+async function cleanupOperationalState(env) {
+  const results = {};
+  const run = async (key, sql) => {
+    try {
+      const result = await env.DB.prepare(sql).run();
+      results[key] = Number(result.meta && result.meta.changes ? result.meta.changes : 0);
+    } catch {
+      results[key] = 0;
+    }
+  };
+  await run("sessions", "DELETE FROM sessions WHERE expires_at < datetime('now')");
+  await run("password_reset_tokens", "DELETE FROM password_reset_tokens WHERE expires_at < datetime('now')");
+  await run("client_password_reset_codes", "DELETE FROM client_password_reset_codes WHERE expires_at < datetime('now')");
+  await run("login_lockouts", "DELETE FROM login_lockouts WHERE last_failure_at < datetime('now','-30 days') OR (locked_until IS NOT NULL AND locked_until < datetime('now','-1 day'))");
+  // Keep business audit records; only trim the high-volume auth/enquiry attempts
+  // that are used for short-window throttling and DDoS amplification control.
+  await run("audit_attempts", `DELETE FROM audit_logs
+    WHERE action IN ('login.failure','login.throttled','login.success','signup.attempt','enquiry.attempt')
+      AND created_at < datetime('now','-30 days')`);
+  await run("notification_dedupe", "DELETE FROM notification_dedupe WHERE created_at < datetime('now','-30 days')");
+  await run("webhook_events", "DELETE FROM webhook_events WHERE created_at < datetime('now','-90 days')");
+  await run("notification_deliveries", "DELETE FROM notification_deliveries WHERE created_at < datetime('now','-180 days')");
+  return results;
+}
+
 async function applyPaymentCommissionAdjustments(env, payment, adjustmentType, actorId, reason) {
   const { results: entries } = await env.DB.prepare(`
     SELECT ce.* FROM commission_entries ce
@@ -14123,9 +14148,9 @@ export default {
       "Content-Security-Policy",
       "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; " +
       "form-action 'self'; script-src 'self' 'unsafe-inline'; " +
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-      "font-src 'self' data: https://fonts.gstatic.com; " +
-      "img-src 'self' data: blob: https:; connect-src 'self' https: wss:; " +
+      "style-src 'self' 'unsafe-inline'; " +
+      "font-src 'self' data:; " +
+      "img-src 'self' data: blob: https:; connect-src 'self' https: ws: wss:; " +
       "manifest-src 'self'; worker-src 'self' blob:"
     );
     const url = new URL(request.url);
@@ -14187,6 +14212,7 @@ export default {
       await backfillReferralCommissions(env, null, { limit: 100, onlyStale: true, reason: "Scheduled referral commission reconciliation" }).catch(() => {});
       await expireTestAccounts(env);
       await expireMonthlyMarketerAccess(env);
+      await cleanupOperationalState(env);
       const settings = await getSmsSettings(env);
       if (settings.enabled && settings.provider !== "mock") {
         try {
@@ -14203,3 +14229,5 @@ export default {
     await task;
   }
 };
+
+export { cleanupOperationalState };

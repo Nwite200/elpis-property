@@ -2,7 +2,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { pbkdf2Sync, randomBytes, createHmac } from 'node:crypto';
 import { copyFileSync, existsSync, mkdirSync, rmSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import worker from './src/index.js';
+import worker, { cleanupOperationalState } from './src/index.js';
 import { resolveLiveDb } from './test_db_paths.mjs';
 
 const LIVE_DB = resolveLiveDb();
@@ -1847,13 +1847,25 @@ await test('referral commission applies two-stage and flat rules, caps at 35,000
 });
 
 console.log('\n--- 13. Migration reproducibility and database integrity ---');
+await test('scheduled cleanup removes expired sessions and aged auth attempts but keeps business audits', async () => {
+  const expiredId = 'retention-expired-session';
+  db.prepare("INSERT OR REPLACE INTO sessions (id,user_id,expires_at) VALUES (?,?,datetime('now','-1 day'))").run(expiredId, mdId);
+  db.prepare("INSERT INTO audit_logs (action,target_type,target_id,created_at) VALUES ('login.failure','user','retention@example.test',datetime('now','-40 days'))").run();
+  db.prepare("INSERT INTO audit_logs (action,target_type,target_id,created_at) VALUES ('client.update','client','retention-client',datetime('now','-40 days'))").run();
+  const result = await cleanupOperationalState(env);
+  assert(result.sessions >= 1, 'expired sessions were not removed');
+  assert(!db.prepare("SELECT id FROM sessions WHERE id=?").get(expiredId), 'expired session still present');
+  assert(db.prepare("SELECT COUNT(*) c FROM audit_logs WHERE action='login.failure' AND target_id='retention@example.test'").get().c === 0, 'aged auth attempts were not removed');
+  assert(db.prepare("SELECT COUNT(*) c FROM audit_logs WHERE action='client.update' AND target_id='retention-client'").get().c === 1, 'business audit must be retained');
+});
+
 await test('all local migrations apply cleanly to a fresh SQLite database', async () => {
   const cleanPath = join(dirname(TEST_DB), 'phase8-clean-migrations.sqlite');
   for (const suffix of ['', '-wal', '-shm']) rmSync(cleanPath + suffix, { force: true });
   const clean = new DatabaseSync(cleanPath);
   clean.exec('PRAGMA foreign_keys = ON;');
   const files = readdirSync('migrations').filter(f => /^\d+_.*\.sql$/.test(f)).sort();
-  assert(files.length === 31, `expected 31 migrations, found ${files.length}`);
+  assert(files.length === 32, `expected 32 migrations, found ${files.length}`);
   for (const file of files) {
     clean.exec(readFileSync(join('migrations', file), 'utf8'));
   }
