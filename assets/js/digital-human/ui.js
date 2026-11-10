@@ -56,12 +56,14 @@ function actionLink(action) {
 }
 
 export class AssistantUI {
-  constructor({ persona, conversation, onSend, onReset, mounted }) {
+  constructor({ persona, conversation, onSend, onReset, mounted, voice }) {
     this.persona = persona;
     this.conversation = conversation;
     this.onSend = onSend;
     this.onReset = onReset;
     this.mounted = mounted;
+    this.voice = voice || null;
+    this.lastAssistantText = "";
     this.open = false;
     this.root = el("div", "elp-dh");
     this.root.id = "elp-dh-root";
@@ -142,9 +144,15 @@ export class AssistantUI {
     input.autocomplete = "off";
     input.placeholder = "Type your message…";
     input.maxLength = 500;
+    const mic = el("button", "elp-dh-mic", "🎙");
+    mic.type = "button";
+    mic.setAttribute("aria-label", "Speak your message");
+    mic.title = "Speak your message";
+    mic.addEventListener("click", () => this.toggleListening());
     const send = el("button", "elp-dh-send", "Send");
     send.type = "submit";
     form.appendChild(label);
+    form.appendChild(mic);
     form.appendChild(input);
     form.appendChild(send);
     form.addEventListener("submit", event => {
@@ -156,11 +164,54 @@ export class AssistantUI {
     panel.appendChild(form);
     this.input = input;
     this.sendButton = send;
+    this.micButton = mic;
 
     const footer = el("footer", "elp-dh-footer");
-    footer.appendChild(el("span", "", "Typed conversation · captions always on · voice arrives in the next phase"));
+    const voiceBar = el("div", "elp-dh-voicebar");
+    const speaker = el("button", "elp-dh-voice-btn", "🔊 Voice off");
+    speaker.type = "button";
+    speaker.setAttribute("aria-pressed", "false");
+    speaker.title = "Turn spoken replies on or off";
+    speaker.addEventListener("click", () => this.toggleVoice());
+    const replay = el("button", "elp-dh-voice-btn", "↻ Replay");
+    replay.type = "button";
+    replay.hidden = true;
+    replay.addEventListener("click", () => this.replay());
+    const stop = el("button", "elp-dh-voice-btn", "■ Stop");
+    stop.type = "button";
+    stop.hidden = true;
+    stop.addEventListener("click", () => this.stopVoice());
+    voiceBar.appendChild(speaker);
+    voiceBar.appendChild(replay);
+    voiceBar.appendChild(stop);
+    const voiceStatus = el("span", "elp-dh-voice-status", "Voice is off");
+    voiceStatus.id = "elp-dh-voice-status";
+    voiceStatus.setAttribute("role", "status");
+    voiceStatus.setAttribute("aria-live", "polite");
+    footer.appendChild(voiceBar);
+    footer.appendChild(voiceStatus);
     this.footer = footer;
+    this.speakerButton = speaker;
+    this.replayButton = replay;
+    this.stopButton = stop;
+    this.voiceStatus = voiceStatus;
     panel.appendChild(footer);
+
+    if (this.voice) {
+      if (!this.voice.state.recognition) mic.hidden = true;
+      if (!this.voice.state.synthesis) {
+        speaker.hidden = true;
+        replay.hidden = true;
+        stop.hidden = true;
+      }
+      this.voice.onTranscript = text => this.submit(text, { fromVoice: true });
+      this.unsubscribeVoice = this.voice.subscribe(snapshot => this.syncVoice(snapshot));
+    } else {
+      mic.hidden = true;
+      speaker.hidden = true;
+      voiceBar.hidden = true;
+      status.textContent = "Voice is unavailable. You can type your message.";
+    }
 
     this.panel = panel;
     this.root.appendChild(panel);
@@ -193,7 +244,9 @@ export class AssistantUI {
         row.appendChild(actions);
       }
       transcript.appendChild(row);
+      if (message.role === "assistant" && message.text) this.lastAssistantText = message.text;
     }
+    if (this.voice) this.voice.lastAssistantText = this.lastAssistantText;
     transcript.scrollTop = transcript.scrollHeight;
   }
 
@@ -227,9 +280,55 @@ export class AssistantUI {
     }
   }
 
-  submit(text) {
+  syncVoice(snapshot) {
+    if (!snapshot) return;
+    this.root.dataset.voice = snapshot.enabled && !snapshot.muted ? "on" : "off";
+    this.root.dataset.listening = snapshot.listening ? "true" : "false";
+    this.root.dataset.speaking = snapshot.speaking ? "true" : "false";
+    if (this.micButton) {
+      this.micButton.classList.toggle("is-listening", !!snapshot.listening);
+      this.micButton.setAttribute("aria-pressed", String(!!snapshot.listening));
+      this.micButton.setAttribute("aria-label", snapshot.listening ? "Stop listening" : "Speak your message");
+    }
+    if (this.speakerButton && !this.speakerButton.hidden) {
+      const on = snapshot.enabled && !snapshot.muted;
+      this.speakerButton.textContent = on ? "🔊 Voice on" : "🔇 Voice off";
+      this.speakerButton.setAttribute("aria-pressed", String(on));
+    }
+    if (this.replayButton) this.replayButton.hidden = !this.lastAssistantText;
+    if (this.stopButton) this.stopButton.hidden = !(snapshot.speaking || snapshot.listening);
+    if (this.voiceStatus) {
+      this.voiceStatus.textContent = snapshot.status || "";
+      this.voiceStatus.dataset.error = snapshot.error ? "true" : "false";
+    }
+  }
+
+  toggleVoice() {
+    if (!this.voice) return;
+    this.voice.toggle();
+  }
+
+  toggleListening() {
+    if (!this.voice) return;
+    if (this.voice.state.listening) this.voice.stopListening();
+    else this.voice.startListening();
+  }
+
+  replay() {
+    if (this.voice) this.voice.replay();
+  }
+
+  stopVoice() {
+    if (this.voice) this.voice.stop();
+  }
+
+  submit(text, { fromVoice = false } = {}) {
     const value = String(text || "").trim();
     if (!value) return;
+    if (this.voice) {
+      this.voice.stopListening();
+      this.voice.stop();
+    }
     this.append({ role: "user", text: value });
     this.thinking(true);
     this.sendButton.disabled = true;
@@ -237,18 +336,26 @@ export class AssistantUI {
       this.thinking(false);
       this.sendButton.disabled = false;
       const reply = this.onSend(value);
+      this.lastAssistantText = reply ? reply.text : "";
+      if (this.voice) this.voice.lastAssistantText = this.lastAssistantText;
       this.append({
         role: "assistant",
         text: reply ? reply.text : "I'm here.",
         actions: reply ? reply.actions : []
       });
-      this.input.focus();
+      if (this.voice && reply && reply.text) this.voice.speak(reply.text);
+      this.syncVoice(this.voice ? this.voice.snapshot() : null);
+      if (!fromVoice) this.input.focus();
     }, 360);
   }
 
   reset() {
+    if (this.voice) this.voice.stop();
+    this.lastAssistantText = "";
+    if (this.voice) this.voice.lastAssistantText = "";
     const messages = this.onReset();
     this.render(messages);
+    this.syncVoice(this.voice ? this.voice.snapshot() : null);
     this.input.focus();
   }
 
@@ -272,6 +379,7 @@ export class AssistantUI {
 
   close() {
     if (!this.open) return;
+    if (this.voice) this.voice.stop();
     this.open = false;
     this.panel.hidden = true;
     this.root.dataset.state = "closed";
@@ -288,6 +396,8 @@ export class AssistantUI {
   }
 
   destroy() {
+    if (this.voice) this.voice.destroy();
+    if (typeof this.unsubscribeVoice === "function") this.unsubscribeVoice();
     this.root.remove();
     this.mounted = false;
   }

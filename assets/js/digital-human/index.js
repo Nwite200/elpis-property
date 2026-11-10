@@ -6,6 +6,7 @@ import { ENABLED, VERSION, PERSONAS, personaByKey } from "./config.js";
 import { getContext } from "./context.js";
 import { Conversation } from "./conversation.js";
 import { AssistantUI } from "./ui.js";
+import { createVoice } from "./voice/controller.js";
 
 const CSS_URL = new URL("../../css/digital-human.css", import.meta.url).href;
 
@@ -50,10 +51,12 @@ async function mount() {
   const context = await getContext();
   const persona = personaByKey("adaora");
   const conversation = new Conversation(context, persona);
+  const voice = createVoice(persona);
 
   const ui = new AssistantUI({
     persona,
     conversation,
+    voice,
     mounted: true,
     onSend(text) {
       return conversation.handle(text);
@@ -77,6 +80,8 @@ async function mount() {
     send: text => ui.submit(text),
     reset: () => ui.reset(),
     state: () => (ui.open ? "open" : "closed"),
+    voice,
+    voiceSnapshot: () => voice.snapshot(),
     hide: () => {
       try { sessionStorage.setItem("elp-dh-hidden", "1"); } catch (_) { /* ignore */ }
       document.removeEventListener("keydown", onKeydown);

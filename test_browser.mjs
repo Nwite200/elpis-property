@@ -301,6 +301,111 @@ try {
     assert(composer, 'composer is not visible on mobile');
     await context.close();
   });
+
+  await test('voice controls stay hidden and typing still works when speech APIs are missing', async () => {
+    const context = await browser.newContext();
+    await context.addInitScript(() => {
+      try {
+        Object.defineProperty(window, 'speechSynthesis', { value: undefined, configurable: true });
+        Object.defineProperty(window, 'SpeechSynthesisUtterance', { value: undefined, configurable: true });
+        Object.defineProperty(window, 'SpeechRecognition', { value: undefined, configurable: true });
+        Object.defineProperty(window, 'webkitSpeechRecognition', { value: undefined, configurable: true });
+      } catch (error) { /* ignore */ }
+    });
+    const page = await context.newPage();
+    await goto(page, BASE + '/login');
+    await page.waitForSelector('#elp-dh-root .elp-dh-launcher', { timeout: 20000 });
+    await page.click('.elp-dh-launcher');
+    await page.waitForSelector('.elp-dh-panel:not([hidden])', { timeout: 10000 });
+    assert(await page.locator('.elp-dh-mic').isHidden(), 'microphone button must be hidden without recognition');
+    assert(await page.locator('.elp-dh-voice-btn').first().isHidden(), 'voice toggle must be hidden without synthesis');
+    const status = await page.locator('#elp-dh-voice-status').innerText();
+    assert(/not supported/i.test(status), `unsupported status missing: ${status}`);
+    await page.fill('#elp-dh-input', 'hello');
+    await page.press('#elp-dh-input', 'Enter');
+    await page.waitForFunction(() => {
+      return Array.from(document.querySelectorAll('.elp-dh-bubble')).some(n => /Hello/.test(n.textContent));
+    }, { timeout: 10000 });
+    await context.close();
+  });
+
+  await test('voice engine speaks, replays, stops and accepts a spoken transcript', async () => {
+    const context = await browser.newContext();
+    await context.addInitScript(() => {
+      window.__voiceSpoken = [];
+      window.__voiceCancelled = 0;
+      class FakeUtterance {
+        constructor(text) { this.text = text; this.onstart = null; this.onend = null; this.onerror = null; }
+      }
+      const voices = [
+        { name: 'Samantha', lang: 'en-NG', localService: true, default: false },
+        { name: 'Daniel', lang: 'en-NG', localService: true, default: true }
+      ];
+      const synth = {
+        speaking: false,
+        getVoices: () => voices,
+        addEventListener() {}, removeEventListener() {},
+        speak(utterance) {
+          window.__voiceSpoken.push(utterance.text);
+          synth.speaking = true;
+          setTimeout(() => {
+            utterance.onstart && utterance.onstart();
+            setTimeout(() => { synth.speaking = false; utterance.onend && utterance.onend(); }, 800);
+          }, 5);
+        },
+        cancel() { synth.speaking = false; window.__voiceCancelled += 1; },
+        resume() {}, pause() {}
+      };
+      Object.defineProperty(window, 'speechSynthesis', { value: synth, configurable: true });
+      Object.defineProperty(window, 'SpeechSynthesisUtterance', { value: FakeUtterance, configurable: true });
+      class FakeRecognition {
+        start() {
+          setTimeout(() => {
+            this.onstart && this.onstart();
+            const result = [{ transcript: 'I want a house' }];
+            result.isFinal = true;
+            this.onresult && this.onresult({ resultIndex: 0, results: [result] });
+            this.onend && this.onend();
+          }, 30);
+        }
+        stop() { this.onend && this.onend(); }
+        abort() {}
+      }
+      Object.defineProperty(window, 'SpeechRecognition', { value: FakeRecognition, configurable: true });
+      Object.defineProperty(window, 'webkitSpeechRecognition', { value: FakeRecognition, configurable: true });
+    });
+    const page = await context.newPage();
+    await goto(page, BASE + '/');
+    await page.waitForSelector('#elp-dh-root .elp-dh-launcher', { timeout: 20000 });
+    await page.click('.elp-dh-launcher');
+    await page.waitForSelector('.elp-dh-panel:not([hidden])', { timeout: 10000 });
+
+    await page.click('.elp-dh-voice-btn');
+    await page.waitForFunction(() => window.__voiceSpoken.length >= 1, { timeout: 10000 });
+    assert((await page.locator('.elp-dh-voice-btn').first().getAttribute('aria-pressed')) === 'true', 'voice toggle did not turn on');
+
+    await page.fill('#elp-dh-input', 'I want a house');
+    await page.press('#elp-dh-input', 'Enter');
+    await page.waitForFunction(() => window.__voiceSpoken.length >= 2, { timeout: 10000 });
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('.elp-dh-bubble')).some(n => /portfolio/i.test(n.textContent)), { timeout: 10000 });
+
+    await page.click('.elp-dh-voice-btn:nth-child(2)');
+    await page.waitForFunction(() => window.__voiceSpoken.length >= 3, { timeout: 10000 });
+    await page.waitForSelector('.elp-dh-voice-btn:nth-child(3):not([hidden])', { timeout: 5000 });
+
+    const beforeStop = await page.evaluate(() => window.__voiceCancelled);
+    await page.click('.elp-dh-voice-btn:nth-child(3)');
+    await page.waitForFunction(previous => window.__voiceCancelled > previous, beforeStop, { timeout: 10000 });
+
+    await page.click('.elp-dh-mic');
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('.elp-dh-bubble')).some(n => n.textContent === 'I want a house'), { timeout: 10000 });
+
+    await page.click('.elp-dh-voice-btn');
+    await page.waitForTimeout(300);
+    const muted = await page.locator('.elp-dh-voice-btn').first().getAttribute('aria-pressed');
+    assert(muted === 'false', 'voice toggle did not mute');
+    await context.close();
+  });
 } catch (error) {
   failed++;
   console.error('  ❌ browser harness\n     ' + error.message);

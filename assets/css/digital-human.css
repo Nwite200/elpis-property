@@ -318,6 +318,67 @@
   text-align: center;
 }
 
+/* ---- Voice controls ---- */
+.elp-dh-mic {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--elp-dh-line);
+  border-radius: 12px;
+  background: var(--elp-dh-paper);
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+.elp-dh-mic:hover { border-color: rgba(232, 181, 45, 0.7); background: #fffaf0; }
+.elp-dh-mic:focus-visible { outline: 2px solid rgba(232, 181, 45, 0.8); outline-offset: 2px; }
+.elp-dh-mic.is-listening {
+  border-color: #d9534f;
+  background: #fff1f0;
+  animation: elp-dh-listen 1.2s ease-in-out infinite;
+}
+
+.elp-dh-voicebar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+.elp-dh-voice-btn {
+  min-height: 28px;
+  padding: 4px 9px;
+  border: 1px solid var(--elp-dh-line);
+  border-radius: 999px;
+  background: var(--elp-dh-paper);
+  color: var(--elp-dh-ink);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+.elp-dh-voice-btn:hover { border-color: rgba(232, 181, 45, 0.7); background: #fffaf0; }
+.elp-dh-voice-btn[aria-pressed="true"] { border-color: rgba(232, 181, 45, 0.75); background: #fffaf0; color: var(--elp-dh-navy); }
+.elp-dh-voice-btn:focus-visible { outline: 2px solid rgba(232, 181, 45, 0.8); outline-offset: 2px; }
+
+.elp-dh-voice-status {
+  display: block;
+  min-height: 15px;
+  color: var(--elp-dh-muted);
+  font-size: 10.5px;
+  line-height: 1.35;
+}
+.elp-dh-voice-status[data-error="true"] { color: #a3352b; }
+
+.elp-dh[data-speaking="true"] .elp-dh-header__avatar {
+  box-shadow: 0 0 0 3px rgba(232, 181, 45, 0.45), 0 0 22px rgba(232, 181, 45, 0.4);
+  animation: elp-dh-speak 900ms ease-in-out infinite;
+}
+
 .elp-dh-sr {
   position: absolute;
   width: 1px;
@@ -358,6 +419,8 @@
 @media (prefers-reduced-motion: reduce) {
   .elp-dh-launcher__ring,
   .elp-dh-typing__dot,
+  .elp-dh-mic.is-listening,
+  .elp-dh[data-speaking="true"] .elp-dh-header__avatar,
   .elp-dh[data-thinking="true"] .elp-dh-status__dot { animation: none; }
   .elp-dh-panel,
   .elp-dh-msg { animation: none; }
@@ -385,4 +448,12 @@
 @keyframes elp-dh-dot {
   0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
   30% { transform: translateY(-4px); opacity: 1; }
+}
+@keyframes elp-dh-listen {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(217, 83, 79, 0.35); }
+  50% { box-shadow: 0 0 0 6px rgba(217, 83, 79, 0); }
+}
+@keyframes elp-dh-speak {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
 }

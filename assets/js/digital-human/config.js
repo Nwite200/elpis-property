@@ -3,7 +3,7 @@
 // One-line rollback for the whole assistant: set ENABLED to false.
 
 export const ENABLED = true;
-export const VERSION = "2.0.0";
+export const VERSION = "3.0.0";
 export const STORAGE_KEY = "elp-dh-transcript-v1";
 export const MAX_TRANSCRIPT = 40;
 

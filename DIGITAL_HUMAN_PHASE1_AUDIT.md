@@ -281,3 +281,25 @@ called done.
 
 **Tests:** 183 total, including three new browser checks (loader on every page, typed conversation
 with Escape/focus, mobile viewport fit).
+
+## 15. Phase 3 status (voice)
+
+- Free, browser-native voice only: `SpeechRecognition`/`webkitSpeechRecognition` for input and
+  `SpeechSynthesis` for output. No API keys, no paid services, no audio leaves the browser through us.
+- Voice is **off by default**; nothing speaks before a user gesture. The speaker control enables it,
+  the microphone control starts one-shot recognition, and Stop cancels both.
+- Male/female voice selection is a documented heuristic over locale + common voice names (voices
+  carry no gender field). If no match exists the device default is used and the status says so.
+- Controls: mic, Voice on/off, Stop, Replay; live status for listening, interim transcript,
+  speaking, permission denial, missing microphone, network/speech-service errors and unsupported
+  browsers. Captions/transcript remain the source of truth.
+- Recognised final speech is inserted as the user message and answered exactly like typed input;
+  text remains available in every state.
+- Speech input may require a connection (browser service) and is not guaranteed offline; the UI
+  states this through its error/status copy and the compatibility report.
+
+**Avatar:** generation failed again with “Insufficient account funds”. The monogram fallback is
+live; add `assets/images/assistants/adaora.png` to switch automatically.
+
+**Tests:** 185 total; browser suite now covers unsupported-browser fallback and a stubbed
+speak/replay/stop/spoken-transcript flow.
