@@ -303,3 +303,28 @@ live; add `assets/images/assistants/adaora.png` to switch automatically.
 
 **Tests:** 185 total; browser suite now covers unsupported-browser fallback and a stubbed
 speak/replay/stop/spoken-transcript flow.
+
+## 16. Phase 4 status (personas + entry introduction)
+
+- **Portraits:** Adaora and Solomon use the owner-supplied portraits (320×320 JPEG, self-hosted).
+  Chiamaka, Emeka, Amara and the staff personas keep the monogram fallback until portraits are
+  supplied; no face is reused for two names.
+- **Entry introduction:** on the landing page and any dashboard (staff, finance, sub-admin, GSM,
+  accountant, super-admin, client) a compact bubble introduces Adaora with a role-aware greeting,
+  once per browser session. It can open the panel, speak the greeting through an explicit button,
+  or be dismissed. It never blocks the launcher or page controls.
+- **Personas:** Adaora (concierge), Solomon (property discovery), Chiamaka (sales), Emeka
+  (rentals), Amara (client relations) are live for their authorised audiences. David, Ngozi,
+  Daniel and Ifeoma remain staff-only and unavailable until Phase 9.
+- **Transformation:** handover crossfades the portrait, updates name/department, changes the voice
+  profile (female/male heuristic), and appends the specialist greeting. The transcript, context,
+  page and role are preserved; users can name a specialist directly (“talk to Solomon”) or ask to
+  return to Adaora.
+- **Routing:** property/viewing → Solomon; sales → Chiamaka; rentals → Emeka; complaints/care →
+  Amara (client/staff); unknown intents stay with the current persona. No privileged action and no
+  fabricated property or payment data.
+- **Voice:** persona change updates the synthesis profile and resets the chosen voice; a handover
+  speaks the specialist greeting and reply only when voice was already enabled by the user.
+
+**Tests:** 188 total; browser suite adds entry-introduction, once-per-session, dashboard greeting,
+persona handover/context continuity and male-voice selection after handover.

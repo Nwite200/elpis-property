@@ -1,8 +1,22 @@
 // Deterministic, intent-driven conversation for Phase 2.
 // No LLM, no fabricated data and no privileged actions.
 
-import { STORAGE_KEY, MAX_TRANSCRIPT } from "./config.js";
+import { STORAGE_KEY, MAX_TRANSCRIPT, PERSONAS, personaByKey } from "./config.js";
 import { greetingFor } from "./context.js";
+
+function scopeOf(context) {
+  if (context.isStaff) return "staff";
+  if (context.isClient) return "client";
+  return "public";
+}
+
+function canUse(persona, context) {
+  return !!persona && persona.available && persona.scope.includes(scopeOf(context));
+}
+
+function handoverIntro(target) {
+  return `Let me introduce you to ${target.name}, our ${target.department} specialist. ${target.name} will take it from here.`;
+}
 
 function portfolioHref(context) {
   return context.isStaff ? "properties.html" : "index.html#properties";
@@ -26,6 +40,7 @@ function contactActions(context) {
 const INTENTS = [
   {
     key: "property",
+    handover: "solomon",
     test: /(property|properties|house|home|land|apartment|duplex|terrace|buy|purchase|portfolio|listing)/i,
     reply(context) {
       return {
@@ -38,11 +53,51 @@ const INTENTS = [
   },
   {
     key: "viewing",
+    handover: "solomon",
     test: /(viewing|view|inspection|visit|inspect)/i,
     reply() {
       return {
         text: "Viewings are arranged by the team. You can send an enquiry from any property page, or contact us directly and we will route it to the right branch.",
         actions: [{ label: "Send an enquiry", href: "index.html#contact" }]
+      };
+    }
+  },
+  {
+    key: "sales",
+    handover: "chiamaka",
+    test: /(sales|sales process|purchase process|payment plan|buying process)/i,
+    reply() {
+      return {
+        text: "I can explain how an Elpis purchase works and what the team needs from you. Start with the live portfolio, then send an enquiry and a sales consultant will follow up.",
+        actions: [
+          { label: "Explore properties", href: "index.html#properties" },
+          { label: "Send an enquiry", href: "index.html#contact" }
+        ]
+      };
+    }
+  },
+  {
+    key: "rental",
+    handover: "emeka",
+    test: /(rent|rental|lease|leasing|tenant)/i,
+    reply() {
+      return {
+        text: "I look after rental and leasing enquiries. Tell the team the location, budget and move-in date through the contact form and we will match the available options.",
+        actions: [{ label: "Rental enquiry", href: "index.html#contact" }]
+      };
+    }
+  },
+  {
+    key: "relations",
+    handover: "amara",
+    test: /(complaint|complain|issue|problem|not happy|unhappy|account help|customer care)/i,
+    reply() {
+      return {
+        text: "I'm sorry you're dealing with that. I can point you to the fastest route to the customer relations team, and a person will pick it up from there.",
+        actions: [
+          { label: "Contact the team", href: "index.html#contact" },
+          { label: "Client portal", href: "client-login.html" }
+        ]
       };
     }
   },
@@ -220,12 +275,60 @@ export class Conversation {
     this.save();
   }
 
+  setPersona(persona) {
+    this.persona = persona;
+  }
+
   handle(text) {
     const input = String(text || "").trim();
     if (!input) return null;
     this.push("user", input);
+
+    // Explicit request: "talk to Solomon", "bring Adaora back".
+    const named = PERSONAS.find(persona =>
+      persona.key !== this.persona.key && new RegExp(`\\b${persona.name}\\b`, "i").test(input)
+    );
+    if (named) {
+      if (!canUse(named, this.context)) {
+        const reply = {
+          text: `${named.name} is not available in this session. I can still point you to the team or help with the portfolio.`,
+          actions: contactActions(this.context)
+        };
+        this.push("assistant", reply.text, reply.actions);
+        return reply;
+      }
+      const intro = named.key === "adaora"
+        ? "Of course — I'll bring Adaora back to the conversation."
+        : handoverIntro(named);
+      this.push("assistant", intro, []);
+      this.context.lastIntent = "persona";
+      this.context.lastPersona = named.key;
+      return {
+        text: intro,
+        actions: [],
+        handover: { key: named.key, greeting: named.greeting, reply: null }
+      };
+    }
+
     const intent = INTENTS.find(rule => rule.test.test(input));
+    if (intent && intent.handover && intent.handover !== this.persona.key) {
+      const target = personaByKey(intent.handover);
+      if (canUse(target, this.context)) {
+        const intro = handoverIntro(target);
+        this.push("assistant", intro, []);
+        const specialistReply = intent.reply(this.context);
+        this.context.lastIntent = intent.key;
+        this.context.lastPersona = target.key;
+        return {
+          text: intro,
+          actions: [],
+          handover: { key: target.key, greeting: target.greeting, reply: specialistReply }
+        };
+      }
+    }
+
     const reply = intent ? intent.reply(this.context) : fallback(this.context);
+    this.context.lastIntent = intent ? intent.key : "fallback";
     this.push("assistant", reply.text, reply.actions);
     return reply;
   }

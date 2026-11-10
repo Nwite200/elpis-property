@@ -267,6 +267,8 @@ try {
     await page.waitForSelector('.elp-dh-panel:not([hidden])', { timeout: 10000 });
     const title = await page.locator('.elp-dh-title').innerText();
     assert(title === 'Adaora', `expected Adaora, got ${title}`);
+    const portrait = await page.locator('.elp-dh-header__avatar img').getAttribute('src');
+    assert(/assistants\/adaora\.jpg$/.test(portrait || ''), `Adaora portrait missing: ${portrait}`);
     const department = await page.locator('.elp-dh-department').innerText();
     assert(/Concierge/i.test(department), `department label missing: ${department}`);
     await page.fill('#elp-dh-input', 'I want to find a property');
@@ -299,6 +301,56 @@ try {
     assert(!overflow, 'assistant introduced horizontal overflow on mobile');
     const composer = await page.locator('#elp-dh-input').isVisible();
     assert(composer, 'composer is not visible on mobile');
+    await context.close();
+  });
+
+  await test('assistant introduces itself on entry and only once per session', async () => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await goto(page, BASE + '/');
+    await page.waitForSelector('.elp-dh-intro', { timeout: 20000 });
+    const text = await page.locator('.elp-dh-intro__text').innerText();
+    assert(/Adaora/.test(text) && /Elpis Property/.test(text), `unexpected intro: ${text}`);
+    await page.click('.elp-dh-intro__open');
+    await page.waitForSelector('.elp-dh-panel:not([hidden])', { timeout: 10000 });
+    await page.keyboard.press('Escape');
+    await page.reload({ waitUntil: 'networkidle' });
+    await page.waitForTimeout(2200);
+    assert((await page.locator('.elp-dh-intro').count()) === 0, 'introduction repeated after reload in the same session');
+    await context.close();
+  });
+
+  await test('dashboard entry greets the signed-in role', async () => {
+    await pageA.evaluate(() => { try { sessionStorage.removeItem('elp-dh-intro-shown'); } catch (_) {} });
+    await goto(pageA, BASE + '/dashboard.html');
+    await pageA.waitForSelector('.elp-dh-intro', { timeout: 20000 });
+    const text = await pageA.locator('.elp-dh-intro__text').innerText();
+    assert(/Welcome back/i.test(text) && /dashboard/i.test(text), `dashboard intro missing role context: ${text}`);
+    await pageA.locator('.elp-dh-intro__close').click();
+  });
+
+  await test('specialist handover switches persona and preserves the conversation', async () => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    const pageErrors = [];
+    page.on('pageerror', error => pageErrors.push(error.message));
+    await goto(page, BASE + '/');
+    await page.waitForSelector('.elp-dh-launcher', { timeout: 20000 });
+    await page.click('.elp-dh-launcher');
+    await page.waitForSelector('.elp-dh-panel:not([hidden])', { timeout: 10000 });
+    await page.fill('#elp-dh-input', 'I need a property');
+    await page.press('#elp-dh-input', 'Enter');
+    await page.waitForFunction(() => document.querySelector('.elp-dh-title')?.textContent === 'Solomon', null, { timeout: 12000 });
+    const solomonPortrait = await page.locator('.elp-dh-header__avatar img').getAttribute('src');
+    assert(/assistants\/solomon\.jpg$/.test(solomonPortrait || ''), `Solomon portrait missing: ${solomonPortrait}`);
+    assert((await page.locator('.elp-dh-bubble').allInnerTexts()).some(t => t.includes('I need a property')), 'conversation context was lost on handover');
+    await page.fill('#elp-dh-input', 'I want to rent');
+    await page.press('#elp-dh-input', 'Enter');
+    await page.waitForFunction(() => document.querySelector('.elp-dh-title')?.textContent === 'Emeka', null, { timeout: 12000 });
+    await page.fill('#elp-dh-input', 'bring Adaora back');
+    await page.press('#elp-dh-input', 'Enter');
+    await page.waitForFunction(() => document.querySelector('.elp-dh-title')?.textContent === 'Adaora', null, { timeout: 12000 });
+    assert(pageErrors.length === 0, `persona flow raised page errors: ${pageErrors.join('; ')}`);
     await context.close();
   });
 
@@ -388,6 +440,9 @@ try {
     await page.press('#elp-dh-input', 'Enter');
     await page.waitForFunction(() => window.__voiceSpoken.length >= 2, { timeout: 10000 });
     await page.waitForFunction(() => Array.from(document.querySelectorAll('.elp-dh-bubble')).some(n => /portfolio/i.test(n.textContent)), { timeout: 10000 });
+    await page.waitForFunction(() => document.querySelector('.elp-dh-title')?.textContent === 'Solomon', null, { timeout: 12000 });
+    const voiceName = await page.evaluate(() => window.ElpAssistant.voiceSnapshot().voiceName);
+    assert(/Daniel/i.test(voiceName), `male voice not selected after handover: ${voiceName}`);
 
     await page.click('.elp-dh-voice-btn:nth-child(2)');
     await page.waitForFunction(() => window.__voiceSpoken.length >= 3, { timeout: 10000 });

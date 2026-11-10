@@ -69,9 +69,23 @@ async function mount() {
   const onKeydown = event => ui.onKeydown(event);
   document.addEventListener("keydown", onKeydown);
 
+  const isEntryPage = context.kind === "home" || context.kind === "dashboard" || /dashboard\.html$/.test(context.page);
+  let introSeen = false;
+  try { introSeen = sessionStorage.getItem("elp-dh-intro-shown") === "1"; } catch (_) { /* ignore */ }
+  if (isEntryPage && !introSeen) {
+    const first = context.firstName ? `, ${context.firstName}` : "";
+    const intro = context.isClient
+      ? `Welcome back${first}. I'm Adaora. I can help you with your account, payments or the right team.`
+      : context.isStaff
+        ? `Welcome back${first}. I'm Adaora. Ask me about this dashboard, or tell me what you need.`
+        : "Welcome to Elpis Property. I'm Adaora. I can help you explore the portfolio or reach the right team.";
+    window.setTimeout(() => ui.showIntro(intro), 900);
+    try { sessionStorage.setItem("elp-dh-intro-shown", "1"); } catch (_) { /* ignore */ }
+  }
+
   window.ElpAssistant = {
     version: VERSION,
-    persona: persona.key,
+    get persona() { return ui.persona.key; },
     personas: PERSONAS.map(p => ({ key: p.key, name: p.name, department: p.department, available: p.available })),
     context,
     open: () => ui.show(),

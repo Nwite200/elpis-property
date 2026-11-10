@@ -10,7 +10,7 @@ export function createVoice(persona) {
   const synth = support.synthesis ? new VoiceSynthesis() : null;
   const recognition = support.recognition ? new VoiceRecognition(support) : null;
   const listeners = new Set();
-  const profile = persona.voice || { lang: "en-NG", rate: 1, pitch: 1 };
+  let profile = persona.voice || { lang: "en-NG", rate: 1, pitch: 1 };
 
   const state = {
     supported: support.recognition || support.synthesis,
@@ -215,6 +215,16 @@ export function createVoice(persona) {
     if (state.enabled) setStatus(readyText());
   }
 
+  function setPersona(nextPersona) {
+    if (!nextPersona) return;
+    profile = nextPersona.voice || profile;
+    cancelAudio();
+    if (synth) synth.voiceName = "";
+    state.interim = "";
+    if (state.enabled) state.status = readyText();
+    emit();
+  }
+
   function destroy() {
     cancelAudio();
     stopListening();
@@ -238,6 +248,7 @@ export function createVoice(persona) {
     startListening,
     stopListening,
     stop,
+    setPersona,
     destroy,
     onTranscript: null,
     lastAssistantText: ""

@@ -3,7 +3,7 @@
 // One-line rollback for the whole assistant: set ENABLED to false.
 
 export const ENABLED = true;
-export const VERSION = "3.0.0";
+export const VERSION = "4.0.0";
 export const STORAGE_KEY = "elp-dh-transcript-v1";
 export const MAX_TRANSCRIPT = 40;
 
@@ -17,7 +17,7 @@ export const PERSONAS = [
     role: "Main Concierge",
     gender: "female",
     initials: "A",
-    avatar: "assets/images/assistants/adaora.png",
+    avatar: "assets/images/assistants/adaora.jpg",
     accent: "#E8B52D",
     available: true,
     scope: ["public", "client", "staff"],
@@ -37,9 +37,9 @@ export const PERSONAS = [
     role: "Property Discovery Specialist",
     gender: "male",
     initials: "S",
-    avatar: "assets/images/assistants/solomon.png",
+    avatar: "assets/images/assistants/solomon.jpg",
     accent: "#0B2A6B",
-    available: false,
+    available: true,
     scope: ["public", "client", "staff"],
     greeting: "Hello, I'm Solomon. Adaora shared your request. Let's find the right property for you.",
     voice: { lang: "en-NG", rate: 1.0, pitch: 0.95, genderHint: "male", preferredNames: ["Daniel", "Alex", "Google UK English Male"] },
@@ -58,7 +58,7 @@ export const PERSONAS = [
     initials: "C",
     avatar: "assets/images/assistants/chiamaka.png",
     accent: "#C79A2E",
-    available: false,
+    available: true,
     scope: ["public", "client", "staff"],
     greeting: "Hello, I'm Chiamaka from Sales. I can explain how an Elpis purchase works.",
     voice: { lang: "en-NG", rate: 1.02, pitch: 1.1, genderHint: "female", preferredNames: ["Chiamaka", "Zira", "Samantha"] },
@@ -74,7 +74,7 @@ export const PERSONAS = [
     initials: "E",
     avatar: "assets/images/assistants/emeka.png",
     accent: "#123C7A",
-    available: false,
+    available: true,
     scope: ["public", "client", "staff"],
     greeting: "Hello, I'm Emeka. I look after rental and leasing enquiries.",
     voice: { lang: "en-NG", rate: 0.98, pitch: 0.92, genderHint: "male", preferredNames: ["Emeka", "Daniel", "Alex"] },
@@ -90,7 +90,7 @@ export const PERSONAS = [
     initials: "A",
     avatar: "assets/images/assistants/amara.png",
     accent: "#B8862B",
-    available: false,
+    available: true,
     scope: ["client", "staff"],
     greeting: "Hello, I'm Amara from Customer Relations. I can help with your account and service questions.",
     voice: { lang: "en-NG", rate: 1.0, pitch: 1.08, genderHint: "female", preferredNames: ["Amara", "Samantha", "Zira"] },

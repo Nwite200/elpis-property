@@ -85,6 +85,96 @@
   box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.18);
 }
 
+/* ---- Entry introduction bubble ---- */
+.elp-dh-intro {
+  position: absolute;
+  right: 0;
+  bottom: 76px;
+  width: min(320px, calc(100vw - 28px));
+  padding: 14px 14px 12px;
+  background: #fff;
+  border: 1px solid rgba(7, 23, 71, 0.12);
+  border-radius: 16px;
+  box-shadow: 0 22px 60px rgba(7, 23, 71, 0.22);
+  animation: elp-dh-rise 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.elp-dh-intro::after {
+  content: "";
+  position: absolute;
+  right: 24px;
+  bottom: -7px;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-right: 1px solid rgba(7, 23, 71, 0.12);
+  border-bottom: 1px solid rgba(7, 23, 71, 0.12);
+  transform: rotate(45deg);
+}
+.elp-dh-intro__text {
+  margin: 0 22px 10px 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--elp-dh-ink);
+}
+.elp-dh-intro__actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.elp-dh-intro__hear {
+  min-height: 36px;
+  padding: 7px 11px;
+  border: 1px solid var(--elp-dh-line);
+  border-radius: 10px;
+  background: var(--elp-dh-paper);
+  color: var(--elp-dh-navy);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.elp-dh-intro__hear:hover { border-color: rgba(232, 181, 45, 0.7); background: #fffaf0; }
+.elp-dh-intro__hear:focus-visible { outline: 2px solid var(--elp-dh-gold); outline-offset: 2px; }
+.elp-dh-intro__open {
+  min-height: 36px;
+  padding: 7px 13px;
+  border: 0;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--elp-dh-navy), #12306f);
+  color: #fff;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.elp-dh-intro__open:hover { transform: translateY(-1px); }
+.elp-dh-intro__open:focus-visible { outline: 2px solid var(--elp-dh-gold); outline-offset: 2px; }
+.elp-dh-intro__close {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--elp-dh-muted);
+  font-size: 13px;
+  cursor: pointer;
+}
+.elp-dh-intro__close:hover { background: var(--elp-dh-paper); color: var(--elp-dh-navy); }
+
+/* Persona crossfade */
+.elp-dh-header__avatar,
+.elp-dh-title,
+.elp-dh-department {
+  transition: opacity 260ms ease, transform 260ms ease;
+}
+.elp-dh.is-switching .elp-dh-header__avatar,
+.elp-dh.is-switching .elp-dh-title,
+.elp-dh.is-switching .elp-dh-department {
+  opacity: 0;
+  transform: scale(0.94);
+}
+
 /* ---- Panel ---- */
 .elp-dh-panel {
   position: absolute;
@@ -140,10 +230,10 @@
 .elp-dh-department {
   margin: 1px 0 0;
   font-size: 11.5px;
+  line-height: 1.25;
   color: rgba(255, 255, 255, 0.72);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .elp-dh-status {
@@ -413,6 +503,8 @@
   }
   .elp-dh-bubble { max-width: 92%; font-size: 14px; }
   .elp-dh-input { font-size: 16px; } /* prevents iOS zoom */
+  /* The bottom sheet covers the launcher position; the panel's X closes it. */
+  .elp-dh[data-state="open"] .elp-dh-launcher { display: none; }
 }
 
 /* ---- Motion preferences ---- */

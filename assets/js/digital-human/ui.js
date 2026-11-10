@@ -1,6 +1,6 @@
 // Assistant shell: launcher, panel, transcript, captions and responsive states.
 
-import { COMPANY, VERSION } from "./config.js";
+import { COMPANY, VERSION, personaByKey } from "./config.js";
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -81,7 +81,8 @@ export class AssistantUI {
     launcher.setAttribute("aria-label", `Open assistant, ${this.persona.name}, ${this.persona.department}`);
     launcher.setAttribute("aria-expanded", "false");
     launcher.setAttribute("aria-controls", "elp-dh-panel");
-    launcher.appendChild(avatar(this.persona, "elp-dh-launcher__avatar"));
+    this.launcherAvatar = avatar(this.persona, "elp-dh-launcher__avatar");
+    launcher.appendChild(this.launcherAvatar);
     launcher.appendChild(el("span", "elp-dh-launcher__ring"));
     launcher.appendChild(el("span", "elp-dh-launcher__dot"));
     launcher.addEventListener("click", () => this.toggle());
@@ -95,13 +96,17 @@ export class AssistantUI {
     panel.hidden = true;
 
     const header = el("header", "elp-dh-header");
-    header.appendChild(avatar(this.persona, "elp-dh-header__avatar"));
+    this.headerAvatar = avatar(this.persona, "elp-dh-header__avatar");
+    header.appendChild(this.headerAvatar);
     const identity = el("div", "elp-dh-identity");
     const title = el("h2", "elp-dh-title", this.persona.name);
     title.id = "elp-dh-title";
     identity.appendChild(title);
-    identity.appendChild(el("p", "elp-dh-department", `${this.persona.department} · Digital assistant`));
+    const department = el("p", "elp-dh-department", `${this.persona.department} · Digital assistant`);
+    identity.appendChild(department);
     header.appendChild(identity);
+    this.titleNode = title;
+    this.departmentNode = department;
 
     const status = el("span", "elp-dh-status");
     status.appendChild(el("span", "elp-dh-status__dot"));
@@ -322,9 +327,109 @@ export class AssistantUI {
     if (this.voice) this.voice.stop();
   }
 
+  showIntro(text) {
+    if (this.introBubble || this.open) return;
+    const bubble = el("div", "elp-dh-intro");
+    bubble.setAttribute("role", "status");
+    bubble.appendChild(el("p", "elp-dh-intro__text", text));
+    const actions = el("div", "elp-dh-intro__actions");
+    const open = el("button", "elp-dh-intro__open", `Talk to ${this.persona.name}`);
+    open.type = "button";
+    open.addEventListener("click", () => {
+      this.removeIntro();
+      this.show();
+    });
+    actions.appendChild(open);
+    if (this.voice && this.voice.state.synthesis) {
+      const hear = el("button", "elp-dh-intro__hear", "🔊 Hear greeting");
+      hear.type = "button";
+      hear.addEventListener("click", () => {
+        this.removeIntro();
+        this.voice.enable({ silent: true });
+        this.voice.speak(text, { force: true });
+        this.show();
+      });
+      actions.appendChild(hear);
+    }
+    bubble.appendChild(actions);
+    const close = el("button", "elp-dh-intro__close", "✕");
+    close.type = "button";
+    close.setAttribute("aria-label", "Dismiss introduction");
+    close.addEventListener("click", () => this.removeIntro());
+    bubble.appendChild(close);
+    this.root.insertBefore(bubble, this.launcher);
+    this.introBubble = bubble;
+    this.introTimer = window.setTimeout(() => this.removeIntro(), 16000);
+  }
+
+  removeIntro() {
+    if (this.introTimer) { window.clearTimeout(this.introTimer); this.introTimer = null; }
+    if (this.introBubble) { this.introBubble.remove(); this.introBubble = null; }
+  }
+
+  updateIdentity() {
+    const header = avatar(this.persona, "elp-dh-header__avatar");
+    const launcher = avatar(this.persona, "elp-dh-launcher__avatar");
+    if (this.headerAvatar) this.headerAvatar.replaceWith(header);
+    if (this.launcherAvatar) this.launcherAvatar.replaceWith(launcher);
+    this.headerAvatar = header;
+    this.launcherAvatar = launcher;
+    if (this.titleNode) this.titleNode.textContent = this.persona.name;
+    if (this.departmentNode) this.departmentNode.textContent = `${this.persona.department} · Digital assistant`;
+    this.launcher.setAttribute("aria-label", `Open assistant, ${this.persona.name}, ${this.persona.department}`);
+    this.root.dataset.persona = this.persona.key;
+  }
+
+  switchPersona({ key, greeting, reply }) {
+    const next = personaByKey(key);
+    if (!next || !next.available) return false;
+    if (next.key === this.persona.key) {
+      if (reply) {
+        this.conversation.push("assistant", reply.text, reply.actions);
+        this.append({ role: "assistant", text: reply.text, actions: reply.actions });
+        this.lastAssistantText = reply.text;
+        if (this.voice) this.voice.lastAssistantText = reply.text;
+        if (this.voice) this.voice.speak(reply.text);
+      }
+      return true;
+    }
+    this.switching = true;
+    this.root.classList.add("is-switching");
+    if (this.voice) this.voice.stop();
+    window.setTimeout(() => {
+      this.persona = next;
+      this.conversation.setPersona(next);
+      if (this.voice) this.voice.setPersona(next);
+      this.updateIdentity();
+      this.root.classList.remove("is-switching");
+      if (greeting) {
+        this.conversation.push("assistant", greeting, []);
+        this.append({ role: "assistant", text: greeting, actions: [] });
+        this.lastAssistantText = greeting;
+        if (this.voice) this.voice.lastAssistantText = greeting;
+      }
+      if (reply) {
+        this.conversation.push("assistant", reply.text, reply.actions);
+        this.append({ role: "assistant", text: reply.text, actions: reply.actions });
+        this.lastAssistantText = reply.text;
+        if (this.voice) {
+          this.voice.lastAssistantText = reply.text;
+          this.voice.speak(`${greeting ? greeting + " " : ""}${reply.text}`);
+        }
+      } else if (greeting && this.voice) {
+        this.voice.speak(greeting);
+      }
+      this.switching = false;
+      this.syncVoice(this.voice ? this.voice.snapshot() : null);
+      if (this.open) this.input.focus();
+      document.dispatchEvent(new CustomEvent("elp-dh:persona", { detail: { persona: next.key } }));
+    }, 300);
+    return true;
+  }
+
   submit(text, { fromVoice = false } = {}) {
     const value = String(text || "").trim();
-    if (!value) return;
+    if (!value || this.switching) return;
     if (this.voice) {
       this.voice.stopListening();
       this.voice.stop();
@@ -343,6 +448,15 @@ export class AssistantUI {
         text: reply ? reply.text : "I'm here.",
         actions: reply ? reply.actions : []
       });
+      if (reply && reply.handover) {
+        this.sendButton.disabled = true;
+        this.syncVoice(this.voice ? this.voice.snapshot() : null);
+        window.setTimeout(() => {
+          this.sendButton.disabled = false;
+          this.switchPersona(reply.handover);
+        }, 950);
+        return;
+      }
       if (this.voice && reply && reply.text) this.voice.speak(reply.text);
       this.syncVoice(this.voice ? this.voice.snapshot() : null);
       if (!fromVoice) this.input.focus();
@@ -353,6 +467,12 @@ export class AssistantUI {
     if (this.voice) this.voice.stop();
     this.lastAssistantText = "";
     if (this.voice) this.voice.lastAssistantText = "";
+    this.switching = false;
+    const adaora = personaByKey("adaora");
+    this.persona = adaora;
+    this.conversation.setPersona(adaora);
+    if (this.voice) this.voice.setPersona(adaora);
+    this.updateIdentity();
     const messages = this.onReset();
     this.render(messages);
     this.syncVoice(this.voice ? this.voice.snapshot() : null);
@@ -365,6 +485,7 @@ export class AssistantUI {
   }
 
   show() {
+    this.removeIntro();
     if (this.open) return;
     this.open = true;
     this.panel.hidden = false;
@@ -396,6 +517,7 @@ export class AssistantUI {
   }
 
   destroy() {
+    this.removeIntro();
     if (this.voice) this.voice.destroy();
     if (typeof this.unsubscribeVoice === "function") this.unsubscribeVoice();
     this.root.remove();
