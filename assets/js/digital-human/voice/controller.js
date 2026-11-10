@@ -4,24 +4,28 @@
 import { detectVoiceSupport, voiceSupportMessage } from "./capabilities.js";
 import { VoiceSynthesis } from "./synthesis.js";
 import { VoiceRecognition } from "./recognition.js";
+import { VoiceRecorder } from "./recorder.js";
 
 export function createVoice(persona) {
   const support = detectVoiceSupport();
   const synth = support.synthesis ? new VoiceSynthesis() : null;
   const recognition = support.recognition ? new VoiceRecognition(support) : null;
+  const recorder = new VoiceRecorder();
   const listeners = new Set();
   let profile = persona.voice || { lang: "en-NG", rate: 1, pitch: 1 };
 
   const state = {
-    supported: support.recognition || support.synthesis,
+    supported: support.recognition || support.synthesis || recorder.supported,
     recognition: support.recognition,
     synthesis: support.synthesis,
+    recorder: recorder.supported,
     enabled: false,
     muted: false,
     listening: false,
+    recording: false,
     speaking: false,
     interim: "",
-    status: support.recognition || support.synthesis
+    status: support.recognition || support.synthesis || recorder.supported
       ? "Voice is off — enable it to hear replies."
       : voiceSupportMessage(support),
     error: ""
@@ -55,9 +59,11 @@ export function createVoice(persona) {
       supported: state.supported,
       recognition: state.recognition,
       synthesis: state.synthesis,
+      recorder: state.recorder,
       enabled: state.enabled,
       muted: state.muted,
       listening: state.listening,
+      recording: state.recording,
       speaking: state.speaking,
       interim: state.interim,
       status: state.status,
@@ -80,7 +86,9 @@ export function createVoice(persona) {
 
   function stopListening() {
     if (recognition) recognition.abort();
+    if (recorder.active) recorder.cancel();
     state.listening = false;
+    state.recording = false;
     state.interim = "";
     if (state.enabled) state.status = readyText();
     emit();
@@ -150,7 +158,66 @@ export function createVoice(persona) {
     return started;
   }
 
+  async function beginRecording() {
+    if (!state.enabled) {
+      state.enabled = true;
+      state.muted = false;
+    }
+    cancelAudio();
+    state.recording = true;
+    state.listening = true;
+    state.error = "";
+    state.status = "Listening… speak, then tap the mic to stop.";
+    emit();
+    let text = "";
+    try {
+      text = await recorder.start({
+        onAutoStop() {
+          state.status = "Transcribing…";
+          state.recording = false;
+          emit();
+        }
+      });
+    } catch (error) {
+      state.recording = false;
+      state.listening = false;
+      const code = error && error.code;
+      const message = code === "unsupported"
+        ? "Voice recording is not supported in this browser. Please type instead."
+        : error && error.name === "NotAllowedError"
+          ? "Microphone permission was blocked. Allow it in your browser settings, or type instead."
+          : error && error.name === "NotFoundError"
+            ? "No microphone was found. You can still type."
+            : code === "rate"
+              ? (error.message || "Too many voice attempts. Please wait a few minutes.")
+              : "I could not transcribe that. Please try again or type.";
+      setStatus(message, code || "recording");
+      return;
+    }
+    state.recording = false;
+    state.listening = false;
+    if (recorder.cancelled) { if (state.enabled) state.status = readyText(); emit(); return; }
+    if (!text) {
+      setStatus("I didn't catch that. Try again, or type your message.", "no-speech");
+      return;
+    }
+    state.status = "Got it…";
+    emit();
+    if (typeof controller.onTranscript === "function") controller.onTranscript(text);
+  }
+
+  function finishRecording() {
+    state.status = "Transcribing…";
+    emit();
+    recorder.stop();
+  }
+
   function startListening() {
+    if (recorder.supported) {
+      if (state.recording) { finishRecording(); return true; }
+      beginRecording();
+      return true;
+    }
     if (!recognition) {
       setStatus(voiceSupportMessage(support), "unsupported");
       return false;
@@ -205,6 +272,15 @@ export function createVoice(persona) {
     return started;
   }
 
+  function toggleListening() {
+    if (state.recording) { finishRecording(); return true; }
+    if (state.listening) {
+      if (recognition) recognition.stop();
+      return true;
+    }
+    return startListening();
+  }
+
   function replay() {
     const text = controller.lastAssistantText;
     if (!text) return false;
@@ -249,6 +325,7 @@ export function createVoice(persona) {
   function destroy() {
     cancelAudio();
     stopListening();
+    if (recorder) recorder.destroy();
     listeners.clear();
   }
 
@@ -267,6 +344,7 @@ export function createVoice(persona) {
     speak,
     replay,
     startListening,
+    toggleListening,
     stopListening,
     stop,
     setPersona,

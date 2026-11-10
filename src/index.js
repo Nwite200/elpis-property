@@ -6063,6 +6063,30 @@ async function handleFetch(request, env) {
     }
 
     // ---- Assistant-assisted human handover (Phase 9) ----
+    if (path === "/api/assistant/transcribe" && request.method === "POST") {
+      const contentType = request.headers.get("content-type") || "";
+      if (!/^audio\//i.test(contentType)) return json({ error: "Audio body required" }, 400);
+      const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+      const attempts = await env.DB.prepare(
+        "SELECT COUNT(*) AS c FROM audit_logs WHERE action='assistant.transcribe.attempt' AND target_id=? AND created_at >= datetime('now','-10 minutes')"
+      ).bind(ip).first();
+      if (attempts && Number(attempts.c) >= 20) return json({ error: "Too many voice attempts. Please wait a few minutes." }, 429);
+      await audit(env, null, "assistant.transcribe.attempt", "assistant", ip, { bytes: Number(request.headers.get("content-length") || 0) }).catch(() => {});
+      if (!env.AI || typeof env.AI.run !== "function") {
+        return json({ error: "Voice transcription is not configured on this deployment." }, 503);
+      }
+      const buffer = await request.arrayBuffer();
+      if (!buffer.byteLength) return json({ error: "Empty audio" }, 400);
+      if (buffer.byteLength > 3_000_000) return json({ error: "Audio is too long. Keep it under 30 seconds." }, 413);
+      try {
+        const result = await env.AI.run("@cf/openai/whisper", { audio: Array.from(new Uint8Array(buffer)) });
+        const text = String((result && (result.text || result.response)) || "").trim();
+        return json({ text });
+      } catch (error) {
+        return json({ error: "Voice transcription failed. Please type instead." }, 502);
+      }
+    }
+
     if (path === "/api/assistant/heartbeat" && request.method === "POST") {
       const actor = await getSessionUser(env, request);
       if (!actor) return json({ error: "Unauthenticated" }, 401);

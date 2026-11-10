@@ -236,7 +236,7 @@ export class AssistantUI {
     this.stopFormWatch = watchFormAttempts(issue => this.showFormGuidance(issue));
 
     if (this.voice) {
-      if (!this.voice.state.recognition) mic.hidden = true;
+      if (!this.voice.state.recognition && !this.voice.state.recorder) mic.hidden = true;
       if (!this.voice.state.synthesis) {
         speaker.hidden = true;
         replay.hidden = true;
@@ -374,8 +374,7 @@ export class AssistantUI {
 
   toggleListening() {
     if (!this.voice) return;
-    if (this.voice.state.listening) this.voice.stopListening();
-    else this.voice.startListening();
+    this.voice.toggleListening();
   }
 
   replay() {

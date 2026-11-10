@@ -27,6 +27,9 @@ binding = "CACHE"
 # KV namespace created in Elpis Property's Cloudflare account.
 id = "c76c15d9dc574f9cace3398d82d30c18"
 
+[ai]
+binding = "AI"
+
 [[queues.producers]]
 binding = "TASKS"
 queue = "elpis-property-staging-tasks"

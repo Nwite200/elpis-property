@@ -211,6 +211,7 @@ function makeEnv(overrides = {}) {
       async delete(key) { r2.delete(key); return {}; }
     },
     TASKS: { async send(msg) { queued.push(msg); return true; } },
+    AI: { async run() { return { text: 'hello from audio' }; } },
     ASSETS: { async fetch() { return new Response('Not found', { status: 404 }); } },
     ENVIRONMENT: 'test',
     ...overrides
@@ -1857,6 +1858,14 @@ await test('referral commission applies two-stage and flat rules, caps at 35,000
   assert(careView.status === 403, 'customer care must not see referral commissions');
   const configView = await request('/api/referral-commissions?status=Configuration%20Required', { headers: { Cookie: mdCookie } });
   assert(configView.status === 200 && configView.data.entries.some(row => row.client_id === eightMonthClient), 'configuration-required referral account missing from dashboard');
+});
+
+console.log('\n--- 13. Assistant voice transcription ---');
+await test('assistant transcription accepts audio and returns the recognised text', async () => {
+  const res = await request('/api/assistant/transcribe', {
+    method: 'POST', headers: { 'Content-Type': 'audio/webm' }, body: 'fake-audio-bytes'
+  });
+  assert(res.status === 200 && /hello from audio/.test(res.data.text), `transcription failed: ${res.status} ${JSON.stringify(res.data)}`);
 });
 
 console.log('\n--- 13. Team Lead member management ---');

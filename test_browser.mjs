@@ -588,6 +588,40 @@ try {
     await context.close();
   });
 
+  await test('microphone recording transcribes audio and sends it as a message', async () => {
+    const context = await browser.newContext();
+    await context.route('**/api/assistant/transcribe', route => route.fulfill({
+      status: 200, contentType: 'application/json', body: JSON.stringify({ text: 'hello from my microphone' })
+    }));
+    await context.addInitScript(() => {
+      navigator.mediaDevices.getUserMedia = async () => ({ getTracks: () => [{ stop() {} }] });
+      class FakeMediaRecorder {
+        static isTypeSupported() { return true; }
+        constructor(stream, options = {}) {
+          this.state = 'inactive';
+          this.mimeType = options.mimeType || 'audio/webm';
+        }
+        start() { this.state = 'recording'; }
+        stop() {
+          this.state = 'inactive';
+          if (this.ondataavailable) this.ondataavailable({ data: new Blob(['fake-audio'], { type: this.mimeType }) });
+          if (this.onstop) this.onstop();
+        }
+      }
+      Object.defineProperty(window, 'MediaRecorder', { value: FakeMediaRecorder, configurable: true });
+    });
+    const page = await context.newPage();
+    await goto(page, BASE + '/login');
+    await page.waitForSelector('.elp-dh-launcher', { timeout: 20000 });
+    await page.click('.elp-dh-launcher');
+    await page.click('.elp-dh-mic');
+    await page.waitForFunction(() => /Listening/.test(document.getElementById('elp-dh-voice-status')?.textContent || ''), { timeout: 8000 });
+    await page.click('.elp-dh-mic');
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('.elp-dh-bubble')).some(n => n.textContent === 'hello from my microphone'), { timeout: 12000 });
+    await page.waitForFunction(() => Array.from(document.querySelectorAll('.elp-dh-bubble')).some(n => /Adaora/.test(n.textContent)), { timeout: 8000 });
+    await context.close();
+  });
+
   await test('voice controls stay hidden and typing still works when speech APIs are missing', async () => {
     const context = await browser.newContext();
     await context.addInitScript(() => {
@@ -596,6 +630,8 @@ try {
         Object.defineProperty(window, 'SpeechSynthesisUtterance', { value: undefined, configurable: true });
         Object.defineProperty(window, 'SpeechRecognition', { value: undefined, configurable: true });
         Object.defineProperty(window, 'webkitSpeechRecognition', { value: undefined, configurable: true });
+        Object.defineProperty(window, 'MediaRecorder', { value: undefined, configurable: true });
+        Object.defineProperty(navigator, 'mediaDevices', { value: undefined, configurable: true });
       } catch (error) { /* ignore */ }
     });
     const page = await context.newPage();
@@ -618,6 +654,7 @@ try {
   await test('voice engine speaks, replays, stops and accepts a spoken transcript', async () => {
     const context = await browser.newContext();
     await context.addInitScript(() => {
+      Object.defineProperty(window, 'MediaRecorder', { value: undefined, configurable: true });
       window.__voiceSpoken = [];
       window.__voiceCancelled = 0;
       class FakeUtterance {
