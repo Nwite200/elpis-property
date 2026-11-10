@@ -279,3 +279,29 @@ Needs your explicit sign-off because it changes UX: **B1 intro navigation** (1.2
   not field data. There is no RUM in the product yet; adding one is the first monitoring win.
 - Staging data is too small to expose SQL cost. Items B4/B8 are plan-level findings and are
   marked scale-dependent rather than given a fake current-ms number.
+
+---
+
+## 7. Implementation status (2026-11-10)
+
+Shipped in `6621b22` and `6180a5c0` (deployed version `6180a5c0-a089-4215-8f81-ded55de79c5e`).
+Contract test added: `/api/dashboard`, `/api/analytics/performance` and `/api/finance/overview`
+return byte-identical JSON with `PERF_BATCH_QUERIES`/`PERF_SARGABLE_DATES` on and off.
+
+| Metric | Before | After | Delta |
+|---|---:|---:|---:|
+| `/api/dashboard` app p50 | 433 ms | **263 ms** | −170 ms (−39%) |
+| `/api/dashboard` app p95 | 474 ms | **361 ms** | −113 ms |
+| `/api/dashboard` app p99 | 528 ms | **388 ms** | −140 ms |
+| `/api/analytics/performance` p50 | 347 ms | **158 ms** | −189 ms (−54%) |
+| `/api/analytics/performance` p99 | 499 ms | **251 ms** | −248 ms |
+| Internal navigation until usable | 1,829 ms | **678 ms** | −1,151 ms |
+| Home transfer (mobile 4G) | 566 KB | **304 KB** | −262 KB (−46%) |
+| Hero transfer (mobile 4G) | 433 KB | **105 KB** | −328 KB (−76%) |
+
+Caveat on LCP: the first-load LCP element is still the intro logo, so the hero reduction does not
+move the lab LCP on a first visit (2.30 s). The byte savings and the internal-navigation fix are
+real; LCP will move when the first-load intro is gated or shortened. Dashboard p50 is now 263 ms;
+the remaining handler queries (~8) and the team-ranking N+1 are the next batching increment.
+
+Rollback: set `PERF_BATCH_QUERIES="0"`, `PERF_SARGABLE_DATES="0"`, or `INTRO_INTERNAL="short"`.
