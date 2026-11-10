@@ -133,9 +133,11 @@ export function createVoice(persona) {
       },
       onError(reason) {
         state.speaking = false;
-        state.status = reason === "synthesis-failed"
-          ? "Spoken replies are not available right now — captions are shown."
-          : "Speech stopped. Captions are always shown.";
+        state.status = reason === "blocked"
+          ? "Your browser blocked spoken replies. Captions are always shown — tap Replay to try again."
+          : reason === "synthesis-failed"
+            ? "Spoken replies are not available right now — captions are shown."
+            : "Speech stopped. Captions are always shown.";
         emit();
       }
     });

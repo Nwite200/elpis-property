@@ -122,7 +122,18 @@ export class VoiceSynthesis {
       utterance.pitch = Number(profile.pitch) || 1;
       utterance.volume = 1;
       if (voice) utterance.voice = voice;
-      utterance.onstart = () => { onStart && onStart(); };
+      let started = false;
+      if (this.watchdog) clearTimeout(this.watchdog);
+      this.watchdog = setTimeout(() => {
+        if (started) return;
+        this.finish(onEnd);
+        onError && onError("blocked");
+      }, 2500);
+      utterance.onstart = () => {
+        started = true;
+        if (this.watchdog) { clearTimeout(this.watchdog); this.watchdog = null; }
+        onStart && onStart();
+      };
       utterance.onend = () => speakNext();
       utterance.onerror = event => {
         const reason = event && event.error ? event.error : "unknown";
@@ -149,6 +160,7 @@ export class VoiceSynthesis {
   finish(onEnd) {
     this.speaking = false;
     this.current = null;
+    if (this.watchdog) { clearTimeout(this.watchdog); this.watchdog = null; }
     if (this.resumeTimer) { clearInterval(this.resumeTimer); this.resumeTimer = null; }
     this.onStateChange && this.onStateChange({ speaking: false, voiceName: this.voiceName });
     onEnd && onEnd();
@@ -158,6 +170,7 @@ export class VoiceSynthesis {
     if (this.synth) {
       try { this.synth.cancel(); } catch (_) { /* ignore */ }
     }
+    if (this.watchdog) { clearTimeout(this.watchdog); this.watchdog = null; }
     if (this.resumeTimer) { clearInterval(this.resumeTimer); this.resumeTimer = null; }
     const wasSpeaking = this.speaking;
     this.speaking = false;

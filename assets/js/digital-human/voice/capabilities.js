@@ -10,7 +10,6 @@ export function detectVoiceSupport() {
     synthesis: !!(synthesis && typeof synthesis.speak === "function" && typeof Utterance === "function"),
     secure: window.isSecureContext !== false,
     Recognition,
-    synthesis,
     Utterance
   };
 }
