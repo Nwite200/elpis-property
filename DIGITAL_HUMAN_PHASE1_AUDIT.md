@@ -328,3 +328,27 @@ speak/replay/stop/spoken-transcript flow.
 
 **Tests:** 188 total; browser suite adds entry-introduction, once-per-session, dashboard greeting,
 persona handover/context continuity and male-voice selection after handover.
+
+## 17. Phase 5 status (dashboard intelligence)
+
+- **Portraits:** all nine personas now use the owner-supplied studio portraits (320×320 JPEG,
+  self-hosted). The four portraits from the second grid cover Chiamaka, Amara, Ngozi, Ifeoma,
+  Emeka, David and Daniel; no face is reused.
+- **Role-aware greetings:** client, marketer, finance/account officer, team lead, manager,
+  administrator, customer care and GSM groups each get their own dashboard greeting and intro
+  bubble text. Clean URLs (`/dashboard`, `/client-dashboard`) are normalised before matching, so
+  the introduction works in production routing as well as `.html` paths.
+- **Authorised summaries:** “summary / status / balance / what’s pending” calls the existing
+  read-only endpoint for the role and reads real figures:
+  - client → `/api/client/dashboard` (agreed price, verified, outstanding, next installment)
+  - finance → `/api/finance/overview` (today, month, pending, outstanding balances)
+  - accountant → `/api/accountant/earnings` (collected, pending, outstanding, settlement)
+  - admin → `/api/admin/overview` (staff, clients, audit count)
+  - care → `/api/customer-care/overview` (clearance queue and calls)
+  - marketer / team lead / manager → `/api/dashboard` scoped by the backend
+- **Safety:** the tool only reads; the server enforces role and branch scope. On 401/403 it explains
+  the limit instead of showing data. No figure is ever invented or cached.
+- **Quick actions:** each role gets links to the workspaces it can already open.
+
+**Tests:** 191 total; browser suite adds role-aware greetings (marketer, finance, super admin),
+a real client balance summary, and a portrait-file check for all nine personas.

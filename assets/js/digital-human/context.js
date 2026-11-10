@@ -45,8 +45,9 @@ const PAGE_LABELS = {
 };
 
 function pageKey(pathname) {
-  const file = pathname.split("/").pop() || "index.html";
-  return file === "" ? "index.html" : file;
+  const raw = pathname.split("/").pop() || "";
+  if (!raw) return "index.html";
+  return raw.includes(".") ? raw : `${raw}.html`;
 }
 
 function pageKind(page) {
@@ -82,6 +83,8 @@ export async function getContext() {
     kind,
     signedIn: false,
     role: null,
+    actualRole: null,
+    roleGroup: "public",
     name: null,
     firstName: null,
     branchId: null,
@@ -97,11 +100,13 @@ export async function getContext() {
       const me = await res.json();
       context.signedIn = true;
       context.role = me.role || null;
+      context.actualRole = me.actual_role || me.role || null;
       context.name = me.full_name || me.name || null;
       context.firstName = context.name ? String(context.name).split(" ")[0] : null;
       context.branchId = me.branch_id || null;
       context.isClient = me.role === "Client";
       context.isStaff = !!me.role && me.role !== "Client";
+      context.roleGroup = roleGroup(context);
     }
   } catch (_) {
     // Public visitor, offline, or timed out: stay in public mode.
@@ -109,23 +114,106 @@ export async function getContext() {
   return context;
 }
 
+export function roleGroup(context) {
+  if (!context || !context.signedIn) return "public";
+  const actual = context.actualRole || "";
+  const role = context.role || "";
+  if (role === "Client") return "client";
+  if (actual === "Super Admin" || actual === "Sub Admin") return "admin";
+  if (actual === "GSM") return "gsm";
+  if (actual === "Accountant") return "accountant";
+  if (actual === "Head Accountant" || role === "Finance Officer") return "finance";
+  if (role === "Marketer") return "marketer";
+  if (role === "Team Lead") return "team";
+  if (role === "Customer Care") return "care";
+  if (["Managing Director", "Branch Manager", "Project Manager"].includes(role)) return "manager";
+  return "staff";
+}
+
+export function quickActionsFor(context) {
+  const link = (label, href) => ({ label, href });
+  switch (context.roleGroup) {
+    case "client":
+      return [link("My payments", "client-payments.html"), link("My receipts", "client-receipts.html"), link("My property", "client-property.html"), link("Contact the team", "index.html#contact")];
+    case "marketer":
+      return [link("My leads", "leads.html"), link("My clients", "clients.html"), link("Performance", "performance.html")];
+    case "team":
+      return [link("Team performance", "performance.html"), link("Leads", "leads.html"), link("Activity centre", "activity-centre.html")];
+    case "finance":
+      return [link("Finance dashboard", "finance-dashboard.html"), link("Transactions", "finance-dashboard.html#transactions"), link("Reports", "reports.html")];
+    case "accountant":
+      return [link("Accountant dashboard", "accountant-dashboard.html"), link("Reports", "reports.html")];
+    case "manager":
+      return [link("Dashboard", "dashboard.html"), link("Revenue", "revenue.html"), link("Reports", "reports.html")];
+    case "admin":
+      return [link("Administration", "super-admin.html"), link("Staff", "staff-management.html"), link("Permissions", "permissions.html")];
+    case "care":
+      return [link("Care queue", "customer-care.html"), link("Clients", "customer-care.html")];
+    case "gsm":
+      return [link("GSM dashboard", "gsm-dashboard.html"), link("Leads", "leads.html")];
+    default:
+      return [
+        link("Explore properties", "index.html#properties"),
+        link("Create an account", "signup.html"),
+        link("Contact the team", "index.html#contact")
+      ];
+  }
+}
+
 export function greetingFor(context, persona) {
   const first = context.firstName ? `, ${context.firstName}` : "";
-  if (context.isClient) {
-    return `Welcome back${first}. Your client dashboard is ready. I can help you find your next step, review your account or reach the team.`;
-  }
-  if (context.isStaff) {
-    const role = context.role || "team member";
-    if (context.kind === "dashboard") {
-      return `Welcome back${first}. You're signed in as ${role}. I can guide you around this dashboard and point you to the right workspace.`;
-    }
-    return `Welcome back${first}. You're signed in as ${role}. I can guide you around ${context.pageLabel}.`;
+  const name = persona ? persona.name : "Adaora";
+  switch (context.roleGroup) {
+    case "client":
+      return `Welcome back${first}. Your dashboard is ready. Would you like to explore properties, review your enquiries or check your account?`;
+    case "marketer":
+      return `Welcome back${first}. Your marketer dashboard is ready. Let's review your client activities and follow-ups.`;
+    case "finance":
+    case "accountant":
+      return `Welcome back${first}. Your account dashboard is ready. Let's review today's payment activities.`;
+    case "team":
+      return `Welcome back${first}. Your team dashboard is ready. Let's review the activities within your authorised team.`;
+    case "manager":
+      return `Welcome back${first}. Your management dashboard is ready. I can help you review your operational activities.`;
+    case "admin":
+      return `Welcome back${first}. Your administration dashboard is ready. What would you like to review?`;
+    case "care":
+      return `Welcome back${first}. Your customer care dashboard is ready. Let's review the care queue.`;
+    case "gsm":
+      return `Welcome back${first}. Your GSM dashboard is ready. What would you like to review?`;
+    default:
+      break;
   }
   if (context.kind === "auth") {
-    return `Welcome to Elpis Property. I'm ${persona.name}. I can guide you through this form or help you find what you need.`;
+    return `Welcome to Elpis Property. I'm ${name}. I can guide you through this form or help you find what you need.`;
   }
   if (context.kind === "property") {
-    return `Welcome to Elpis Property. I'm ${persona.name}. I can help you explore the portfolio or connect you with the right team.`;
+    return `Welcome to Elpis Property. I'm ${name}. I can help you explore the portfolio or connect you with the right team.`;
   }
-  return `Welcome to Elpis Property. I'm ${persona.name}, your concierge. I can help you explore the portfolio, create an account or reach the right team.`;
+  return `Welcome to Elpis Property. I'm ${name}, your concierge. I can help you explore the portfolio, create an account or reach the right team.`;
+}
+
+export function introTextFor(context) {
+  const first = context.firstName ? `, ${context.firstName}` : "";
+  switch (context.roleGroup) {
+    case "client":
+      return `Welcome back${first}. Your dashboard is ready. Would you like to explore properties, review your enquiries or check your account?`;
+    case "marketer":
+      return `Welcome back${first}. Your marketer dashboard is ready. Let's review your client activities and follow-ups.`;
+    case "finance":
+    case "accountant":
+      return `Welcome back${first}. Your account dashboard is ready. Let's review today's payment activities.`;
+    case "team":
+      return `Welcome back${first}. Your team dashboard is ready. Let's review the activities within your authorised team.`;
+    case "manager":
+      return `Welcome back${first}. Your management dashboard is ready. I can help you review your operational activities.`;
+    case "admin":
+      return `Welcome back${first}. Your administration dashboard is ready. What would you like to review?`;
+    case "care":
+      return `Welcome back${first}. Your customer care dashboard is ready. Let's review the care queue.`;
+    case "gsm":
+      return `Welcome back${first}. Your GSM dashboard is ready. What would you like to review?`;
+    default:
+      return "Welcome to Elpis Property. I'm Adaora. I can help you explore the portfolio or reach the right team.";
+  }
 }

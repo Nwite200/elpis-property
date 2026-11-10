@@ -437,10 +437,15 @@ export class AssistantUI {
     this.append({ role: "user", text: value });
     this.thinking(true);
     this.sendButton.disabled = true;
-    window.setTimeout(() => {
+    window.setTimeout(async () => {
+      let reply = null;
+      try {
+        reply = await this.onSend(value);
+      } catch (_) {
+        reply = { text: "I could not reach that workspace just now. The pages still work — please try again.", actions: [] };
+      }
       this.thinking(false);
       this.sendButton.disabled = false;
-      const reply = this.onSend(value);
       this.lastAssistantText = reply ? reply.text : "";
       if (this.voice) this.voice.lastAssistantText = this.lastAssistantText;
       this.append({

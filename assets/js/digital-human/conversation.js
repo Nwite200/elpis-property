@@ -2,7 +2,8 @@
 // No LLM, no fabricated data and no privileged actions.
 
 import { STORAGE_KEY, MAX_TRANSCRIPT, PERSONAS, personaByKey } from "./config.js";
-import { greetingFor } from "./context.js";
+import { greetingFor, quickActionsFor } from "./context.js";
+import { summarizeDashboard } from "./tools/dashboard.js";
 
 function scopeOf(context) {
   if (context.isStaff) return "staff";
@@ -38,6 +39,13 @@ function contactActions(context) {
 }
 
 const INTENTS = [
+  {
+    key: "summary",
+    test: /(summary|overview|how am i doing|what.?s pending|what is pending|what.?s due|today|my day|status|performance|figures|numbers|balance|outstanding|how much)/i,
+    async reply(context) {
+      return summarizeDashboard(context);
+    }
+  },
   {
     key: "property",
     handover: "solomon",
@@ -214,11 +222,7 @@ const INTENTS = [
 function fallback(context) {
   return {
     text: "I can help with the property portfolio, registration, your dashboard, payments and reaching the team. Try one of these:",
-    actions: [
-      { label: "Explore properties", href: portfolioHref(context) },
-      { label: "Create an account", href: "signup.html" },
-      { label: "Contact the team", href: "index.html#contact" }
-    ]
+    actions: quickActionsFor(context)
   };
 }
 
@@ -243,7 +247,7 @@ export class Conversation {
       this.messages.push({
         role: "assistant",
         text: greetingFor(context, persona),
-        actions: persona.quickActions || []
+        actions: quickActionsFor(context)
       });
       this.save();
     }
@@ -263,7 +267,7 @@ export class Conversation {
     this.messages.push({
       role: "assistant",
       text: greetingFor(this.context, this.persona),
-      actions: this.persona.quickActions || []
+      actions: quickActionsFor(this.context)
     });
     this.save();
     return this.messages;
@@ -279,7 +283,7 @@ export class Conversation {
     this.persona = persona;
   }
 
-  handle(text) {
+  async handle(text) {
     const input = String(text || "").trim();
     if (!input) return null;
     this.push("user", input);
@@ -316,7 +320,7 @@ export class Conversation {
       if (canUse(target, this.context)) {
         const intro = handoverIntro(target);
         this.push("assistant", intro, []);
-        const specialistReply = intent.reply(this.context);
+        const specialistReply = await intent.reply(this.context);
         this.context.lastIntent = intent.key;
         this.context.lastPersona = target.key;
         return {
@@ -327,7 +331,7 @@ export class Conversation {
       }
     }
 
-    const reply = intent ? intent.reply(this.context) : fallback(this.context);
+    const reply = intent ? await intent.reply(this.context) : fallback(this.context);
     this.context.lastIntent = intent ? intent.key : "fallback";
     this.push("assistant", reply.text, reply.actions);
     return reply;

@@ -3,7 +3,7 @@
 // privileged, every link and future tool stays inside the existing app.
 
 import { ENABLED, VERSION, PERSONAS, personaByKey } from "./config.js";
-import { getContext } from "./context.js";
+import { getContext, introTextFor } from "./context.js";
 import { Conversation } from "./conversation.js";
 import { AssistantUI } from "./ui.js";
 import { createVoice } from "./voice/controller.js";
@@ -75,12 +75,7 @@ async function mount() {
   let introSeen = false;
   try { introSeen = sessionStorage.getItem(introKey) === "1"; } catch (_) { /* ignore */ }
   if ((isHome || isDashboard) && !introSeen) {
-    const first = context.firstName ? `, ${context.firstName}` : "";
-    const intro = context.isClient
-      ? `Welcome back${first}. I'm Adaora. I can help you with your account, payments or the right team.`
-      : context.isStaff
-        ? `Welcome back${first}. I'm Adaora. Ask me about this dashboard, or tell me what you need.`
-        : "Welcome to Elpis Property. I'm Adaora. I can help you explore the portfolio or reach the right team.";
+    const intro = introTextFor(context);
     window.setTimeout(() => ui.showIntro(intro), 900);
     try { sessionStorage.setItem(introKey, "1"); } catch (_) { /* ignore */ }
   }

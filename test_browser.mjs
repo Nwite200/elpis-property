@@ -110,6 +110,19 @@ function upsert(email, name, role, branch) {
 }
 const mdId = upsert('browser.md@elpisproperty.test', 'Browser MD', mdRole, ikeja);
 const marketerId = upsert('browser.marketer@elpisproperty.test', 'Browser Marketer', marketerRole, ikeja);
+const financeId = upsert('browser.finance@elpisproperty.test', 'Browser Finance', roleId('Finance Officer'), ikeja);
+const adminId = upsert('browser.superadmin@elpisproperty.test', 'Browser Super Admin', roleId('Super Admin'), ikeja);
+const clientUserId = upsert('browser.client@elpisproperty.test', 'Browser Client', roleId('Client'), ikeja);
+const existingClient = db.prepare("SELECT id FROM clients WHERE client_reference='TEST-BROWSER-CLIENT'").get();
+if (existingClient) {
+  db.prepare("UPDATE clients SET user_id=?, full_name=?, phone_number=?, email_address=? WHERE id=?")
+    .run(clientUserId, 'Browser Client', '08088000999', 'browser.client@elpisproperty.test', existingClient.id);
+} else {
+  db.prepare(`INSERT INTO clients (client_reference, full_name, phone_number, email_address, status, assigned_branch_id,
+    created_by, original_marketer_id, agreed_purchase_price, user_id)
+    VALUES ('TEST-BROWSER-CLIENT','Browser Client','08088000999','browser.client@elpisproperty.test','Active Buyer',?,?,?,?,?)`)
+    .run(ikeja, mdId, marketerId, 50000000, clientUserId);
+}
 const teamLeadRole = roleId('Team Lead');
 const teamLead = db.prepare("SELECT id FROM users WHERE email='tl.ikeja@elpisproperty.test'").get()
   || { id: upsert('tl.ikeja@elpisproperty.test', 'Branch 1 Team Lead', teamLeadRole, ikeja) };
@@ -354,6 +367,63 @@ try {
     await context.close();
   });
 
+  await test('dashboard greetings and summaries are role-aware', async () => {
+    const cases = [
+      { email: 'browser.marketer@elpisproperty.test', path: '/dashboard.html', greeting: /marketer dashboard/i, answer: /open leads/i },
+      { email: 'browser.finance@elpisproperty.test', path: '/finance-dashboard.html', greeting: /account dashboard/i, answer: /Today:/i },
+      { email: 'browser.superadmin@elpisproperty.test', path: '/dashboard.html', greeting: /administration dashboard/i, answer: /active staff/i }
+    ];
+    for (const item of cases) {
+      const context = await browser.newContext();
+      const page = await context.newPage();
+      await login(page, item.email);
+      await page.evaluate(() => {
+        try {
+          sessionStorage.removeItem('elp-dh-intro-home');
+          sessionStorage.removeItem('elp-dh-intro-dashboard');
+        } catch (_) {}
+      });
+      await goto(page, BASE + item.path);
+      await page.waitForSelector('.elp-dh-intro', { timeout: 20000 });
+      const greeting = await page.locator('.elp-dh-intro__text').innerText();
+      assert(item.greeting.test(greeting), `${item.email} greeting: ${greeting}`);
+      await page.click('.elp-dh-intro__open');
+      await page.fill('#elp-dh-input', 'summary');
+      await page.press('#elp-dh-input', 'Enter');
+      await page.waitForTimeout(1800);
+      const bubbles = await page.locator('.elp-dh-bubble').allInnerTexts();
+      assert(bubbles.some(text => item.answer.test(text)), `${item.email} summary missing: ${bubbles.slice(-3).join(' | ')}`);
+      await context.close();
+    }
+  });
+
+  await test('client dashboard gets an account greeting and a real balance summary', async () => {
+    const context = await browser.newContext();
+    const loginRes = await context.request.post(BASE + '/api/login', {
+      data: { email: 'browser.client@elpisproperty.test', password: PASSWORD }
+    });
+    assert(loginRes.ok(), `client login failed: ${loginRes.status()}`);
+    const page = await context.newPage();
+    await goto(page, BASE + '/client-dashboard.html');
+    await page.waitForSelector('.elp-dh-intro', { timeout: 20000 });
+    const greeting = await page.locator('.elp-dh-intro__text').innerText();
+    assert(/dashboard is ready/i.test(greeting) && /explore properties/i.test(greeting), `client greeting: ${greeting}`);
+    await page.click('.elp-dh-intro__open');
+    await page.fill('#elp-dh-input', 'summary');
+    await page.press('#elp-dh-input', 'Enter');
+    await page.waitForTimeout(1800);
+    const bubbles = await page.locator('.elp-dh-bubble').allInnerTexts();
+    assert(bubbles.some(text => /Outstanding balance/i.test(text) && /₦/.test(text)), `client summary missing: ${bubbles.slice(-3).join(' | ')}`);
+    await context.close();
+  });
+
+  await test('every persona has a self-hosted portrait', async () => {
+    const { PERSONAS } = await import('./assets/js/digital-human/config.js');
+    for (const persona of PERSONAS) {
+      assert(existsSync(persona.avatar), `${persona.key} portrait missing: ${persona.avatar}`);
+    }
+  });
+
   await test('voice controls stay hidden and typing still works when speech APIs are missing', async () => {
     const context = await browser.newContext();
     await context.addInitScript(() => {
@@ -481,6 +551,7 @@ try {
       cleanup.prepare(`DELETE FROM lead_follow_ups WHERE staff_id IN (${marks}) OR lead_id IN (SELECT id FROM leads WHERE lead_reference LIKE 'TEST-BROWSER-%')`).run(...ids);
       cleanup.prepare(`DELETE FROM lead_temperature_history WHERE changed_by IN (${marks}) OR lead_id IN (SELECT id FROM leads WHERE lead_reference LIKE 'TEST-BROWSER-%')`).run(...ids);
       cleanup.prepare(`DELETE FROM leads WHERE lead_reference LIKE 'TEST-BROWSER-%'`).run();
+      cleanup.prepare(`DELETE FROM clients WHERE client_reference='TEST-BROWSER-CLIENT'`).run();
       cleanup.prepare(`DELETE FROM sessions WHERE user_id IN (${marks})`).run(...ids);
       cleanup.prepare(`DELETE FROM staff_profiles WHERE user_id IN (${marks})`).run(...ids);
       cleanup.prepare(`DELETE FROM team_members WHERE user_id IN (${marks})`).run(...ids);
