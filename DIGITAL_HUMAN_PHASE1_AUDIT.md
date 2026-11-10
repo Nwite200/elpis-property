@@ -258,3 +258,26 @@ Phase 2 needs:
 
 On approval I will implement Phase 2 behind `ASSISTANT_ENABLED`, add a Playwright acceptance test
 for mount/visibility/keyboard/mobile, and keep every existing suite green.
+
+---
+
+## 14. Phase 2 status (shipped)
+
+- Floating launcher + panel on 42 pages (all except `offline.html`), scoped styles, no new
+  framework, no render-blocking CSS (stylesheet injected at runtime), mount delayed to idle.
+- Adaora persona with page/role-aware greeting, typed conversation, deterministic intent routing,
+  captions, keyboard support (`Escape`, focus return), reduced-motion support and mobile bottom-sheet
+  layout.
+- Conversation transcript persists per tab in `sessionStorage`; restart clears it.
+- All replies are navigation/contact guidance with real links. No figures, listings, payments or
+  staff records are invented.
+- Rollback: `export const ENABLED = false` in `assets/js/digital-human/config.js`.
+
+**Avatar limitation:** the image generator failed with “insufficient account funds”, so no
+portrait was produced. The component renders a brand monogram (`A`) until
+`assets/images/assistants/adaora.png` exists; dropping the file in place switches the avatar
+automatically (same for the other eight personas). This must be completed before Phase 4 is
+called done.
+
+**Tests:** 183 total, including three new browser checks (loader on every page, typed conversation
+with Escape/focus, mobile viewport fit).

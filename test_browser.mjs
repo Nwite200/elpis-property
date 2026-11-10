@@ -242,6 +242,65 @@ try {
       return Array.from(document.querySelectorAll('#chatMessages .chat-message-bubble')).some(node => node.textContent === expected);
     }, message, { timeout: 15000 });
   });
+
+  await test('assistant loader is present on every page except offline', async () => {
+    const pages = readdirSync('.').filter(f => f.endsWith('.html'));
+    for (const page of pages) {
+      const html = readFileSync(page, 'utf8');
+      if (page === 'offline.html') {
+        assert(!html.includes('digital-human/index.js'), 'offline page must not mount the assistant');
+      } else {
+        assert(html.includes('assets/js/digital-human/index.js'), `${page} is missing the assistant loader`);
+      }
+    }
+  });
+
+  await test('assistant mounts, answers a typed question and closes with Escape', async () => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    const pageErrors = [];
+    page.on('pageerror', error => pageErrors.push(error.message));
+    await goto(page, BASE + '/');
+    await page.waitForSelector('#elp-dh-root .elp-dh-launcher', { timeout: 20000 });
+    assert(await page.locator('.elp-dh-launcher').isVisible(), 'launcher is not visible');
+    await page.click('.elp-dh-launcher');
+    await page.waitForSelector('.elp-dh-panel:not([hidden])', { timeout: 10000 });
+    const title = await page.locator('.elp-dh-title').innerText();
+    assert(title === 'Adaora', `expected Adaora, got ${title}`);
+    const department = await page.locator('.elp-dh-department').innerText();
+    assert(/Concierge/i.test(department), `department label missing: ${department}`);
+    await page.fill('#elp-dh-input', 'I want to find a property');
+    await page.press('#elp-dh-input', 'Enter');
+    await page.waitForFunction(() => {
+      const nodes = Array.from(document.querySelectorAll('.elp-dh-bubble'));
+      return nodes.some(n => /portfolio/i.test(n.textContent));
+    }, { timeout: 10000 });
+    const actions = await page.locator('.elp-dh-action').count();
+    assert(actions > 0, 'assistant reply has no actions');
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(() => document.querySelector('.elp-dh-panel')?.hidden === true, { timeout: 5000 });
+    const focused = await page.evaluate(() => document.activeElement?.classList.contains('elp-dh-launcher'));
+    assert(focused, 'focus did not return to the launcher after Escape');
+    assert(pageErrors.length === 0, `assistant raised page errors: ${pageErrors.join('; ')}`);
+    await context.close();
+  });
+
+  await test('assistant panel fits a mobile viewport without overflow', async () => {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true });
+    const page = await context.newPage();
+    await goto(page, BASE + '/login');
+    await page.waitForSelector('#elp-dh-root .elp-dh-launcher', { timeout: 20000 });
+    await page.click('.elp-dh-launcher');
+    await page.waitForSelector('.elp-dh-panel:not([hidden])', { timeout: 10000 });
+    const box = await page.locator('.elp-dh-panel').boundingBox();
+    assert(box && box.x >= 0 && box.y >= 0 && box.x + box.width <= 391 && box.y + box.height <= 845,
+      `panel outside mobile viewport: ${JSON.stringify(box)}`);
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
+    assert(!overflow, 'assistant introduced horizontal overflow on mobile');
+    const composer = await page.locator('#elp-dh-input').isVisible();
+    assert(composer, 'composer is not visible on mobile');
+    await context.close();
+  });
 } catch (error) {
   failed++;
   console.error('  ❌ browser harness\n     ' + error.message);
