@@ -18,7 +18,22 @@ export class VoiceRecorder {
 
   async start({ onAutoStop } = {}) {
     if (!this.supported) throw Object.assign(new Error("unsupported"), { code: "unsupported" });
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    let stream;
+    try {
+      stream = await Promise.race([
+        navigator.mediaDevices.getUserMedia({ audio: true }),
+        new Promise((_, reject) => setTimeout(() => reject(Object.assign(new Error("microphone timeout"), { code: "microphone" })), 8000))
+      ]);
+    } catch (error) {
+      throw Object.assign(new Error(error && error.message ? error.message : "microphone unavailable"), {
+        code: error && error.code ? error.code : "microphone",
+        name: error && error.name ? error.name : "Error"
+      });
+    }
+    if (this.cancelled) {
+      for (const track of stream.getTracks()) track.stop();
+      return "";
+    }
     const mime = pickMime();
     const recorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
     const chunks = [];

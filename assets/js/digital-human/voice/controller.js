@@ -280,7 +280,9 @@ export function createVoice(persona, context) {
           ? "Microphone permission was blocked. Allow it in your browser settings, or type instead."
           : error && error.name === "NotFoundError"
             ? "No microphone was found. You can still type."
-            : code === "rate"
+            : code === "microphone"
+              ? "The microphone did not start. Check your browser permission, or type your message."
+              : code === "rate"
               ? (error.message || "Too many voice attempts. Please wait a few minutes.")
               : "I could not transcribe that. Please try again or type.";
       setStatus(message, code || "recording");
@@ -299,6 +301,13 @@ export function createVoice(persona, context) {
   }
 
   function finishRecording() {
+    if (!recorder.active) {
+      state.recording = false;
+      state.listening = false;
+      state.status = "The microphone did not start. Tap the mic to try again, or type your message.";
+      emit();
+      return;
+    }
     state.status = "Transcribing…";
     emit();
     recorder.stop();
