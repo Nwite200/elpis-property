@@ -19,5 +19,9 @@
   "devDependencies": {
     "playwright-core": "^1.64.1",
     "wrangler": "^4.157.0"
+  },
+  "dependencies": {
+    "@simplewebauthn/browser": "^13.3.0",
+    "@simplewebauthn/server": "^13.3.3"
   }
 }

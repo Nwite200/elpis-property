@@ -1969,6 +1969,26 @@ await test('authenticated users can store language and voice-engine preferences'
   assert(anonymous.status === 401, 'preferences must require sign-in');
 });
 
+console.log('\n--- 14. Passkey / WebAuthn API contract ---');
+await test('passkey options require auth, issue one-time challenges and reject replays', async () => {
+  const anonymous = await request('/api/passkeys/register/options', { method: 'POST', body: {} });
+  assert(anonymous.status === 401, `anonymous registration options must be 401, got ${anonymous.status}`);
+  const options = await request('/api/passkeys/register/options', { method: 'POST', headers: { Cookie: mdCookie }, body: {} });
+  assert(options.status === 200 && options.data.challengeId && options.data.options.challenge, 'registration options missing challenge');
+  const loginOptions = await request('/api/passkeys/login/options', { method: 'POST', body: {} });
+  assert(loginOptions.status === 200 && loginOptions.data.challengeId, 'authentication options missing challenge');
+  const firstVerify = await request('/api/passkeys/login/verify', {
+    method: 'POST', body: { challengeId: loginOptions.data.challengeId, response: { id: 'unknown-credential' } }
+  });
+  assert(firstVerify.status === 401 || firstVerify.status === 400, `unknown credential must be rejected, got ${firstVerify.status}`);
+  const replay = await request('/api/passkeys/login/verify', {
+    method: 'POST', body: { challengeId: loginOptions.data.challengeId, response: { id: 'unknown-credential' } }
+  });
+  assert(replay.status === 400, `consumed challenge must not be replayable, got ${replay.status}`);
+  const list = await request('/api/passkeys', { headers: { Cookie: mdCookie } });
+  assert(list.status === 200 && Array.isArray(list.data.passkeys), 'passkey list missing');
+});
+
 console.log('\n--- 14. Migration reproducibility and database integrity ---');
 await test('scheduled cleanup removes expired sessions and aged auth attempts but keeps business audits', async () => {
   const expiredId = 'retention-expired-session';
@@ -1988,7 +2008,7 @@ await test('all local migrations apply cleanly to a fresh SQLite database', asyn
   const clean = new DatabaseSync(cleanPath);
   clean.exec('PRAGMA foreign_keys = ON;');
   const files = readdirSync('migrations').filter(f => /^\d+_.*\.sql$/.test(f)).sort();
-  assert(files.length === 34, `expected 34 migrations, found ${files.length}`);
+  assert(files.length === 35, `expected 35 migrations, found ${files.length}`);
   for (const file of files) {
     clean.exec(readFileSync(join('migrations', file), 'utf8'));
   }

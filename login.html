@@ -162,6 +162,7 @@
           'GSM': '/gsm-dashboard.html',
           'Accountant': '/accountant-dashboard.html'
         }[role] || `/dashboard.html?role=${encodeURIComponent(me.role_name || me.role || '')}`;
+        sessionStorage.setItem('elp-passkey-prompt', '1');
         window.location.href = landing;
       } catch (err) {
         msg.textContent = 'Server is currently offline. Management portal will be enabled in Phase 2.';
@@ -173,6 +174,8 @@
   <script src="assets/js/mobile-nav.js"></script>
   <script src="assets/js/pwa.js"></script>
   <script src="assets/js/password-toggle.js"></script>
+  <script src="assets/js/simplewebauthn-browser.js"></script>
+  <script src="assets/js/passkeys.js"></script>
   <script type="module" src="assets/js/digital-human/index.js"></script>
 </body>
 </html>

@@ -201,6 +201,7 @@
           return;
         }
 
+        sessionStorage.setItem('elp-passkey-prompt', '1');
         if (data.user && data.user.role === 'Client') {
           window.location.href = '/client-dashboard.html';
         } else if (data.user && data.user.role === 'Finance Officer') {
@@ -218,6 +219,8 @@
   <script src="assets/js/mobile-nav.js"></script>
   <script src="assets/js/pwa.js"></script>
   <script src="assets/js/password-toggle.js"></script>
+  <script src="assets/js/simplewebauthn-browser.js"></script>
+  <script src="assets/js/passkeys.js"></script>
   <script type="module" src="assets/js/digital-human/index.js"></script>
 </body>
 </html>

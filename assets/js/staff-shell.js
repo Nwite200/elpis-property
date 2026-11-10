@@ -154,6 +154,7 @@
       { section: "Communication" },
       { href: "staff-notifications.html", label: "🔔 Notifications", page: "notifications", roles: ["Managing Director", "Branch Manager", "Team Lead", "Marketer", "Finance Officer"] },
       { href: "staff-chat.html", label: "💬 Staff Chat", page: "chat", roles: ["Managing Director", "Branch Manager", "Team Lead", "Marketer", "Finance Officer"] },
+      { href: "passkeys.html", label: "🔐 Passkeys & Devices", page: "passkeys", roles: ["Super Admin", "Managing Director", "Project Manager", "Branch Manager", "Team Lead", "Marketer", "Finance Officer", "Head Accountant", "Customer Care", "Sub Admin", "GSM", "Accountant"] },
       { section: "Account" },
       { href: "index.html", label: "🌐 Public Website", page: "public", roles: ["Managing Director", "Branch Manager", "Team Lead", "Marketer", "Finance Officer", "Customer Care", "Sub Admin", "GSM", "Accountant"] },
       { href: "#", label: "🚪 Logout", page: "logout", roles: ["Managing Director", "Branch Manager", "Team Lead", "Marketer", "Finance Officer", "Customer Care", "Sub Admin", "GSM", "Accountant"], id: "logoutBtn" }

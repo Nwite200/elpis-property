@@ -1,3 +1,10 @@
+import {
+  generateRegistrationOptions,
+  verifyRegistrationResponse,
+  generateAuthenticationOptions,
+  verifyAuthenticationResponse
+} from "@simplewebauthn/server";
+
 const SESSION_COOKIE = "ELPIS_session";
 const SESSION_TTL_MS = 1000 * 60 * 60 * 8; // 8 hours
 
@@ -138,6 +145,62 @@ async function createSession(env, userId) {
     .bind(id, userId, expires)
     .run();
   return { id, expires };
+}
+
+function base64UrlEncode(bytes) {
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function base64UrlDecode(value) {
+  const base64 = String(value || "").replace(/-/g, "+").replace(/_/g, "/");
+  const padded = base64 + "=".repeat((4 - (base64.length % 4)) % 4);
+  const binary = atob(padded);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+
+function webauthnContext(request) {
+  const url = new URL(request.url);
+  let rpID = url.hostname;
+  if (rpID === "www.elpisproperty.org") rpID = "elpisproperty.org";
+  const origins = [url.origin];
+  if (rpID === "elpisproperty.org") origins.push("https://www.elpisproperty.org");
+  return { rpID, origins };
+}
+
+function passkeyLanding(roleName) {
+  const map = {
+    "Customer Care": "/customer-care.html",
+    "Sub Admin": "/sub-admin-dashboard.html",
+    "GSM": "/gsm-dashboard.html",
+    "Accountant": "/accountant-dashboard.html",
+    "Client": "/client-dashboard.html"
+  };
+  return map[roleName] || "/dashboard.html";
+}
+
+async function savePasskeyChallenge(env, { userId, type, challenge }) {
+  const id = crypto.randomUUID();
+  await env.DB.prepare(`
+    INSERT INTO passkey_challenges (id, user_id, type, challenge, expires_at)
+    VALUES (?, ?, ?, ?, datetime('now','+5 minutes'))
+  `).bind(id, userId || null, type, challenge).run();
+  return id;
+}
+
+async function consumePasskeyChallenge(env, id, type) {
+  const row = await env.DB.prepare(
+    "SELECT * FROM passkey_challenges WHERE id=? AND type=? AND consumed_at IS NULL AND expires_at > datetime('now')"
+  ).bind(id, type).first();
+  if (!row) return null;
+  const consumed = await env.DB.prepare(
+    "UPDATE passkey_challenges SET consumed_at=datetime('now') WHERE id=? AND consumed_at IS NULL"
+  ).bind(id).run();
+  if (!consumed.meta || Number(consumed.meta.changes) !== 1) return null;
+  return row;
 }
 
 async function getSessionUser(env, request) {
@@ -2453,6 +2516,7 @@ async function cleanupOperationalState(env) {
   await run("notification_dedupe", "DELETE FROM notification_dedupe WHERE created_at < datetime('now','-30 days')");
   await run("webhook_events", "DELETE FROM webhook_events WHERE created_at < datetime('now','-90 days')");
   await run("notification_deliveries", "DELETE FROM notification_deliveries WHERE created_at < datetime('now','-180 days')");
+  await run("passkey_challenges", "DELETE FROM passkey_challenges WHERE expires_at < datetime('now') OR (consumed_at IS NOT NULL AND consumed_at < datetime('now','-1 day'))");
   return results;
 }
 
@@ -5461,6 +5525,236 @@ async function handleFetch(request, env) {
       if (user) await audit(env, user.id, "logout", "user", String(user.id), null);
       const cookie = `${SESSION_COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Lax; Expires=Thu, 01 Jan 1970 00:00:00 GMT`;
       return json({ ok: true }, 200, { "Set-Cookie": cookie });
+    }
+
+    // ---- Passkeys / WebAuthn ----
+    if (path === "/api/passkeys/register/options" && request.method === "POST") {
+      if (!csrfOk(request)) return json({ error: "CSRF check failed" }, 403);
+      const actor = await getSessionUser(env, request);
+      if (!actor) return json({ error: "Unauthenticated" }, 401);
+      const { rpID, origins } = webauthnContext(request);
+      const existing = await env.DB.prepare(
+        "SELECT credential_id, transports FROM passkey_credentials WHERE user_id=?"
+      ).bind(actor.id).all();
+      const options = await generateRegistrationOptions({
+        rpName: "Elpis Property",
+        rpID,
+        userID: new TextEncoder().encode(String(actor.id)),
+        userName: actor.email,
+        userDisplayName: actor.full_name || actor.email,
+        attestationType: "none",
+        excludeCredentials: existing.results.map(row => ({
+          id: row.credential_id,
+          transports: row.transports ? JSON.parse(row.transports) : undefined
+        })),
+        authenticatorSelection: {
+          residentKey: "preferred",
+          userVerification: "required"
+        },
+        timeout: 60000
+      });
+      const challengeId = await savePasskeyChallenge(env, { userId: actor.id, type: "registration", challenge: options.challenge });
+      return json({ challengeId, options, rpID, origin: origins[0] });
+    }
+
+    if (path === "/api/passkeys/register/verify" && request.method === "POST") {
+      if (!csrfOk(request)) return json({ error: "CSRF check failed" }, 403);
+      const actor = await getSessionUser(env, request);
+      if (!actor) return json({ error: "Unauthenticated" }, 401);
+      const body = await request.json().catch(() => ({}));
+      if (!body.challengeId || !body.response) return json({ error: "Registration response required" }, 400);
+      const challengeRow = await consumePasskeyChallenge(env, body.challengeId, "registration");
+      if (!challengeRow || Number(challengeRow.user_id) !== Number(actor.id)) {
+        return json({ error: "Registration challenge expired or invalid" }, 400);
+      }
+      const { rpID, origins } = webauthnContext(request);
+      let verification;
+      try {
+        verification = await verifyRegistrationResponse({
+          response: body.response,
+          expectedChallenge: challengeRow.challenge,
+          expectedOrigin: origins,
+          expectedRPID: rpID,
+          requireUserVerification: true
+        });
+      } catch (error) {
+        await audit(env, actor.id, "passkey.registration.failure", "user", String(actor.id), { reason: "verification_failed" }).catch(() => {});
+        return json({ error: "Passkey registration could not be verified" }, 400);
+      }
+      if (!verification.verified || !verification.registrationInfo) {
+        return json({ error: "Passkey registration could not be verified" }, 400);
+      }
+      const info = verification.registrationInfo;
+      const credential = info.credential;
+      const name = String(body.name || "My device").trim().slice(0, 60) || "My device";
+      let inserted;
+      try {
+        inserted = await env.DB.prepare(`
+          INSERT INTO passkey_credentials (user_id, credential_id, public_key, counter, transports, device_type, backed_up, credential_name)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `).bind(
+          actor.id,
+          credential.id,
+          base64UrlEncode(credential.publicKey),
+          Number(credential.counter || 0),
+          JSON.stringify(credential.transports || []),
+          info.credentialDeviceType || "singleDevice",
+          info.credentialBackedUp ? 1 : 0,
+          name
+        ).run();
+      } catch (error) {
+        return json({ error: "This passkey is already registered" }, 409);
+      }
+      await audit(env, actor.id, "passkey.registered", "passkey", String(inserted.meta.last_row_id), { name }).catch(() => {});
+      return json({ ok: true, passkey: { id: inserted.meta.last_row_id, name } });
+    }
+
+    if (path === "/api/passkeys/login/options" && request.method === "POST") {
+      if (!csrfOk(request)) return json({ error: "CSRF check failed" }, 403);
+      const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+      const attempts = await env.DB.prepare(
+        "SELECT COUNT(*) AS c FROM audit_logs WHERE action='passkey.login.attempt' AND target_id=? AND created_at >= datetime('now','-10 minutes')"
+      ).bind(ip).first();
+      if (attempts && Number(attempts.c) >= 30) return json({ error: "Too many passkey attempts. Please wait a few minutes." }, 429);
+      await audit(env, null, "passkey.login.attempt", "passkey", ip, {}).catch(() => {});
+      const body = await request.json().catch(() => ({}));
+      const email = String(body.email || "").trim().toLowerCase();
+      let user = null;
+      let allowCredentials = [];
+      if (email) {
+        user = await env.DB.prepare(`
+          SELECT u.id, u.email, u.full_name, u.is_active, r.name AS role_name
+          FROM users u JOIN roles r ON r.id=u.role_id WHERE LOWER(u.email)=?
+        `).bind(email).first();
+        if (user && user.is_active) {
+          const creds = await env.DB.prepare(
+            "SELECT credential_id, transports FROM passkey_credentials WHERE user_id=?"
+          ).bind(user.id).all();
+          allowCredentials = creds.results.map(row => ({
+            id: row.credential_id,
+            transports: row.transports ? JSON.parse(row.transports) : undefined
+          }));
+        }
+      }
+      const { rpID } = webauthnContext(request);
+      const options = await generateAuthenticationOptions({
+        rpID,
+        allowCredentials,
+        userVerification: "required",
+        timeout: 60000
+      });
+      const challengeId = await savePasskeyChallenge(env, { userId: user ? user.id : null, type: "authentication", challenge: options.challenge });
+      return json({ challengeId, options });
+    }
+
+    if (path === "/api/passkeys/login/verify" && request.method === "POST") {
+      if (!csrfOk(request)) return json({ error: "CSRF check failed" }, 403);
+      const body = await request.json().catch(() => ({}));
+      if (!body.challengeId || !body.response) return json({ error: "Authentication response required" }, 400);
+      const challengeRow = await consumePasskeyChallenge(env, body.challengeId, "authentication");
+      if (!challengeRow) return json({ error: "Authentication challenge expired or invalid" }, 400);
+      const credentialId = String(body.response.id || "");
+      const row = await env.DB.prepare(`
+        SELECT pc.*, u.email, u.full_name, u.is_active, u.is_test, u.test_expires_at, u.access_valid_until, r.name AS role_name
+        FROM passkey_credentials pc
+        JOIN users u ON u.id=pc.user_id
+        JOIN roles r ON r.id=u.role_id
+        WHERE pc.credential_id=?
+      `).bind(credentialId).first();
+      if (!row) return json({ error: "Unknown passkey" }, 401);
+      if (challengeRow.user_id && Number(challengeRow.user_id) !== Number(row.user_id)) {
+        return json({ error: "Passkey does not belong to this account" }, 401);
+      }
+      if (!row.is_active) return json({ error: "This account is inactive" }, 401);
+      if (testAccountExpired(row, env)) return json({ error: "This test account has expired" }, 403);
+      if (row.role_name === "Marketer" && monthlyAccessLapsed(row, env) && await monthlyReactivationEnabled(env, "Marketer")) {
+        return json({ error: "Your monthly access has lapsed. Contact your branch manager or the MD for reactivation." }, 403);
+      }
+      const { rpID, origins } = webauthnContext(request);
+      let verification;
+      try {
+        verification = await verifyAuthenticationResponse({
+          response: body.response,
+          expectedChallenge: challengeRow.challenge,
+          expectedOrigin: origins,
+          expectedRPID: rpID,
+          credential: {
+            id: row.credential_id,
+            publicKey: base64UrlDecode(row.public_key),
+            counter: Number(row.counter || 0),
+            transports: row.transports ? JSON.parse(row.transports) : undefined
+          },
+          requireUserVerification: true
+        });
+      } catch (error) {
+        await audit(env, row.user_id, "passkey.login.failure", "passkey", String(row.id), { reason: "verification_failed" }).catch(() => {});
+        return json({ error: "Passkey could not be verified" }, 401);
+      }
+      if (!verification.verified) return json({ error: "Passkey could not be verified" }, 401);
+      await env.DB.prepare("UPDATE passkey_credentials SET counter=?, last_used_at=datetime('now') WHERE id=?")
+        .bind(Number(verification.authenticationInfo.newCounter || 0), row.id).run();
+      const priorSession = parseCookies(request)[SESSION_COOKIE];
+      if (priorSession) await env.DB.prepare("DELETE FROM sessions WHERE id=?").bind(priorSession).run();
+      const sess = await createSession(env, row.user_id);
+      await env.DB.prepare("UPDATE users SET last_login_at=datetime('now') WHERE id=?").bind(row.user_id).run();
+      await audit(env, row.user_id, "passkey.login.success", "passkey", String(row.id), {}).catch(() => {});
+      const cookie = `${SESSION_COOKIE}=${sess.id}; Path=/; HttpOnly; Secure; SameSite=Lax; Expires=${new Date(sess.expires).toUTCString()}`;
+      return json({
+        ok: true,
+        redirect: passkeyLanding(row.role_name),
+        user: { id: row.user_id, email: row.email, full_name: row.full_name, role: row.role_name }
+      }, 200, { "Set-Cookie": cookie });
+    }
+
+    if (path === "/api/passkeys" && request.method === "GET") {
+      const actor = await getSessionUser(env, request);
+      if (!actor) return json({ error: "Unauthenticated" }, 401);
+      const { results } = await env.DB.prepare(`
+        SELECT id, credential_name, transports, device_type, backed_up, created_at, last_used_at
+        FROM passkey_credentials WHERE user_id=? ORDER BY id DESC
+      `).bind(actor.id).all();
+      return json({
+        passkeys: results.map(row => ({
+          id: row.id,
+          name: row.credential_name || "Passkey",
+          transports: row.transports ? JSON.parse(row.transports) : [],
+          device_type: row.device_type || null,
+          backed_up: Boolean(row.backed_up),
+          created_at: row.created_at,
+          last_used_at: row.last_used_at
+        }))
+      });
+    }
+
+    const passkeyMatch = path.match(/^\/api\/passkeys\/(\d+)$/);
+    if (passkeyMatch && request.method === "PATCH") {
+      if (!csrfOk(request)) return json({ error: "CSRF check failed" }, 403);
+      const actor = await getSessionUser(env, request);
+      if (!actor) return json({ error: "Unauthenticated" }, 401);
+      const body = await request.json().catch(() => ({}));
+      const name = String(body.name || "").trim().slice(0, 60);
+      if (!name) return json({ error: "Device name is required" }, 400);
+      const updated = await env.DB.prepare("UPDATE passkey_credentials SET credential_name=? WHERE id=? AND user_id=?")
+        .bind(name, passkeyMatch[1], actor.id).run();
+      if (!updated.meta || Number(updated.meta.changes) === 0) return json({ error: "Passkey not found" }, 404);
+      await audit(env, actor.id, "passkey.renamed", "passkey", passkeyMatch[1], { name }).catch(() => {});
+      return json({ ok: true });
+    }
+
+    if (passkeyMatch && request.method === "DELETE") {
+      if (!csrfOk(request)) return json({ error: "CSRF check failed" }, 403);
+      const actor = await getSessionUser(env, request);
+      if (!actor) return json({ error: "Unauthenticated" }, 401);
+      const body = await request.json().catch(() => ({}));
+      const userRow = await env.DB.prepare("SELECT password_hash FROM users WHERE id=?").bind(actor.id).first();
+      if (!userRow || !body.password || !(await verifyPassword(body.password, userRow.password_hash))) {
+        return json({ error: "Confirm your password to remove a passkey" }, 403);
+      }
+      const removed = await env.DB.prepare("DELETE FROM passkey_credentials WHERE id=? AND user_id=?")
+        .bind(passkeyMatch[1], actor.id).run();
+      if (!removed.meta || Number(removed.meta.changes) === 0) return json({ error: "Passkey not found" }, 404);
+      await audit(env, actor.id, "passkey.removed", "passkey", passkeyMatch[1], {}).catch(() => {});
+      return json({ ok: true });
     }
 
     if (path === "/api/me" && request.method === "GET") {

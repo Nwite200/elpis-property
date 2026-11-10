@@ -80,6 +80,7 @@ async function login(page, email) {
   // /login URL can satisfy a naive pathname check before the session cookie
   // is applied.
   await page.waitForSelector('#logoutBtn', { timeout: 25000 });
+  await page.evaluate(() => { try { localStorage.setItem('elp-passkey-dismissed', '1'); } catch (_) {} });
 }
 
 if (!existsSync(CHROME)) {
@@ -672,6 +673,44 @@ try {
     await page.waitForFunction(() => window.__voiceSpoken.length >= 2, { timeout: 15000 });
     const status = await page.locator('#elp-dh-voice-status').innerText();
     assert(/device|Voice ready|unavailable|Speaking/i.test(status), `fallback status missing: ${status}`);
+    await context.close();
+  });
+
+  await test('a passkey can be registered, used to sign in and removed', async () => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await login(page, 'browser.md@elpisproperty.test');
+    const cdp = await context.newCDPSession(page);
+    await cdp.send('WebAuthn.enable');
+    const authenticator = await cdp.send('WebAuthn.addVirtualAuthenticator', {
+      options: {
+        protocol: 'ctap2',
+        transport: 'internal',
+        hasResidentKey: true,
+        hasUserVerification: true,
+        isUserVerified: true,
+        automaticPresenceSimulation: true
+      }
+    });
+    await goto(page, BASE + '/passkeys.html');
+    await page.waitForSelector('#addPasskeyBtn', { timeout: 20000 });
+    await page.click('#addPasskeyBtn');
+    await page.waitForFunction(() => document.querySelectorAll('.passkey-device').length >= 1, { timeout: 20000 });
+    const count = await page.locator('.passkey-device').count();
+    assert(count >= 1, 'passkey was not listed after registration');
+    await page.evaluate(async () => { await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' }); });
+    await goto(page, BASE + '/login.html');
+    await page.click('#passkeyLoginBtn');
+    await page.waitForURL(/dashboard|client-dashboard/, { timeout: 25000 });
+    assert(await page.locator('#logoutBtn').count() > 0, 'passkey login did not create an authenticated session');
+    await goto(page, BASE + '/passkeys.html');
+    page.on('dialog', async dialog => {
+      if (dialog.type() === 'prompt') await dialog.accept(PASSWORD);
+      else await dialog.accept();
+    });
+    await page.click('.passkey-device .passkey-danger');
+    await page.waitForFunction(() => (document.querySelector('#passkeyList')?.textContent || '').includes('No passkeys yet'), { timeout: 15000 });
+    await cdp.send('WebAuthn.removeVirtualAuthenticator', { authenticatorId: authenticator.authenticatorId });
     await context.close();
   });
 

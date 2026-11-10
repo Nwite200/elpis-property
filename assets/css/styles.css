@@ -5003,3 +5003,152 @@ textarea:focus-visible {
     font-size: 10.5px;
   }
 }
+
+/* ---- Passkeys / WebAuthn ---- */
+.passkey-login-wrap {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+.passkey-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--brand-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+.passkey-divider::before,
+.passkey-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--brand-line);
+}
+.passkey-login-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+}
+.passkey-login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.passkey-note {
+  margin: 0;
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--brand-muted);
+  line-height: 1.4;
+}
+.passkey-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9500;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(7, 23, 71, 0.55);
+  backdrop-filter: blur(6px);
+}
+.passkey-modal {
+  width: min(100%, 430px);
+  background: #fff;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 30px 90px rgba(7, 23, 71, 0.32);
+  border: 1px solid rgba(7, 23, 71, 0.08);
+}
+.passkey-modal-title {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-size: 25px;
+  color: var(--brand-primary);
+}
+.passkey-modal-text {
+  margin: 0 0 20px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--brand-text);
+}
+.passkey-modal-actions { display: flex; gap: 9px; flex-wrap: wrap; }
+.passkey-page-body { background: var(--brand-background); min-height: 100vh; }
+.passkey-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 28px;
+  background: #fff;
+  border-bottom: 1px solid var(--brand-line);
+}
+.passkey-brand { width: 54px; height: auto; display: block; }
+.passkey-back { font-size: 13px; font-weight: 700; color: var(--brand-primary); }
+.passkey-page {
+  width: min(100% - 40px, 860px);
+  margin: 42px auto 80px;
+}
+.passkey-page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+.passkey-kicker {
+  margin: 0 0 6px;
+  font-size: 10px;
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+  color: var(--brand-secondary-dark);
+  font-weight: 800;
+}
+.passkey-page h1 {
+  margin: 0 0 8px;
+  font-size: 32px;
+  color: var(--brand-primary);
+}
+.passkey-lead {
+  margin: 0;
+  max-width: 600px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--brand-muted);
+}
+.passkey-message {
+  min-height: 20px;
+  margin: 6px 0 14px;
+  font-size: 13px;
+  color: var(--brand-primary);
+}
+.passkey-list { display: grid; gap: 12px; }
+.passkey-device {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: #fff;
+  border: 1px solid var(--brand-line);
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+.passkey-device-info strong { display: block; font-size: 14.5px; color: var(--brand-primary); }
+.passkey-device-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.passkey-danger { color: #a3352b !important; border-color: rgba(163, 53, 43, 0.3) !important; }
+.passkey-help {
+  margin-top: 26px;
+  padding: 20px 22px;
+  background: #fff;
+  border: 1px solid var(--brand-line);
+  border-radius: 14px;
+}
+.passkey-help h2 { margin: 0 0 8px; font-size: 17px; color: var(--brand-primary); }
+.passkey-help p { margin: 0 0 8px; font-size: 13px; line-height: 1.6; color: var(--brand-text); }
+@media (max-width: 640px) {
+  .passkey-topbar { padding: 12px 16px; }
+  .passkey-page { margin-top: 26px; }
+  .passkey-page-head { flex-direction: column; }
+  .passkey-page h1 { font-size: 26px; }
+  .passkey-device { flex-direction: column; align-items: flex-start; }
+  .passkey-modal-actions .btn { flex: 1 1 auto; }
+}
