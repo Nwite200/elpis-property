@@ -20,6 +20,20 @@ export function headttsSupport() {
   };
 }
 
+async function chooseEndpoints() {
+  try {
+    const override = localStorage.getItem("elp-dh-headtts-endpoints");
+    if (override === "wasm" || override === "webgpu") return [override];
+  } catch (_) { /* ignore */ }
+  if (!navigator.gpu || typeof navigator.gpu.requestAdapter !== "function") return ["wasm"];
+  try {
+    const adapter = await navigator.gpu.requestAdapter();
+    return adapter ? ["webgpu", "wasm"] : ["wasm"];
+  } catch (_) {
+    return ["wasm"];
+  }
+}
+
 async function initialize(onStatus) {
   if (shared) return shared;
   if (initPromise) return initPromise;
@@ -27,8 +41,10 @@ async function initialize(onStatus) {
     onStatus && onStatus("Loading neural voice module…");
     const { HeadTTS } = await import(/* @vite-ignore */ MODULE_URL);
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const endpoints = await chooseEndpoints();
+    onStatus && onStatus(`Loading neural voice model (${endpoints.join(" → ")})…`);
     const instance = new HeadTTS({
-      endpoints: ["webgpu", "wasm"],
+      endpoints,
       audioCtx,
       workerModule: new URL(WORKER_URL, window.location.origin).href,
       dictionaryURL: new URL(DICTIONARY_URL, window.location.origin).href,

@@ -14553,7 +14553,7 @@ export default {
     headers.set(
       "Content-Security-Policy",
       "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; " +
-      "form-action 'self'; script-src 'self' 'unsafe-inline' blob: https://cdn.jsdelivr.net; " +
+      "form-action 'self'; script-src 'self' 'unsafe-inline' blob: 'wasm-unsafe-eval' https://cdn.jsdelivr.net; " +
       "style-src 'self' 'unsafe-inline'; " +
       "font-src 'self' data:; " +
       "img-src 'self' data: blob: https:; connect-src 'self' https: ws: wss:; " +
